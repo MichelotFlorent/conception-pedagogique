@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="analysis_page_title">Analyse des besoins</title>
+
+    <!-- Performance: Preconnect to font domains -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Tailwind CDN + Concordia theme -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'concordia-burgundy': '#912338',
+            'concordia-gold': '#FFD700',
+            indigo: {
+              50: '#fef2f4',
+              100: '#fde6ea',
+              200: '#f9c0ca',
+              300: '#f5949f',
+              400: '#d4475a',
+              500: '#b52e47',
+              600: '#912338',
+              700: '#6d1a2a',
+              800: '#5a1523',
+              900: '#48101c',
+              950: '#350c14',
+            }
+          }
+        }
+      }
+    }
+    </script>
+
+    <!-- Material Icons Round -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="p-4 md:p-8">
+    <!-- Header Mount Point -->
+    <div id="app-header-mount"></div>
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8">
+            <!-- Title Section -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight" data-i18n="analysis_heading">
+                    Analyse des besoins de formation
+                </h1>
+                <p class="text-slate-500 mt-1" data-i18n="analysis_subtitle">
+                    Formulaire basé sur Carliner (2015) – Training Design Basics
+                </p>
+            </div>
+
+            <!-- Toolbars -->
+            <div class="flex flex-wrap gap-4" data-html2canvas-ignore="true">
+                <!-- Context Selector -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="analysis_label_context">Contexte</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <select id="contextSelect" onchange="updateContextFields(this.value)" class="text-sm text-slate-600 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1">
+                            <option value="general" data-i18n="analysis_ctx_general">Général</option>
+                            <option value="k12" data-i18n="analysis_ctx_k12">Primaire / Secondaire (K-12)</option>
+                            <option value="postsecondary" data-i18n="analysis_ctx_postsec">Postsecondaire / Universitaire</option>
+                            <option value="corporate" data-i18n="analysis_ctx_corporate">Entreprise / Formation professionnelle</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- I/O Group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="analysis_label_io">Import & Export</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="loadAnalysis()" class="text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="analysis_tip_load" title="Charger une sauvegarde (JSON)">
+                            <span class="material-icons-round text-xl">folder_open</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_load">charger</span>
+                        </button>
+                        <button onclick="saveAnalysis()" class="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="analysis_tip_save" title="Sauvegarder (JSON)">
+                            <span class="material-icons-round text-xl">save</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_save">sauvegarder</span>
+                        </button>
+                        <button onclick="exportAnalysisMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="analysis_tip_md" title="Exporter en Markdown">
+                            <span class="material-icons-round text-xl">description</span>
+                            <span class="text-sm font-semibold hidden md:inline">MD</span>
+                        </button>
+                        <input id="loadFileInput" type="file" accept=".json" class="hidden" onchange="loadAnalysisFromFile(event)">
+                        <div class="w-px bg-slate-200 h-6 mx-1"></div>
+                        <button onclick="resetAnalysis()" class="text-slate-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="analysis_tip_reset" title="Réinitialiser">
+                            <span class="material-icons-round text-xl">restart_alt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Help group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="analysis_label_help">Aide</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="openHelpModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Guide méthodologique">
+                            <span class="material-icons-round text-xl">help</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="analysis_btn_help">aide</span>
+                        </button>
+                        <button onclick="openInfoModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="À propos">
+                            <span class="material-icons-round text-xl">info</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="analysis_btn_info">infos</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Language selector -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="analysis_label_language">Langue</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <select id="langSelect" onchange="switchLang(this.value)" class="text-sm text-slate-600 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1">
+                            <option value="fr">Français</option>
+                            <option value="en-CA">English (CA)</option>
+                        </select>
+                        <button onclick="document.getElementById('langFileInput').click()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-2 rounded-lg transition-colors" title="Charger un pack de langue">
+                            <span class="material-icons-round text-xl">translate</span>
+                        </button>
+                        <input id="langFileInput" type="file" accept=".json" class="hidden" onchange="loadLangPack(event)">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Form Content - 8 Sections + Synthesis -->
+        <div id="analysisForm" class="space-y-8">
+
+            <!-- Section 1: Request Clarification -->
+            <div class="card">
+                <h2><span class="material-icons-round">assignment</span> <span data-i18n="analysis_section_1">1. Clarification de la demande</span></h2>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_request_original">Demande originale (textuelle)</label>
+                    <textarea id="requestOriginal" rows="3" data-i18n-placeholder="analysis_ph_request" placeholder="Copiez ici la demande exacte du commanditaire…"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_sponsor">Commanditaire</label>
+                    <input type="text" id="sponsorName" data-i18n-placeholder="analysis_ph_sponsor" placeholder="Nom et fonction">
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_request_reformulated">Demande reformulée</label>
+                    <textarea id="requestReformulated" rows="4" data-i18n-placeholder="analysis_ph_reformulated" placeholder="Reformulez la demande avec les éléments clés…"></textarea>
+                </div>
+            </div>
+
+            <!-- Section 2: Business Need -->
+            <div class="card">
+                <h2><span class="material-icons-round">business_center</span> <span data-i18n="analysis_section_2">2. Besoin organisationnel</span></h2>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_business_type">Type de besoin</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="radio" name="businessNeedType" value="revenue">
+                            <span data-i18n="analysis_opt_revenue">Générer des revenus</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="radio" name="businessNeedType" value="expenses">
+                            <span data-i18n="analysis_opt_expenses">Contenir les dépenses</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="radio" name="businessNeedType" value="compliance">
+                            <span data-i18n="analysis_opt_compliance">Se conformer aux règlements</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="radio" name="businessNeedType" value="quality">
+                            <span data-i18n="analysis_opt_quality">Améliorer la qualité</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_business_statement">Énoncé du besoin (mesurable)</label>
+                    <textarea id="businessStatement" rows="3" data-i18n-placeholder="analysis_ph_business" placeholder="Ex. : après la formation, 90 % des participants atteindront leurs objectifs…"></textarea>
+                </div>
+            </div>
+
+            <!-- Section 3: Desired Performance -->
+            <div class="card">
+                <h2><span class="material-icons-round">star</span> <span data-i18n="analysis_section_3">3. Performance désirée</span></h2>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_desired_scenario">Scénario de performance désirée</label>
+                    <textarea id="desiredScenario" rows="6" data-i18n-placeholder="analysis_ph_desired" placeholder="Décrivez une « photo » de la performance désirée…"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_performance_indicators">Indicateurs de performance</label>
+                    <textarea id="performanceIndicators" rows="3" data-i18n-placeholder="analysis_ph_indicators" placeholder="1. Indicateur 1&#10;2. Indicateur 2&#10;3. Indicateur 3"></textarea>
+                </div>
+            </div>
+
+            <!-- Section 4: Current Performance -->
+            <div class="card">
+                <h2><span class="material-icons-round">assessment</span> <span data-i18n="analysis_section_4">4. Performance actuelle</span></h2>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_current_scenario">Scénario de performance actuelle</label>
+                    <textarea id="currentScenario" rows="6" data-i18n-placeholder="analysis_ph_current" placeholder="Décrivez comment les apprenants performent actuellement…"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_performance_gap">Écart de performance</label>
+                    <textarea id="performanceGap" rows="4" data-i18n-placeholder="analysis_ph_gap" placeholder="Décrivez les différences clés entre performance actuelle et désirée…"></textarea>
+                </div>
+            </div>
+
+            <!-- Section 5: Task Analysis -->
+            <div class="card">
+                <h2><span class="material-icons-round">list</span> <span data-i18n="analysis_section_5">5. Analyse des tâches</span></h2>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_main_tasks">Tâches principales (5 à 9 maximum)</label>
+                    <div id="mainTasksList" class="space-y-3">
+                        <!-- Tasks added dynamically -->
+                    </div>
+                    <button onclick="addMainTask()" class="mt-3 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-semibold border border-slate-200">
+                        <span class="material-icons-round text-sm">add</span>
+                        <span data-i18n="analysis_btn_add_task">ajouter une tâche</span>
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_entry_tasks">Tâches préalables (prérequis)</label>
+                    <textarea id="entryTasks" rows="3" data-i18n-placeholder="analysis_ph_entry" placeholder="Listez les compétences que les apprenants doivent déjà posséder…"></textarea>
+                </div>
+            </div>
+
+            <!-- Section 6: Learner Profile -->
+            <div class="card">
+                <h2><span class="material-icons-round">people</span> <span data-i18n="analysis_section_6">6. Profil des apprenants</span></h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_learner_count">Nombre approximatif d'apprenants</label>
+                        <input type="number" id="learnerCount" placeholder="25">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_experience">Niveau d'expérience</label>
+                        <select id="experienceLevel">
+                            <option value="" data-i18n="analysis_opt_select">Sélectionner…</option>
+                            <option value="beginner" data-i18n="analysis_opt_beginner">Débutant</option>
+                            <option value="intermediate" data-i18n="analysis_opt_intermediate">Intermédiaire</option>
+                            <option value="advanced" data-i18n="analysis_opt_advanced">Avancé</option>
+                            <option value="mixed" data-i18n="analysis_opt_mixed">Mixte</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_learner_profile">Profil détaillé des apprenants</label>
+                    <textarea id="learnerProfile" rows="5" data-i18n-placeholder="analysis_ph_profile" placeholder="Décrivez démographie, connaissances antérieures, attitudes, motivations…"></textarea>
+                </div>
+
+                <!-- Context-specific fields -->
+                <div id="k12Fields" class="context-fields hidden space-y-4 mt-4 pl-4 border-l-4 border-indigo-200">
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_grade_level">Niveau scolaire</label>
+                        <input type="text" id="gradeLevel" data-i18n-placeholder="analysis_ph_grade" placeholder="Ex. : 3e secondaire, CM2">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_parent_involvement">Implication des parents</label>
+                        <textarea id="parentInvolvement" rows="2" data-i18n-placeholder="analysis_ph_parent" placeholder="Décrivez le rôle attendu des parents…"></textarea>
+                    </div>
+                </div>
+
+                <div id="postsecFields" class="context-fields hidden space-y-4 mt-4 pl-4 border-l-4 border-indigo-200">
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_program">Programme d'études</label>
+                        <input type="text" id="academicProgram" data-i18n-placeholder="analysis_ph_program" placeholder="Ex. : baccalauréat en génie">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_course_position">Position dans le cursus</label>
+                        <input type="text" id="coursePosition" data-i18n-placeholder="analysis_ph_course_position" placeholder="Ex. : 2e année, cours obligatoire">
+                    </div>
+                </div>
+
+                <div id="corpFields" class="context-fields hidden space-y-4 mt-4 pl-4 border-l-4 border-indigo-200">
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_job_title">Titre de poste</label>
+                        <input type="text" id="jobTitle" data-i18n-placeholder="analysis_ph_job" placeholder="Ex. : représentant des ventes">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_manager_support">Soutien de la direction</label>
+                        <textarea id="managerSupport" rows="2" data-i18n-placeholder="analysis_ph_manager" placeholder="Décrivez le degré de soutien de la direction…"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 7: Influencing Factors -->
+            <div class="card">
+                <h2><span class="material-icons-round">psychology</span> <span data-i18n="analysis_section_7">7. Facteurs d'influence</span></h2>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_barriers">Obstacles à l'apprentissage</label>
+                    <textarea id="learningBarriers" rows="4" data-i18n-placeholder="analysis_ph_barriers" placeholder="Charge de travail, manque de temps, équipement inadéquat…"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_support">Facteurs de soutien</label>
+                    <textarea id="supportFactors" rows="4" data-i18n-placeholder="analysis_ph_support" placeholder="Culture d'apprentissage, coaching, ressources…"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_environment">Environnement d'apprentissage</label>
+                    <textarea id="learningEnvironment" rows="3" data-i18n-placeholder="analysis_ph_environment" placeholder="Lieu, équipement disponible, connectivité…"></textarea>
+                </div>
+            </div>
+
+            <!-- Section 8: Project Constraints -->
+            <div class="card">
+                <h2><span class="material-icons-round">schedule</span> <span data-i18n="analysis_section_8">8. Contraintes du projet</span></h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_deadline">Date de lancement souhaitée</label>
+                        <input type="date" id="projectDeadline">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="analysis_lbl_budget">Budget disponible</label>
+                        <input type="text" id="projectBudget" placeholder="$ ___________">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_format">Format demandé</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="formatClassroom">
+                            <span data-i18n="analysis_opt_classroom">Classe présentielle</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="formatVirtual">
+                            <span data-i18n="analysis_opt_virtual">Classe virtuelle</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="formatSelfStudy">
+                            <span data-i18n="analysis_opt_selfstudy">Autoformation</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="formatBlended">
+                            <span data-i18n="analysis_opt_blended">Apprentissage mixte</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_constraints_other">Autres contraintes</label>
+                    <textarea id="otherConstraints" rows="3" data-i18n-placeholder="analysis_ph_constraints" placeholder="Technologie, approbations requises, ressources…"></textarea>
+                </div>
+            </div>
+
+            <!-- Synthesis Section -->
+            <div class="card bg-slate-50">
+                <h2><span class="material-icons-round">summarize</span> <span data-i18n="analysis_section_synthesis">Synthèse et recommandations</span></h2>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_key_findings">Constats clés</label>
+                    <textarea id="keyFindings" rows="4" data-i18n-placeholder="analysis_ph_findings" placeholder="1. Constat 1&#10;2. Constat 2&#10;3. Constat 3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_is_training_solution">La formation est-elle la solution appropriée ?</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="radio" name="isTrainingSolution" value="yes">
+                            <span data-i18n="analysis_opt_yes">Oui – la formation peut combler l'écart</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="radio" name="isTrainingSolution" value="partial">
+                            <span data-i18n="analysis_opt_partial">Partiellement – doit être combinée à d'autres interventions</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="radio" name="isTrainingSolution" value="no">
+                            <span data-i18n="analysis_opt_no">Non – d'autres solutions sont plus appropriées</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_recommendations">Recommandations</label>
+                    <textarea id="recommendations" rows="6" data-i18n-placeholder="analysis_ph_recommendations" placeholder="Format recommandé, durée estimée, approche pédagogique…"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Mount Point -->
+    <div id="app-footer-mount"></div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content" style="max-width: 640px;">
+            <span class="close-btn" onclick="closeHelpModal()">&times;</span>
+            <h2 style="border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 15px;" data-i18n="analysis_help_title">Guide méthodologique</h2>
+            <div style="font-size: 0.95rem; line-height: 1.6; color: #404040;" data-i18n="analysis_help_body">
+<p><strong>1. Qu'est-ce qu'une analyse des besoins ?</strong><br>
+L'analyse des besoins est la première étape de toute conception pédagogique. Elle permet de déterminer si une formation est la réponse appropriée à un problème de performance et, le cas échéant, de définir son contenu et son format.</p>
+
+<p><strong>2. Les 8 sections</strong><br>
+<ul>
+    <li><strong>Clarification :</strong> comprendre et reformuler la demande initiale.</li>
+    <li><strong>Besoin organisationnel :</strong> rattacher la demande à un objectif mesurable.</li>
+    <li><strong>Performance désirée :</strong> décrire ce que les apprenants devraient faire.</li>
+    <li><strong>Performance actuelle :</strong> documenter l'état actuel et l'écart.</li>
+    <li><strong>Analyse des tâches :</strong> décomposer le travail en tâches concrètes.</li>
+    <li><strong>Profil des apprenants :</strong> connaître le public cible.</li>
+    <li><strong>Facteurs d'influence :</strong> identifier obstacles et leviers.</li>
+    <li><strong>Contraintes :</strong> cadrer le projet (budget, délais, format).</li>
+</ul></p>
+
+<p><strong>3. Référence</strong><br>
+Carliner, S. (2015). <em>Training Design Basics</em> (2nd ed.). ATD Press.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeInfoModal()">&times;</span>
+            <h2 data-i18n="analysis_about_title">À propos</h2>
+            <p data-i18n="analysis_about_text">Cet outil permet de réaliser une analyse structurée des besoins de formation, adaptée à différents contextes éducatifs et professionnels.</p>
+            <p data-i18n="analysis_about_prototype">Ce document est un prototype non officiel, partagé à des fins d'expérimentation.</p>
+            <p data-i18n="analysis_about_privacy"><strong>Traitement local :</strong> toutes les données restent sur votre navigateur, rien n'est envoyé en ligne.</p>
+            <div class="modal-footer" data-i18n="analysis_about_credits">
+                Développé par Florent Michelot, inspiré des travaux de F. Jourde & J. Dubois (2026) &bull; CC BY-SA
+            </div>
+        </div>
+    </div>
+
+    <script src="js/i18n-core.js"></script>
+    <script src="js/analyse.js"></script>
+    <script src="js/components-loader.js" defer></script>
+</body>
+</html>

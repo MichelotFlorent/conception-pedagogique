@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="persona_page_title">Generateur de Personas</title>
+
+    <!-- Performance: Preconnect to font domains -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Tailwind CDN + Concordia theme -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'concordia-burgundy': '#912338',
+            'concordia-gold': '#FFD700',
+            indigo: {
+              50: '#fef2f4',
+              100: '#fde6ea',
+              200: '#f9c0ca',
+              300: '#f5949f',
+              400: '#d4475a',
+              500: '#b52e47',
+              600: '#912338',
+              700: '#6d1a2a',
+              800: '#5a1523',
+              900: '#48101c',
+              950: '#350c14',
+            }
+          }
+        }
+      }
+    }
+    </script>
+
+    <!-- Material Icons Round -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="p-4 md:p-8">
+    <!-- Header Mount Point -->
+    <div id="app-header-mount"></div>
+
+    <div class="max-w-4xl mx-auto">
+        <header class="mb-8">
+            <!-- Title -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight" data-i18n="persona_heading">Generateur de Personas</h1>
+                <p class="text-slate-500 mt-1" data-i18n="persona_subtitle">Creez et gerez plusieurs personas pour concevoir des formations adaptees.</p>
+            </div>
+
+            <!-- Toolbars -->
+            <div class="flex flex-wrap gap-4" data-html2canvas-ignore="true">
+                <!-- I/O group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="persona_grp_io">Import & Export</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="document.getElementById('fileInput').click()" class="text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="persona_tip_load" title="Charger une sauvegarde (JSON)">
+                            <span class="material-icons-round text-xl">folder_open</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="persona_btn_load">charger</span>
+                        </button>
+                        <button onclick="saveData()" class="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="persona_tip_save" title="Sauvegarder (JSON)">
+                            <span class="material-icons-round text-xl">save</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="persona_btn_save">sauvegarder</span>
+                        </button>
+                        <button onclick="exportMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="persona_tip_md" title="Exporter tous les personas (Markdown)">
+                            <span class="material-icons-round text-xl">description</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="persona_btn_export_md">Export MD</span>
+                        </button>
+                        <input id="fileInput" type="file" accept=".json" class="hidden" onchange="loadData(this)">
+                    </div>
+                </div>
+
+                <!-- Aide group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="persona_grp_help">Aide</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="openHelpModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="persona_tip_guide" title="Guide methodologique">
+                            <span class="material-icons-round text-xl">help</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="persona_btn_help">aide</span>
+                        </button>
+                        <button onclick="openInfoModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="persona_tip_about" title="A propos">
+                            <span class="material-icons-round text-xl">info</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="persona_btn_info">infos</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Language selector -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="persona_grp_language">Langue</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <select id="langSelect" onchange="switchLang(this.value)" class="text-sm text-slate-600 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1">
+                            <option value="fr">Francais</option>
+                            <option value="en-CA">English (CA)</option>
+                        </select>
+                        <button onclick="document.getElementById('langFileInput').click()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-2 rounded-lg transition-colors" data-i18n-tooltip="persona_tip_load_lang" title="Charger un pack de langue">
+                            <span class="material-icons-round text-xl">translate</span>
+                        </button>
+                        <input id="langFileInput" type="file" accept=".json" class="hidden" onchange="loadLangPack(event)">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+    <div class="container">
+
+        <!-- Persona Count Selector -->
+        <div class="persona-count-group">
+            <label data-i18n="persona_lbl_count">Nombre de personas :</label>
+            <div class="persona-count-controls">
+                <button class="btn btn-outline btn-icon" onclick="changeCount(-1)" aria-label="Moins">
+                    <span class="material-icons-round">remove</span>
+                </button>
+                <input type="number" id="personaCount" value="3" min="1" max="10" onchange="updateCount(this.value)">
+                <button class="btn btn-outline btn-icon" onclick="changeCount(1)" aria-label="Plus">
+                    <span class="material-icons-round">add</span>
+                </button>
+            </div>
+            <span class="persona-count-hint" data-i18n="persona_hint_count">Recommandation : 3 a 5 personas</span>
+        </div>
+
+        <!-- Persona Tabs -->
+        <div id="personaTabs" class="persona-tabs"></div>
+
+        <!-- Persona Form Container (dynamic) -->
+        <div id="personaFormContainer"></div>
+
+    </div>
+
+    </div><!-- /max-w-4xl -->
+
+    <!-- Footer Mount Point -->
+    <div id="app-footer-mount"></div>
+
+    <!-- Modal Help -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content" style="max-width: 640px;">
+            <span class="close-btn" onclick="closeHelpModal()">&times;</span>
+            <h2 style="border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 15px;" data-i18n="persona_help_title">Guide methodologique</h2>
+            <div style="font-size: 0.95rem; line-height: 1.6; color: #404040;" data-i18n="persona_help_body">
+<p><strong>1. Qu'est-ce qu'un persona ?</strong><br>
+Un persona est un profil fictif mais realiste representant un segment de votre public cible. Il synthetise des donnees issues d'observations, d'entretiens ou d'analyses pour guider la conception de formations adaptees.</p>
+
+<p><strong>2. Combien de personas creer ?</strong><br>
+En general, 3 a 5 personas suffisent pour couvrir la diversite de votre public. Un seul persona risque de trop generaliser; au-dela de 7, la complexite devient difficile a gerer.</p>
+
+<p><strong>3. Les 6 sections essentielles</strong><br>
+<ul>
+    <li><strong>Identite & Image :</strong> Nom, avatar et citation cle pour humaniser le persona.</li>
+    <li><strong>Donnees demographiques :</strong> Age, genre, formation, poste, experience.</li>
+    <li><strong>Contexte de travail :</strong> Environnement, temps disponible, contraintes.</li>
+    <li><strong>Preferences d'apprentissage :</strong> Attitude face a la formation, aisance numerique, formats preferes.</li>
+    <li><strong>Ecarts de performance & Motivation :</strong> Niveau actuel, freins au changement, benefices attendus.</li>
+    <li><strong>Moments d'apprentissage :</strong> Quand et comment le persona peut apprendre (formel, informel, social, etc.).</li>
+</ul>
+</p>
+
+<p><strong>4. Utilisation</strong><br>
+Remplissez chaque section par persona, naviguez entre les onglets, puis exportez en JSON (sauvegarde) ou Markdown (partage/IA).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Info -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeInfoModal()">&times;</span>
+            <h2 data-i18n="persona_about_title">A propos</h2>
+            <p data-i18n="persona_about_text">Cet outil permet de creer et gerer plusieurs personas afin de concevoir des formations adaptees aux differents profils d'apprenants.</p>
+            <p data-i18n="persona_about_prototype">Ce document est un prototype non officiel, partage a des fins d'experimentation.</p>
+            <p data-i18n="persona_about_privacy"><strong>Traitement local :</strong> toutes les donnees restent sur votre navigateur, rien n'est envoye en ligne.</p>
+            <div class="modal-footer" data-i18n="persona_about_credits">
+                Developpe par Florent Michelot, inspire des travaux de F. Jourde & J. Dubois (2026) &bull; CC BY-SA
+            </div>
+        </div>
+    </div>
+
+    <script src="js/i18n-core.js"></script>
+    <script src="js/persona.js"></script>
+    <script src="js/components-loader.js" defer></script>
+</body>
+</html>

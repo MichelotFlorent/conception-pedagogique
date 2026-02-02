@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Formation à Distance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'concordia-burgundy': '#912338',
+            'concordia-gold': '#FFD700',
+            indigo: {
+              50: '#fef2f4',
+              100: '#fde6ea',
+              200: '#f9c0ca',
+              300: '#f5949f',
+              400: '#d4475a',
+              500: '#b52e47',
+              600: '#912338',
+              700: '#6d1a2a',
+              800: '#5a1523',
+              900: '#48101c',
+              950: '#350c14',
+            }
+          }
+        }
+      }
+    }
+    </script>
+    <!-- Sortable Library for reordering dimensions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="p-4 md:p-8">
+    <!-- Header Mount Point -->
+    <div id="app-header-mount"></div>
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header Section -->
+        <header class="mb-8">
+            <!-- Title -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight" data-i18n="cfg_heading">Configuration Pédagogique</h1>
+                <p class="text-slate-500 mt-1" data-i18n="cfg_subtitle">Définissez les dimensions de votre dispositif de formation</p>
+            </div>
+
+            <!-- Formation field -->
+            <div class="mb-6">
+                <label for="formationInput" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="cfg_label_formation">Formation :</label>
+                <input id="formationInput" type="text" data-i18n-placeholder="cfg_ph_formation" placeholder="Nom de la formation" class="mt-2 w-full md:w-[420px] bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300" />
+            </div>
+
+            <!-- Toolbars -->
+            <div class="flex flex-wrap gap-4">
+                <!-- Outils Toolbar -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="cfg_label_tools">Outils</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="showAboutModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="cfg_title_about" title="À propos">
+                            <span class="material-icons-round text-xl">info</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="cfg_btn_info">infos</span>
+                        </button>
+                        <button onclick="togglePanel('orderPanel')" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="cfg_title_reorder" title="Réorganiser">
+                            <span class="material-icons-round text-xl">sort</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="cfg_btn_order">ordre</span>
+                        </button>
+                        <button id="btnAlerts" onclick="toggleAlerts()" class="text-slate-400 hover:text-amber-600 hover:bg-amber-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="cfg_title_analysis" title="Activer l'analyse (Expérimental)">
+                            <span class="material-icons-round text-xl">science</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="cfg_btn_analysis">analyse</span>
+                            <span id="betaBadge" class="hidden md:inline-flex items-center justify-center bg-slate-100 text-slate-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-slate-200 uppercase tracking-wide">Beta</span>
+                        </button>
+                        <button onclick="saveState()" class="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="cfg_title_save" title="Sauvegarder">
+                            <span class="material-icons-round text-xl">save</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="cfg_btn_save">sauvegarde</span>
+                        </button>
+                        <button onclick="triggerLoad()" class="text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="cfg_title_load" title="Charger une sauvegarde">
+                            <span class="material-icons-round text-xl">folder_open</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="cfg_btn_load">charger</span>
+                        </button>
+                        <button onclick="exportMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="cfg_title_export_md" title="Exporter en Markdown">
+                            <span class="material-icons-round text-xl">description</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="cfg_btn_export_md">Export MD</span>
+                        </button>
+                        <input id="loadFileInput" type="file" accept="application/json" class="hidden" onchange="loadStateFromFile(event)">
+                        <div class="w-px bg-slate-200 h-6 mx-1"></div>
+                        <button onclick="showResetModal()" class="text-slate-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="cfg_title_reset" title="Réinitialiser">
+                            <span class="material-icons-round text-xl">restart_alt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Language selector -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="cfg_label_language">Langue</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <select id="langSelect" onchange="switchLang(this.value)" class="text-sm text-slate-600 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1">
+                            <option value="fr">Français</option>
+                            <option value="en-CA">English (CA)</option>
+                        </select>
+                        <button onclick="document.getElementById('langFileInput').click()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-2 rounded-lg transition-colors" data-i18n-title="cfg_title_load_lang" title="Charger un pack de langue">
+                            <span class="material-icons-round text-xl">translate</span>
+                        </button>
+                        <input id="langFileInput" type="file" accept="application/json" class="hidden" onchange="loadLangPack(event)">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Custom Reset Modal -->
+        <div id="resetModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden" onclick="if(event.target === this) hideResetModal()">
+            <div class="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full mx-4 border border-slate-200 animate-[slideIn_0.2s_ease-out]">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="bg-rose-100 p-3 rounded-full text-rose-600">
+                        <span class="material-icons-round">refresh</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900" data-i18n="cfg_reset_heading">Réinitialiser ?</h3>
+                </div>
+                <p class="text-slate-600 text-sm mb-6" data-i18n="cfg_reset_msg">Tous les curseurs reviendront à leur position centrale (50%).</p>
+                <div class="flex gap-3 justify-end">
+                    <button onclick="hideResetModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" data-i18n="cfg_btn_cancel">annuler</button>
+                    <button onclick="performReset()" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md transition-colors" data-i18n="cfg_btn_confirm_reset">réinitialiser</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Modal -->
+        <div id="aboutModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden" onclick="if(event.target === this) hideAboutModal()">
+            <div class="bg-white rounded-2xl p-6 shadow-2xl max-w-md w-full mx-4 border border-slate-200 relative animate-[slideIn_0.2s_ease-out]">
+                <button onclick="hideAboutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">
+                    <span class="material-icons-round">close</span>
+                </button>
+
+                <h3 class="text-lg font-bold text-slate-900 mb-5 flex items-center gap-2">
+                    <span class="material-icons-round text-indigo-500">info</span>
+                    <span data-i18n="cfg_about_heading">À propos</span>
+                </h3>
+
+                <div class="space-y-4">
+                    <p class="text-sm text-slate-600 leading-relaxed" data-i18n="cfg_about_text">
+                        Cet outil permet de visualiser et d'équilibrer les 6 dimensions structurelles de votre dispositif de formation.
+                    </p>
+                    <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                        <p class="text-xs text-indigo-800 leading-relaxed italic" data-i18n="cfg_about_reference">
+                            Inspiré de : Docq et al. 2023. Enseigner à distance: 5 balises pour vous lancer. Presses universitaires de Louvain.
+                        </p>
+                    </div>
+                    <p class="text-xs text-slate-500 flex items-center gap-2">
+                        <span class="material-icons-round text-sm text-emerald-500">verified_user</span>
+                        <span data-i18n="cfg_about_privacy">Traitement local : toutes les données restent sur votre navigateur, rien n'est envoyé en ligne.</span>
+                    </p>
+                    <div class="text-[10px] text-slate-400 border-t border-slate-100 pt-3 mt-4" data-i18n="cfg_about_credits">
+                        Développé par Florent Michelot, inspiré des travaux de F. Jourde & J. Dubois (2026) • CC BY-SA
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel: Reorder Dimensions -->
+        <div id="orderPanel" class="mb-6 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden panel-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="material-icons-round text-indigo-500">unfold_more</span>
+                        <span data-i18n="cfg_order_heading">Priorité des dimensions</span>
+                    </h3>
+                    <button onclick="togglePanel('orderPanel')" class="text-slate-400 hover:text-slate-600 p-1 rounded-full"><span class="material-icons-round">close</span></button>
+                </div>
+                <p class="text-sm text-slate-500 mb-6" data-i18n="cfg_order_instruction">Glissez-déposez pour réorganiser l'affichage.</p>
+                <ul id="sortableList" class="space-y-2 max-w-2xl">
+                    <!-- List items generated by JS -->
+                </ul>
+                <div class="mt-6 pt-6 border-t border-slate-100">
+                    <button onclick="applyOrder()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-200 transition-all active:scale-95" data-i18n="cfg_order_apply">
+                        Mettre à jour l'affichage
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+            <!-- Main Content Area: Sliders -->
+            <div class="lg:col-span-2 space-y-4" id="slidersContainer">
+                <!-- Sliders dynamically injected here -->
+            </div>
+
+            <!-- Sidebar: Alerts -->
+            <div class="space-y-6 lg:sticky lg:top-8">
+                 <div id="alertsContainer" class="hidden">
+                     <!-- Alerts injected here by JS -->
+                 </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer Mount Point -->
+    <div id="app-footer-mount"></div>
+
+    <script src="js/i18n-core.js"></script>
+    <script src="js/configuration.js"></script>
+    <script src="js/components-loader.js" defer></script>
+</body>
+</html>

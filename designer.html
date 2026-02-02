@@ -1,0 +1,3012 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>
+   Concepteur Pédagogique - Learning Designer - v. 1.0
+  </title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'concordia-burgundy': '#912338',
+        'concordia-gold': '#FFD700',
+        indigo: {
+          50: '#fef2f4',
+          100: '#fde6ea',
+          200: '#f9c0ca',
+          300: '#f5949f',
+          400: '#d4475a',
+          500: '#b52e47',
+          600: '#912338',
+          700: '#6d1a2a',
+          800: '#5a1523',
+          900: '#48101c',
+          950: '#350c14',
+        }
+      }
+    }
+  }
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+
+<style id="top-level-tabs-style">
+  body.top-tabs-enabled .top-tab-btn{
+    flex: 1 1 0%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    user-select: none;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.15;
+    text-align: center;
+    background: transparent;
+  }
+  body.top-tabs-enabled .top-tab-label{
+    display: block;
+    white-space: normal;
+  }
+  body.top-tabs-enabled .top-tab-btn[aria-selected="true"]{
+    background-color: #f0f0f0;
+    color: #1a1a1a;
+    border-color: #c7c7c7;
+  }
+  body.top-tabs-enabled .top-tab-btn[aria-selected="false"]{
+    color: #404040;
+    background: transparent;
+    border-color: transparent;
+  }
+  body.top-tabs-enabled .top-tab-btn:focus-visible{
+    outline: 2px solid #912338;
+    outline-offset: 2px;
+  }
+
+  body.top-tabs-enabled .top-tab-btn[aria-selected="false"]:hover{
+    border-color: #c7c7c7;
+  }
+  body.hc.top-tabs-enabled .top-tab-btn[aria-selected="false"]:hover{
+    border-color: #0f172a;
+  }
+
+  body.hc.top-tabs-enabled .top-tab-btn[aria-selected="true"]{
+    background-color: #ffffff;
+    color: #0f172a;
+    border-color: #0f172a;
+  }
+  body.hc.top-tabs-enabled .top-tab-btn[aria-selected="false"]{
+    color: #0f172a;
+    background: transparent;
+    border-color: transparent;
+  }
+
+  /* Replace accordion headers with level-1 tabs */
+  body.top-tabs-enabled button[data-panel="key-params-panel"],
+  body.top-tabs-enabled button[data-panel="timeline-panel"],
+  body.top-tabs-enabled #analysis-tabs-wrap > summary{
+    display: none !important;
+  }
+
+  /* Force the corresponding content blocks open (tabs control visibility) */
+  body.top-tabs-enabled #key-params-panel,
+  body.top-tabs-enabled #timeline-panel{
+    display: block !important;
+  }
+  body.top-tabs-enabled #timeline-panel{
+    margin-top: 0 !important;
+  }
+  body.top-tabs-enabled #key-params-panel #kpwiz-bar{
+    border-top: 0 !important;
+  }
+
+  /* Ensure collapsible panel contents are visible when top-level tabs are enabled */
+  body.top-tabs-enabled #key-params-panel,
+  body.top-tabs-enabled #timeline-panel{
+    max-height: none !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    transition: none !important;
+  }
+  body.top-tabs-enabled #key-params-panel.open,
+  body.top-tabs-enabled #timeline-panel.open{
+    max-height: none !important;
+    opacity: 1 !important;
+  }
+</style>
+
+<!-- LD PATCH: Ensure all dropdowns (select) are opaque (no transparent background) -->
+<style id="ld-opaque-selects">
+  /* Global: all selects must have a non-transparent background (overrides utility classes like bg-transparent) */
+  select{
+    background-color:#ffffff !important;
+    /* Keep native arrow unless explicitly removed elsewhere; ensure the control itself is opaque */
+  }
+  select option, select optgroup{
+    background-color:#ffffff !important;
+    color: inherit;
+  }
+
+  /* In dark UI mode, keep selects consistent with the existing dark form-control palette */
+  html.ui-dark select{
+    background-color:#0b1220 !important;
+    color:#e2e8f0 !important;
+    border-color:#334155 !important;
+  }
+  html.ui-dark select option, html.ui-dark select optgroup{
+    background-color:#0b1220 !important;
+    color:#e2e8f0 !important;
+  }
+
+  /* Print: keep dropdowns opaque even when print styles strip backgrounds */
+  @media print{
+    select{ background-color:#ffffff !important; }
+    select option, select optgroup{ background-color:#ffffff !important; }
+  }
+</style>
+
+</head>
+<body class="p-2 md:p-4 hide-types text-slate-900">
+<!-- Header Mount Point -->
+<div id="app-header-mount"></div>
+<div class="ld-page">
+<header class="mb-3">
+<h1 class="text-2xl font-bold text-slate-900 leading-tight">
+    Concepteur Pédagogique - Learning Designer
+  </h1>
+<div class="mt-2 flex flex-wrap gap-x-2 gap-y-2 no-print items-start content-start">
+<div class="flex flex-col relative gap-0.5 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider pl-1" data-i18n="grp_project">
+       Projet
+      </span>
+<div class="flex items-center bg-white border border-slate-200 rounded-md p-0.5 gap-0.5 shadow-sm h-[30px]">
+<button class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-1.5 py-0.5 rounded transition-colors flex items-center gap-1.5" data-i18n-title="title_save_project" data-action="save-project">
+<span class="material-icons-round text-lg">
+         save
+        </span>
+<span class="text-xs font-medium hidden md:inline" data-i18n="btn_save">
+         Enregistrer
+        </span>
+</button>
+<button class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-1.5 py-0.5 rounded transition-colors flex items-center gap-1.5" data-i18n-title="title_load_project" data-action="load-project">
+<span class="material-icons-round text-lg">
+         file_upload
+        </span>
+<span class="text-xs font-medium hidden md:inline" data-i18n="btn_load">
+         Charger
+        </span>
+</button>
+<div class="w-px bg-slate-200 my-1 mx-0.5">
+</div>
+<div class="relative group">
+<div class="flex items-center">
+<span class="material-icons-round text-slate-600 absolute left-1.5 pointer-events-none text-lg z-10 group-hover:text-indigo-600 transition-colors">
+          download
+         </span>
+<select class="appearance-none bg-transparent hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 pl-7 pr-6 py-1 rounded transition-colors outline-none cursor-pointer text-xs font-medium h-[26px]" data-i18n-title="title_export_dropdown" data-action-change="handle-export" style="width: 10rem; min-width: 0;">
+<option data-i18n="btn_export_dropdown" disabled="" selected="" value="">
+           Exporter...
+          </option>
+<option data-i18n="opt_md" value="markdown">
+           Markdown (conseillé pour l'IA)
+          </option>
+<option data-i18n="opt_csv" value="csv">
+           CSV (modules/moments/activités)
+          </option>
+<option data-i18n="opt_real_rtf" value="rtf">
+           Texte (.rtf)
+          </option>
+<option value="docx">
+           Word (.docx)
+          </option>
+<option data-i18n="opt_pdf" value="pdf">
+           PDF (pour imprimer)
+          </option>
+<option data-i18n="opt_rtf" value="richtext">
+           Page Web HTML (contient les graphiques)
+          </option>
+</select>
+<span class="material-icons-round text-slate-400 pointer-events-none absolute right-1 text-sm">
+          expand_more
+         </span>
+</div>
+</div>
+<button class="text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 rounded px-2 py-1 flex items-center gap-1"
+        data-action="open-export-preview"
+        title="Aperçu export"
+        type="button">
+  <span class="material-icons-round text-[16px]">visibility</span>
+  <span class="text-xs font-medium hidden md:inline" data-i18n="label_preview">Aperçu</span>
+</button>
+<button id="open-global-search-btn"
+        class="text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 rounded px-2 py-1 flex items-center gap-1"
+        title="Recherche globale (Ctrl+K)"
+        type="button">
+  <span class="material-icons-round text-[16px]">search</span>
+  <span class="text-xs font-medium hidden md:inline">Recherche</span>
+</button>
+<input accept=".json" class="hidden" id="load-file-input" data-action-change="load-project-file" type="file"/>
+</div>
+</div>
+<div class="flex flex-col relative gap-0.5 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider pl-1" data-i18n="label_more">Plus</span>
+<div class="flex items-center bg-white border border-slate-200 rounded-md p-0.5 gap-0.5 shadow-sm h-[30px] min-w-max relative">
+<button class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-1.5 py-0.5 rounded transition-colors flex items-center gap-1.5" id="btn-more" data-action="toggle-more-menu" title="Plus d'actions" type="button">
+<span class="material-icons-round text-lg">more_horiz</span>
+<span class="text-xs font-medium hidden md:inline">Plus…</span>
+</button>
+<div class="hidden absolute right-0 top-[34px] w-72 bg-white border border-slate-200 rounded-md shadow-lg z-50 p-1" id="more-menu">
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2 py-1" data-i18n="label_templates">Modèles</div>
+<button class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-50 text-slate-700 flex items-center gap-2" data-action="open-template-export-modal" type="button">
+<span class="material-icons-round text-base text-slate-500">upload_file</span>
+<span class="text-sm">Exporter un modèle</span>
+</button>
+<button class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-50 text-slate-700 flex items-center gap-2" data-action="open-template-import-modal" type="button">
+<span class="material-icons-round text-base text-slate-500">download_for_offline</span>
+<span class="text-sm">Importer un modèle</span>
+</button>
+<div class="my-1 border-t border-slate-200"></div>
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2 py-1">Diagnostic</div>
+<button class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-50 text-slate-700 flex items-center gap-2" data-action="toggle-debug-ui" type="button">
+<span class="material-icons-round text-base text-slate-500">bug_report</span>
+<span class="text-sm">Diagnostic UI</span>
+</button>
+<button class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-50 text-slate-700 flex items-center gap-2" data-i18n-title="title_export_language_template" data-action="export-language-pack-template" type="button">
+<span class="material-icons-round text-base text-slate-500">download</span>
+<span class="text-sm" data-i18n="btn_export_language_template">Exporter modèle langue</span>
+</button>
+<button class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-50 text-slate-700 flex items-center gap-2" data-i18n-title="title_i18n_audit" data-action="open-i18n-audit" type="button">
+<span class="material-icons-round text-base text-slate-500">fact_check</span>
+<span class="text-sm" data-i18n="btn_i18n_audit">Vérifier traductions</span>
+</button>
+
+
+</div>
+<input accept=".json" class="hidden" id="template-file-input" type="file"/>
+</div>
+</div>
+<!-- Language selector -->
+<div class="flex flex-col relative gap-0.5 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider pl-1" data-i18n="label_language">Langue</span>
+<div class="flex items-center bg-white border border-slate-200 rounded-md p-0.5 gap-1 shadow-sm h-[30px] min-w-max">
+<select id="ui-lang-select" data-action-change="handle-ui-language-change" class="appearance-none bg-transparent text-slate-600 px-2 pr-6 py-1 rounded outline-none cursor-pointer text-xs font-medium border-none focus:outline-none">
+<option value="fr" data-i18n="opt_lang_fr">Français</option>
+<option value="en-CA">English (CA)</option>
+<option value="" data-i18n="opt_lang_loaded" data-role="loaded-lang" disabled>Langue chargée</option>
+</select>
+<button class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-1.5 py-0.5 rounded transition-colors flex items-center" data-action="trigger-language-pack-load" data-i18n-title="title_load_language_pack" title="Charger un pack de langue" type="button">
+<span class="material-icons-round text-lg">translate</span>
+</button>
+</div>
+</div>
+<input accept=".json,application/json" class="hidden" id="lang-pack-input" data-action-change="load-language-pack" type="file"/>
+<div class="flex flex-col relative gap-0.5 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider pl-1" data-i18n="grp_view">
+       Vue
+      </span>
+<div class="flex items-center bg-white border border-slate-200 rounded-md p-0.5 gap-1 shadow-sm h-[30px]">
+<button class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors flex items-center justify-center ml-0.5" data-i18n-title="title_fold_all" id="btn-toggle-all-header" data-action="toggle-all-activities">
+<span class="material-icons-round text-xl" id="icon-toggle-all">
+         unfold_less
+        </span>
+</button>
+<div class="w-px h-5 bg-slate-200">
+</div>
+<button aria-pressed="false" class="text-slate-700 hover:text-indigo-700 hover:bg-slate-50 active:bg-slate-100 px-2 h-[26px] rounded-md transition flex items-center gap-1" data-action="toggle-high-contrast" id="contrast-toggle-btn" title="Passer au haut contraste" type="button">
+<span class="material-icons-round text-base">invert_colors</span>
+<span class="text-[11px] font-extrabold tracking-wide" id="contrast-btn-text">STD</span>
+</button>
+<div class="w-px h-5 bg-slate-200">
+</div>
+<div class="relative">
+<select class="appearance-none bg-white border border-slate-200 text-slate-700 pl-2 pr-7 h-[26px] rounded-md outline-none cursor-pointer text-[11px] font-extrabold tracking-wide" id="view-style-select" data-action-change="handle-view-style-change" title="Style d'affichage">
+<option value="std" data-i18n="opt_chart_style_std">STD</option>
+<option value="hc" data-i18n="opt_chart_style_hc">HC</option>
+<option value="contrast" data-i18n="opt_chart_style_contrast">Contraste+</option>
+<option value="transparent" data-i18n="opt_chart_style_transparent">Transparent</option>
+</select>
+<span class="material-icons-round pointer-events-none text-slate-500 text-base absolute right-1 top-1/2 -translate-y-1/2">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none bg-white border border-slate-200 text-slate-700 pl-2 pr-7 h-[26px] rounded-md outline-none cursor-pointer text-[11px] font-extrabold tracking-wide" id="ui-theme-select" data-action-change="handle-ui-theme-change" title="Thème interface">
+<option value="light" data-i18n="opt_chart_style_light">Clair</option>
+<option value="dark" data-i18n="opt_chart_style_dark">Sombre</option>
+</select>
+<span class="material-icons-round pointer-events-none text-slate-500 text-base absolute right-1 top-1/2 -translate-y-1/2">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col relative gap-0.5 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider pl-1" data-i18n="grp_learning_types">Types</span>
+<div class="flex items-center bg-white border border-slate-200 rounded-md p-0.5 gap-1 shadow-sm h-[30px]">
+<button class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors flex items-center gap-1 w-full justify-center" data-i18n-title="title_toggle_types" data-action="toggle-learning-types" type="button">
+<span class="material-icons-round text-base" id="icon-toggle-types">visibility_off</span>
+<span class="text-xs font-bold" data-i18n="btn_toggle_types">Types d'appr.</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col relative gap-0.5 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider pl-1" data-i18n="label_designed_time">
+       Temps Conçu (Planifié)
+      </span>
+<div class="flex items-center bg-white border border-slate-200 rounded-md px-2 gap-1 shadow-sm h-[30px]">
+<span class="material-icons-round text-slate-600 text-lg">
+         schedule
+        </span>
+<span class="text-xs font-extrabold text-slate-800 tabular-nums" id="header-designed-val">
+         0
+        </span>
+<span class="text-xs font-bold text-slate-600" id="header-designed-unit">
+         min
+        </span>
+</div>
+</div>
+</div>
+</header>
+<div class="mb-3 no-print w-full" id="top-tabs-bar-wrap">
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-1 flex gap-1" role="tablist" aria-label="Sections">
+    <button type="button" id="top-tab-btn-info" role="tab" aria-selected="false" aria-controls="key-params-wrapper" class="top-tab-btn">
+      <span class="material-icons-round text-sm">tune</span>
+      <span class="top-tab-label" data-i18n="tab_info">INFORMATIONS ET PARAMÈTRES DE LA FORMATION</span>
+    </button>
+    <button type="button" id="top-tab-btn-visual" role="tab" aria-selected="false" aria-controls="visualisations-wrapper" class="top-tab-btn">
+      <span class="material-icons-round text-sm">insights</span>
+      <span class="top-tab-label" data-i18n="tab_visual">VISUALISATIONS DES SÉQUENCES</span>
+    </button>
+    <button type="button" id="top-tab-btn-analysis" role="tab" aria-selected="false" aria-controls="analysis-tabs-wrap" class="top-tab-btn">
+      <span class="material-icons-round text-sm">bar_chart</span>
+      <span class="top-tab-label" data-i18n="tab_analysis">GRAPHIQUES D'ANALYSE</span>
+    </button>
+  </div>
+</div>
+
+<div id="key-params-wrapper" role="tabpanel" aria-labelledby="top-tab-btn-info" class="mb-3 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+<button class="w-full px-3 py-2 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors no-print h-[32px] rounded-lg border border-slate-200 rounded-lg border border-slate-200" data-i18n-title="title_toggle_panel" data-action="toggle-panel" data-panel="key-params-panel">
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-slate-500 text-sm">
+       tune
+      </span>
+<span class="font-bold text-slate-700 uppercase text-xs tracking-wide" data-i18n="panel_key_parameters">
+       Informations et paramètres de la formation
+      </span>
+</div>
+<span class="material-icons-round text-slate-400 rotate-icon text-sm" id="key-params-panel-icon">
+      expand_more
+     </span>
+</button><div class="panel-content" id="key-params-panel" style="display: none;">
+<!-- Key parameters wizard (Option 6) -->
+<div class="px-3 py-2 border-t border-slate-100 bg-white flex items-center justify-between gap-2 flex-wrap" id="kpwiz-bar">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider" data-i18n="label_path">Parcours</span>
+<div class="flex items-center gap-1 flex-wrap" id="kpwiz-steps">
+<button class="kpwiz-step-btn px-2 h-[26px] rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-bold" data-kpwiz-step="1" type="button" data-i18n="btn_wizard_identity">1. Identité</button>
+<button class="kpwiz-step-btn px-2 h-[26px] rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-bold" data-kpwiz-step="2" type="button" data-i18n="btn_wizard_audience">2. Public</button>
+<button class="kpwiz-step-btn px-2 h-[26px] rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-bold" data-kpwiz-step="3" type="button" data-i18n="btn_wizard_objectives">3. Objectifs et résultats</button>
+<button class="kpwiz-step-btn px-2 h-[26px] rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-bold" data-kpwiz-step="4" type="button" data-i18n="btn_wizard_competences">4. Compétences</button>
+<button class="kpwiz-step-btn px-2 h-[26px] rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-bold" data-kpwiz-step="5" type="button" data-i18n="btn_wizard_tools">5. Outils et matériel</button>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2 h-[26px] rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-[10px] font-extrabold" data-kpwiz-action="prev" type="button" data-i18n="btn_wizard_prev">Précédent</button>
+<button class="px-2 h-[26px] rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-[10px] font-extrabold" data-kpwiz-action="next" type="button" data-i18n="btn_wizard_next">Suivant</button>
+<button class="px-2 h-[26px] rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-extrabold" data-kpwiz-action="showall" type="button" data-i18n="btn_wizard_showall">Tout afficher</button>
+</div>
+</div>
+<div id="kpwiz-steps-wrapper">
+<section class="kpwiz-step" id="kpwiz-step-1">
+<div class="p-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+<div>
+<label class="compact-label block" data-i18n="label_course_name">
+        Nom de la formation
+       </label>
+<input class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none" data-i18n-placeholder="ph_course_name" id="param-name" placeholder="Entrez le nom de la formation..." type="text"/>
+</div><div class="flex-1">
+<label class="compact-label block" data-i18n="label_learning_time">
+         Temps d'Apprentissage (Cible)
+        </label>
+<div class="flex gap-1">
+<input class="w-2/3 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none" id="param-learning-val" min="0" data-action-input="update-stats-debounced" placeholder="0" type="number"/>
+<select class="w-1/3 px-1 py-1 text-xs border border-slate-200 rounded bg-slate-50 focus:ring-1 focus:ring-indigo-500 outline-none" id="param-learning-unit" data-action-change="update-stats">
+<option data-i18n="unit_mins" value="mins">
+           min
+          </option>
+<option data-i18n="unit_hours" value="hours">
+           Heures
+          </option>
+<option data-i18n="unit_days" value="days">
+           Jours
+          </option>
+<option data-i18n="unit_weeks" value="weeks">
+           Semaines
+          </option>
+<option data-i18n="unit_months" value="months">
+           Mois
+          </option>
+</select>
+</div>
+</div>
+
+<div class="flex-1">
+  <label class="compact-label block">Unité préférée (Modules / Moments / Activités)</label>
+  <select class="w-full px-2 py-1 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none" id="param-preferred-unit">
+    <option value="60" data-i18n="unit_mins">min</option>
+    <option value="3600" data-i18n="unit_hours">Heures</option>
+    <option value="86400" data-i18n="unit_days">Jours</option>
+    <option value="604800" data-i18n="unit_weeks">Semaines</option>
+    <option value="2592000" data-i18n="unit_months">Mois</option>
+  </select>
+  <p class="text-[11px] text-slate-400 mt-1">Défaut pour l’unité affichée et saisie dans les blocs. Vous pouvez modifier une unité localement si nécessaire.</p>
+</div>
+
+
+<div class="flex-1">
+<label class="compact-label block" data-i18n="label_designed_time">
+         Temps Conçu (Planifié)
+        </label>
+<div class="flex gap-1 items-center">
+<input class="w-2/3 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none bg-slate-100 text-slate-500" id="param-designed-val" min="0" placeholder="0" readonly="" type="number"/>
+<span class="w-1/3 text-xs text-slate-600 font-bold px-1" id="param-designed-unit-display">
+          min
+         </span>
+<input id="param-designed-time" type="number" class="hidden" aria-hidden="true" tabindex="-1"/>
+<select id="param-designed-unit" class="hidden" aria-hidden="true" tabindex="-1">
+  <option data-i18n="unit_mins" value="mins">min</option>
+  <option data-i18n="unit_hours" value="hours">heures</option>
+  <option data-i18n="unit_days" value="days">jours</option>
+  <option data-i18n="unit_weeks" value="weeks">semaines</option>
+  <option data-i18n="unit_months" value="months">mois</option>
+</select>
+</div>
+</div>
+</div></div>
+<div class="p-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"><div>
+<label class="compact-label block" data-i18n="label_topic">
+       Thème
+      </label>
+<input class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none" data-i18n-placeholder="ph_topic" id="param-topic" placeholder="Entrez le thème..." type="text"/>
+</div><div>
+<label class="compact-label block" data-i18n="label_mode">
+       Modalité
+      </label>
+<select class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none bg-white" id="param-mode">
+<option data-i18n="opt_mode_placeholder" disabled="" selected="" value="">
+        Sélectionnez une modalité...
+       </option>
+<option data-i18n="opt_mode_classroom" value="classroom">
+        Présentiel (sur site)
+       </option>
+<option data-i18n="opt_mode_online" value="online">
+        Distanciel (en ligne)
+       </option>
+<option data-i18n="opt_mode_blended" value="blended">
+        Hybride (sur site et en ligne)
+       </option>
+</select>
+</div><div>
+<label class="compact-label block" data-i18n="label_authors">
+        Concepteurs(s)
+       </label>
+<input class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none" data-i18n-placeholder="ph_authors" id="param-authors" placeholder="Entrez le nom du/des concepteurs..." type="text"/>
+</div>
+<div>
+<label class="compact-label block" data-i18n="label_trainers">
+        Formateur(s)
+       </label>
+<input class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none" data-i18n-placeholder="ph_trainers" id="param-trainers" placeholder="Entrez le nom du/des formateur(s)..." type="text"/>
+</div>
+<div class="md:col-span-2 lg:col-span-3">
+<label class="compact-label block" data-i18n="label_description">
+        Description générale
+       </label>
+<textarea class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none resize-y" data-i18n-placeholder="ph_description" id="param-description" placeholder="Description détaillée..." rows="1"></textarea>
+</div>
+</div>
+</section>
+<section class="kpwiz-step hidden" id="kpwiz-step-2">
+<div class="p-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+<div class="md:col-span-2 lg:col-span-3">
+<label class="compact-label block" data-i18n="label_target_audience">Public cible</label>
+<textarea class="w-full px-2 py-1 border border-slate-200 rounded text-sm focus:ring-1 focus:ring-indigo-500 outline-none resize-y" id="param-target-audience" placeholder="" rows="1"></textarea>
+</div>
+<div>
+<label class="compact-label block" data-i18n="label_level">Niveau</label>
+<select class="w-full px-2 py-1 border border-slate-200 rounded text-sm focus:ring-1 focus:ring-indigo-500 outline-none bg-white" id="param-level">
+<option data-i18n="opt_level_unspecified" selected="" value="unspecified">Non spécifié</option>
+<option data-i18n="opt_level_mixed" value="mixed">Mixte</option>
+<option data-i18n="opt_level_beginner" value="beginner">Débutant</option>
+<option data-i18n="opt_level_intermediate" value="intermediate">Intermédiaire</option>
+<option data-i18n="opt_level_advanced" value="advanced">Avancé</option>
+<option data-i18n="opt_level_expert" value="expert">Expert</option>
+</select>
+</div>
+<div>
+<label class="compact-label block" data-i18n="label_class_size">
+       Taille de la cohorte
+      </label>
+<input class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none font-bold text-slate-800" id="global-class-size" min="1" data-action-input="update-stats-debounced" type="number" value="30"/>
+</div>
+<div class="md:col-span-2 lg:col-span-3">
+<label class="compact-label block" data-i18n="label_prerequisites">Prérequis</label>
+<textarea class="w-full px-2 py-1 border border-slate-200 rounded text-sm focus:ring-1 focus:ring-indigo-500 outline-none resize-y" id="param-prerequisites" placeholder="" rows="1"></textarea>
+</div>
+</div>
+</section>
+<section class="kpwiz-step hidden" id="kpwiz-step-3">
+<div class="p-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+<div class="md:col-span-2 lg:col-span-3">
+<details open class="group border border-slate-200 rounded-lg bg-white/0">
+<summary class="px-3 py-2 cursor-pointer select-none flex items-center justify-between">
+<span class="compact-label" data-i18n="label_aims">Objectifs d'apprentissage (ce qu'on va enseigner)</span>
+<span class="material-icons-round text-slate-400 text-sm transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-3 pb-3">
+<!-- Objectifs (saisie unitaire) -->
+<textarea class="hidden" data-i18n-placeholder="ph_aims" id="param-aims" placeholder="Entrez les objectifs..." rows="2"></textarea>
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+<div class="hidden mb-2 p-2 rounded-md bg-indigo-50 border border-indigo-200 text-[11px] flex items-center justify-between gap-2" id="aims-origin-bar">
+<div class="text-slate-700 min-w-0">
+<span class="font-bold">Ajout depuis :</span>
+<span class="text-slate-600" id="aims-origin-label"></span>
+</div>
+<button class="text-[10px] font-bold text-indigo-700 bg-white border border-indigo-200 px-2 py-1 rounded hover:bg-indigo-100 transition-colors" data-action="back-to-aims-origin" data-i18n="btn_back_to_activity">Retour à l'activité</button>
+</div>
+<div class="flex items-center gap-2 mb-2 flex-wrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-aims-csv" title="Charger une liste d'objectifs (CSV/TSV/TXT)" type="button">
+<span class="material-icons-round text-sm">upload_file</span>
+            Charger fichier (CSV/TSV/TXT)
+          </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-aims-template" title="Télécharger un modèle CSV" type="button">
+<span class="material-icons-round text-sm">download</span>
+            Modèle CSV
+          </button>
+<span class="text-[10px] text-slate-400 italic" id="aims-csv-status"></span>
+</div>
+<input accept=".csv,.tsv,.txt" class="hidden" id="aims-csv-file-input" type="file"/>
+<!-- Taxonomie des objectifs (catégories / sous-catégories) -->
+<div class="flex items-center gap-2 mb-2 flex-wrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-aims-taxonomy" title="Charger une taxonomie d'objectifs (CSV)" type="button">
+<span class="material-icons-round text-sm">schema</span>
+            Charger taxonomie (CSV)
+          </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-aims-taxonomy-template" title="Télécharger le modèle CSV de taxonomie" type="button">
+<span class="material-icons-round text-sm">download</span>
+            Modèle taxonomie
+          </button>
+<button class="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded hover:bg-red-100 transition-colors flex items-center gap-1" id="btn-reset-aims-taxonomy" title="Réinitialiser la taxonomie d'objectifs" type="button">
+<span class="material-icons-round text-sm">restart_alt</span>
+            Réinitialiser
+          </button>
+<span class="text-[10px] text-slate-400 italic" id="aims-taxonomy-status"></span>
+</div>
+<input accept=".csv" class="hidden" id="aims-taxonomy-file-input" type="file"/>
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-1">
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-2" id="new-aim-cat-input" list="aims-cat-datalist" placeholder="Catégorie (optionnel)..." type="text"/>
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-2" id="new-aim-subcat-input" list="aims-subcat-datalist" placeholder="Sous-catégorie (optionnel)..." type="text"/>
+<datalist id="aims-cat-datalist"></datalist>
+<datalist id="aims-subcat-datalist"></datalist>
+<div class="flex gap-1 flex-col sm:flex-row sm:items-center sm:col-span-8">
+<input class="flex-1 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs" id="new-aim-item-input" placeholder="Ajouter un objectif..." type="text"/>
+<button class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold hover:bg-indigo-200 transition-colors flex items-center justify-center h-[26px]" data-action="add-aim-item" title="Ajouter un objectif" type="button">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+</div>
+<ul class="space-y-0.5 mt-2" id="aims-list"></ul>
+<p class="text-xs text-slate-400 italic mt-1" id="no-aims-text">Aucun objectif défini</p>
+</div>
+</div>
+</details>
+</div>
+<div class="md:col-span-2 lg:col-span-3">
+<details open class="group border border-slate-200 rounded-lg bg-white/0">
+<summary class="px-3 py-2 cursor-pointer select-none flex items-center justify-between">
+<span class="compact-label" data-i18n="label_outcomes_text">Résultats d'apprentissage (ce que les apprenants sauront faire)</span>
+<span class="material-icons-round text-slate-400 text-sm transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-3 pb-3">
+<!-- Résultats d'apprentissage (texte) -->
+<textarea class="hidden" id="param-outcomes-text" placeholder="Entrez les résultats d'apprentissage..." rows="2"></textarea>
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+<div class="flex items-center gap-2 mb-2 flex-wrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-outcomes-text-csv" title="Charger une liste de résultats (CSV/TSV/TXT)" type="button">
+<span class="material-icons-round text-sm">upload_file</span>
+            Charger fichier (CSV/TSV/TXT)
+          </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-outcomes-text-template" title="Télécharger un modèle CSV" type="button">
+<span class="material-icons-round text-sm">download</span>
+            Modèle CSV
+          </button>
+<span class="text-[10px] text-slate-400 italic" id="outcomes-text-csv-status"></span>
+</div>
+<input accept=".csv,.tsv,.txt" class="hidden" id="outcomes-text-csv-file-input" type="file"/>
+<!-- Taxonomie des résultats (catégories / sous-catégories) -->
+<div class="flex items-center gap-2 mb-2 flex-wrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-outcomes-text-taxonomy" title="Charger une taxonomie de résultats (CSV)" type="button">
+<span class="material-icons-round text-sm">schema</span>
+            Charger taxonomie (CSV)
+          </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-outcomes-text-taxonomy-template" title="Télécharger le modèle CSV de taxonomie" type="button">
+<span class="material-icons-round text-sm">download</span>
+            Modèle taxonomie
+          </button>
+<button class="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded hover:bg-red-100 transition-colors flex items-center gap-1" id="btn-reset-outcomes-text-taxonomy" title="Réinitialiser la taxonomie de résultats" type="button">
+<span class="material-icons-round text-sm">restart_alt</span>
+            Réinitialiser
+          </button>
+<span class="text-[10px] text-slate-400 italic" id="outcomes-text-taxonomy-status"></span>
+</div>
+<input accept=".csv" class="hidden" id="outcomes-text-taxonomy-file-input" type="file"/>
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-1">
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-2" id="new-outcomes-text-cat-input" list="outcomes-text-cat-datalist" placeholder="Catégorie (optionnel)..." type="text"/>
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-2" id="new-outcomes-text-subcat-input" list="outcomes-text-subcat-datalist" placeholder="Sous-catégorie (optionnel)..." type="text"/>
+<datalist id="outcomes-text-cat-datalist"></datalist>
+<datalist id="outcomes-text-subcat-datalist"></datalist>
+<div class="flex gap-1 flex-col sm:flex-row sm:items-center sm:col-span-8">
+<input class="flex-1 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs" id="new-outcomes-text-item-input" placeholder="Ajouter un résultat (texte)..." type="text"/>
+<button class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold hover:bg-indigo-200 transition-colors flex items-center justify-center h-[26px]" data-action="add-outcomes-text-item" title="Ajouter un résultat (texte)" type="button">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+</div>
+<ul class="space-y-0.5 mt-2" id="outcomes-text-list"></ul>
+<p class="text-xs text-slate-400 italic mt-1" id="no-outcomes-text-text">Aucun résultat (texte) défini</p>
+</div>
+</div>
+</details>
+<details open class="group border border-slate-200 rounded-lg bg-white/0">
+<summary class="px-3 py-2 cursor-pointer select-none flex items-center justify-between">
+<span class="compact-label" data-i18n="label_outcomes">Résultats d'apprentissage selon une taxonomie</span>
+<span class="material-icons-round text-slate-400 text-sm transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-3 pb-3">
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+<div class="flex items-center gap-2 mb-2 flex-wrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-taxonomy" title="Charger une taxonomie personnalisée" type="button">
+<span class="material-icons-round text-sm">upload_file</span>
+            Charger taxonomie
+          </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-taxonomy-template" title="Télécharger le modèle CSV" type="button">
+<span class="material-icons-round text-sm">download</span>
+            Modèle CSV
+          </button>
+<button class="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded hover:bg-red-100 transition-colors flex items-center gap-1" id="btn-reset-taxonomy" title="Réinitialiser la taxonomie par défaut" type="button">
+<span class="material-icons-round text-sm">restart_alt</span>
+            Réinitialiser
+          </button>
+<span class="text-[10px] text-slate-400 italic" id="taxonomy-status"></span>
+</div>
+<input accept=".csv" class="hidden" id="taxonomy-file-input" type="file"/>
+<div class="flex gap-1 mb-1 no-print flex-col sm:flex-row">
+<div class="flex gap-1">
+<select class="text-[10px] font-bold text-slate-600 border border-slate-200 rounded py-1 px-1 bg-white focus:ring-1 focus:ring-indigo-500 outline-none w-24" id="new-bloom-level">
+<option data-i18n="bloom_placeholder" disabled="" selected="" value="">
+            Catégorie...
+          </option>
+</select>
+<select class="text-[10px] text-slate-600 border border-slate-200 rounded py-1 px-1 bg-white focus:ring-1 focus:ring-indigo-500 outline-none w-24" id="new-bloom-sub">
+<option data-i18n="bloom_sub_placeholder" disabled="" selected="" value="">
+            Sous-cat...
+          </option>
+</select>
+</div>
+<div class="flex flex-1 gap-1">
+<input class="flex-1 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs" data-i18n-placeholder="ph_add_outcome" id="new-outcome-input" placeholder="Ajouter un résultat..." type="text"/>
+<button class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold hover:bg-indigo-200 transition-colors flex items-center justify-center h-[26px]" data-action="add-outcome" data-i18n-title="title_add_outcome" id="btn-add-outcome" type="button">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+</div>
+<ul class="space-y-0.5" id="outcomes-list"></ul>
+<p class="text-xs text-slate-400 italic mt-1" data-i18n="text_no_outcomes" id="no-outcomes-text">Aucun résultat défini</p>
+</div>
+</div>
+</details>
+</div>
+</div></section>
+<section class="kpwiz-step hidden" id="kpwiz-step-4">
+<div class="p-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+<div class="md:col-span-2 lg:col-span-3">
+<details open class="group border border-slate-200 rounded-lg bg-white/0">
+<summary class="px-3 py-2 cursor-pointer select-none flex items-center justify-between">
+<span>Compétences du sujet</span>
+<span class="material-icons-round text-slate-400 text-sm transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="mt-1">
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+<div class="flex items-center gap-2 mb-2 toolbar-nowrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-competences-csv" title="Charger une liste de compétences du sujet (CSV/TSV/TXT)" type="button">
+<span class="material-icons-round text-sm">upload_file</span>
+      Charger fichier (CSV/TSV/TXT)
+    </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-competences-template" title="Télécharger un modèle CSV" type="button">
+<span class="material-icons-round text-sm">download</span>
+      Modèle CSV
+    </button>
+<span class="text-[10px] text-slate-400 italic" id="competences-csv-status"></span>
+</div>
+<input accept=".csv,.tsv,.txt" class="hidden" id="competences-csv-file-input" type="file"/>
+<div class="flex items-center gap-2 mb-2 toolbar-nowrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-competences-taxonomy" title="Charger une taxonomie de compétences du sujet (CSV)" type="button">
+<span class="material-icons-round text-sm">schema</span>
+      Charger taxonomie (CSV)
+    </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-competences-taxonomy-template" title="Télécharger le modèle CSV de taxonomie" type="button">
+<span class="material-icons-round text-sm">download</span>
+      Modèle taxonomie
+    </button>
+<button class="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded hover:bg-red-100 transition-colors flex items-center gap-1" id="btn-reset-competences-taxonomy" title="Réinitialiser la taxonomie de compétences du sujet" type="button">
+<span class="material-icons-round text-sm">restart_alt</span>
+      Réinitialiser
+    </button>
+<span class="text-[10px] text-slate-400 italic" id="competences-taxonomy-status"></span>
+</div>
+<input accept=".csv" class="hidden" id="competences-taxonomy-file-input" type="file"/>
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-1">
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-2" id="new-competence-cat-input" list="competences-cat-datalist" placeholder="Catégorie (optionnel)..." type="text"/>
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-2" id="new-competence-subcat-input" list="competences-subcat-datalist" placeholder="Sous-catégorie (optionnel)..." type="text"/>
+<datalist id="competences-cat-datalist"></datalist>
+<datalist id="competences-subcat-datalist"></datalist>
+<div class="flex gap-1 flex-col sm:flex-row sm:items-center sm:col-span-8">
+<input class="flex-1 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs" id="new-competence-input" placeholder="Ajouter une compétence du sujet..." type="text"/>
+<button class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold hover:bg-indigo-200 transition-colors flex items-center justify-center h-[26px]" data-action="add-competence" title="Ajouter une compétence du sujet" type="button">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+</div>
+<ul class="space-y-0.5 mt-2" id="competences-list"></ul>
+<p class="text-xs text-slate-400 italic mt-1" id="no-competences-text">Aucune compétence définie</p>
+</div>
+</div>
+</details>
+<details open class="group border border-slate-200 rounded-lg bg-white/0 mt-3">
+<summary class="px-3 py-2 cursor-pointer select-none flex items-center justify-between">
+<span>Compétences transversales</span>
+<span class="material-icons-round text-slate-400 text-sm transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="mt-1">
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+<div class="flex items-center gap-2 mb-2 toolbar-nowrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-competences-trans-csv" title="Charger une liste de compétences transversales (CSV/TSV/TXT)" type="button">
+<span class="material-icons-round text-sm">upload_file</span>
+      Charger fichier (CSV/TSV/TXT)
+    </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-competences-trans-template" title="Télécharger un modèle CSV" type="button">
+<span class="material-icons-round text-sm">download</span>
+      Modèle CSV
+    </button>
+<span class="text-[10px] text-slate-400 italic" id="competences-trans-csv-status"></span>
+</div>
+<input accept=".csv,.tsv,.txt" class="hidden" id="competences-trans-csv-file-input" type="file"/>
+<div class="flex items-center gap-2 mb-2 toolbar-nowrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-competences-trans-taxonomy" title="Charger une taxonomie de compétences transversales (CSV)" type="button">
+<span class="material-icons-round text-sm">schema</span>
+      Charger taxonomie (CSV)
+    </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-competences-trans-taxonomy-template" title="Télécharger le modèle CSV de taxonomie" type="button">
+<span class="material-icons-round text-sm">download</span>
+      Modèle taxonomie
+    </button>
+<button class="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded hover:bg-red-100 transition-colors flex items-center gap-1" id="btn-reset-competences-trans-taxonomy" title="Réinitialiser la taxonomie de compétences transversales" type="button">
+<span class="material-icons-round text-sm">restart_alt</span>
+      Réinitialiser
+    </button>
+<span class="text-[10px] text-slate-400 italic" id="competences-trans-taxonomy-status"></span>
+</div>
+<input accept=".csv" class="hidden" id="competences-trans-taxonomy-file-input" type="file"/>
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-1">
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-2" id="new-competence-trans-cat-input" list="competences-trans-cat-datalist" placeholder="Catégorie (optionnel)..." type="text"/>
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-2" id="new-competence-trans-subcat-input" list="competences-trans-subcat-datalist" placeholder="Sous-catégorie (optionnel)..." type="text"/>
+<datalist id="competences-trans-cat-datalist"></datalist>
+<datalist id="competences-trans-subcat-datalist"></datalist>
+<div class="flex gap-1 flex-col sm:flex-row sm:items-center sm:col-span-8">
+<input class="flex-1 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs" id="new-competence-transversal-input" placeholder="Ajouter une compétence transversale..." type="text"/>
+<button class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold hover:bg-indigo-200 transition-colors flex items-center justify-center h-[26px]" data-action="add-competence-transversal" title="Ajouter une compétence transversale" type="button">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+</div>
+<ul class="space-y-0.5 mt-2" id="competences-transversales-list"></ul>
+<p class="text-xs text-slate-400 italic mt-1" id="no-competences-transversales-text">Aucune compétence définie</p>
+</div>
+</div>
+</details>
+</div>
+</div>
+</section>
+<section class="kpwiz-step hidden" id="kpwiz-step-5">
+<div class="p-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+<div class="md:col-span-2 lg:col-span-3">
+<details open class="group border border-slate-200 rounded-lg bg-white/0">
+<summary class="px-3 py-2 cursor-pointer select-none flex items-center justify-between">
+<span class="compact-label" data-i18n="label_tools_materials">Outils et matériel</span>
+<span class="material-icons-round text-slate-400 text-sm transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-3 pb-3">
+<textarea class="hidden" id="param-tools-materials" placeholder="Entrez les outils et matériels..." rows="2"></textarea>
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+<div class="flex items-center gap-2 mb-2 flex-wrap no-print">
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-load-tools-materials-csv" title="Charger une liste d'outils et matériel (CSV/TSV/TXT)" type="button">
+<span class="material-icons-round text-sm">upload_file</span>
+            Charger fichier (CSV/TSV/TXT)
+          </button>
+<button class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200 transition-colors flex items-center gap-1" id="btn-download-tools-materials-template" title="Télécharger un modèle CSV" type="button">
+<span class="material-icons-round text-sm">download</span>
+            Modèle CSV
+          </button>
+<span class="text-[10px] text-slate-400 italic" id="tools-materials-csv-status"></span>
+</div>
+<input accept=".csv,.tsv,.txt" class="hidden" id="tools-materials-csv-file-input" type="file"/>
+
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-1">
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-1" id="new-tools-materials-cat-input" list="tools-materials-cat-datalist" placeholder="Catégorie (optionnel)..." type="text"/>
+<input class="px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs sm:col-span-1" id="new-tools-materials-subcat-input" list="tools-materials-subcat-datalist" placeholder="Sous-catégorie (optionnel)..." type="text"/>
+<datalist id="tools-materials-cat-datalist"></datalist>
+<datalist id="tools-materials-subcat-datalist"></datalist>
+<div class="flex gap-1 flex-col sm:flex-row sm:items-center sm:col-span-10">
+<input class="flex-1 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-xs" id="new-tools-materials-item-input" placeholder="Ajouter un outil ou matériel..." type="text"/>
+<button class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold hover:bg-indigo-200 transition-colors flex items-center justify-center h-[26px]" data-action="add-tools-materials-item" title="Ajouter un outil ou matériel" type="button">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+</div>
+
+<div class="mt-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
+  <div class="flex flex-col sm:flex-row gap-2 items-end">
+    <div class="flex-1 min-w-0">
+      <label class="compact-label">Rechercher</label>
+      <input id="tools-materials-search" class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-2 focus:ring-indigo-500 outline-none text-sm" type="text" placeholder="Rechercher un outil, une catégorie ou une sous-catégorie..." />
+    </div>
+    <div class="sm:w-48">
+      <label class="compact-label">Catégorie</label>
+      <select id="tools-materials-filter-cat" class="w-full px-2 py-1 border border-slate-200 rounded bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+        <option value="" data-i18n="opt_all_categories">Toutes</option>
+      </select>
+    </div>
+    <div class="sm:w-56">
+      <label class="compact-label">Sous-catégorie</label>
+      <select id="tools-materials-filter-subcat" class="w-full px-2 py-1 border border-slate-200 rounded bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+        <option value="" data-i18n="opt_all_categories">Toutes</option>
+      </select>
+    </div>
+    <button id="tools-materials-filter-reset" type="button" class="px-2 py-1 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-800 hover:border-slate-300">
+      Réinitialiser
+    </button>
+  </div>
+  <div class="mt-1 flex items-center justify-between text-[11px] text-slate-400">
+    <span id="tools-materials-filter-count">0/0 affichés</span>
+    <span id="tools-materials-filter-empty" class="hidden italic">Aucun résultat</span>
+  </div>
+</div>
+
+<ul class="space-y-0.5 mt-2" id="tools-materials-list"></ul>
+<p class="text-xs text-slate-400 italic mt-1" id="no-tools-materials-text">Aucun outil / matériel défini</p>
+</div>
+<p class="text-[11px] text-slate-500 mt-2">
+Vous pouvez importer une liste (CSV/TSV/TXT) ou ajouter des éléments manuellement. Exemple : <span class="font-semibold">Moodle — Forum</span>. Vous pouvez aussi réorganiser les éléments par glisser-déposer.
+</p>
+</div>
+</details>
+</div>
+</div>
+
+</section>
+</div><!-- /kpwiz-steps-wrapper -->
+</div>
+</div>
+<div id="visualisations-wrapper" role="tabpanel" aria-labelledby="top-tab-btn-visual" class="mb-3 no-print flex flex-col gap-3 ld-page">
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col justify-center ld-page" id="timelines-wrapper">
+<button class="w-full px-3 py-2 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors no-print h-[32px] rounded-lg border border-slate-200" data-i18n-title="title_toggle_panel" data-action="toggle-panel" data-panel="timeline-panel">
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-slate-500 text-sm">
+        insights
+       </span>
+<span class="font-bold text-slate-700 uppercase text-xs tracking-wide" data-i18n="panel_timelines_title">
+        Visualisations des séquences
+       </span>
+</div>
+<span class="material-icons-round text-slate-400 rotate-icon text-sm" id="timeline-panel-icon">
+       expand_more
+      </span>
+</button>
+<div class="panel-content w-full flex flex-col gap-2 mt-2 p-2 rounded-xl border border-slate-200 bg-slate-50" id="timeline-panel" style="display: none;">
+<div class="flex justify-end">
+<span class="text-slate-400 text-[10px] italic" data-i18n="status_calculating" id="stats-update-info"></span>
+</div>
+<div class="bg-transparent rounded-xl border border-transparent p-1 flex items-center justify-start gap-2 flex-wrap" id="timeline-scale-controls">
+<div class="flex items-center gap-1">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-sm">zoom_in</span>
+<span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Échelle temporelle</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-1.5 py-0.5 rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-center" id="timeline-zoom-out" title="Zoom arrière" type="button">
+<span class="material-icons-round text-slate-600 text-sm">remove</span>
+</button>
+<input class="w-32 md:w-44" id="timeline-zoom-range" max="3" min="0.5" step="0.1" type="range" value="1"/>
+<span class="text-[11px] font-bold text-slate-600 w-10 text-right tabular-nums" id="timeline-zoom-value">100%</span>
+<button class="px-1.5 py-0.5 rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-center" id="timeline-zoom-in" title="Zoom avant" type="button">
+<span class="material-icons-round text-slate-600 text-sm">add</span>
+</button>
+<button class="px-1.5 py-0.5 rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-center" id="timeline-zoom-reset" title="Réinitialiser" type="button">
+<span class="material-icons-round text-slate-600 text-sm">restart_alt</span>
+</button>
+</div>
+<div class="flex items-center gap-2 ml-auto">
+  <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_duration_tolerance">Tolérance (écart acceptable)</span>
+  <div class="flex items-center gap-1">
+    <input class="w-12 px-2 py-0.5 text-[11px] border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none text-right" id="param-duration-tol-rel" min="0" step="0.5" data-action-input="update-stats-debounced" placeholder="%" type="number" value="5" aria-label="Tolérance relative en pourcentage"/>
+    <span class="text-[10px] text-slate-400" data-i18n="hint_duration_tolerance_pct">%</span>
+  </div>
+</div>
+</div>
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1">
+<div class="flex items-center justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-1.5">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-base">
+          view_agenda
+         </span>
+<span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_timeline_structure_planned">
+          Modules prévus
+         </span>
+</div>
+</div>
+<div class="w-full h-6 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-activities-planned">
+<div class="timeline-inner" id="timeline-activities-planned-inner"></div>
+</div>
+<div class="w-full flex text-xs text-slate-600 font-medium leading-none mt-1 timeline-zoom-outer" id="timeline-activities-planned-labels">
+<div class="timeline-inner" id="timeline-activities-planned-labels-inner"></div>
+</div>
+</div>
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1">
+<div class="flex items-center justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-1.5">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-base">
+          account_tree
+         </span>
+<span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_timeline_structure">
+          Modules conçus
+         </span>
+</div>
+</div>
+<div class="w-full h-6 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-activities">
+<div class="timeline-inner" id="timeline-activities-inner"></div>
+</div>
+<div class="w-full flex text-xs text-slate-600 font-medium leading-none mt-1 timeline-zoom-outer" id="timeline-activities-labels">
+<div class="timeline-inner" id="timeline-activities-labels-inner"></div>
+</div>
+</div>
+
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1">
+  <div class="flex items-center justify-between px-1">
+    <div class="flex items-center gap-1.5">
+      <span class="material-icons-round text-base text-slate-400">view_week</span>
+      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_timeline_moments">Moments</span>
+    </div>
+  </div>
+  <div class="w-full h-6 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-moments">
+    <div class="timeline-inner" id="timeline-moments-inner"></div>
+  </div>
+  <div class="w-full flex text-xs text-slate-600 font-medium leading-none mt-1 timeline-zoom-outer" id="timeline-moments-labels">
+    <div class="timeline-inner" id="timeline-moments-labels-inner"></div>
+  </div>
+</div>
+
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1">
+  <div class="flex items-center justify-between px-1">
+    <div class="flex items-center gap-1.5">
+      <span class="material-icons-round text-base text-slate-400">view_list</span>
+      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_timeline_submoments">Sous-moments</span>
+    </div>
+  </div>
+  <div class="w-full h-6 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-submoments">
+    <div class="timeline-inner" id="timeline-submoments-inner"></div>
+  </div>
+  <div class="w-full flex text-xs text-slate-600 font-medium leading-none mt-1 timeline-zoom-outer" id="timeline-submoments-labels">
+    <div class="timeline-inner" id="timeline-submoments-labels-inner"></div>
+  </div>
+</div>
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1 timeline-track-pedagogy">
+<div class="flex items-center justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-1.5">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-base">
+          psychology
+         </span>
+<span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_timeline_pedagogy">
+          Types d'apprentissage
+         </span>
+</div>
+</div>
+<div class="w-full h-6 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-steps">
+<div class="timeline-inner" id="timeline-steps-inner"></div>
+</div>
+</div>
+<button class="w-full px-2 py-1.5 flex items-center justify-between bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors" data-action="toggle-timeline-details" type="button">
+<div class="flex items-center gap-1.5">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-base">
+         tune
+        </span>
+<span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_timeline_details">
+         Détails
+        </span>
+</div>
+<span class="material-icons-round text-slate-400 rotate-icon text-sm" id="timeline-details-icon">
+        expand_more
+       </span>
+</button>
+<div class="panel-content w-full flex flex-col gap-2" data-display="flex" id="timeline-details" style="display: none;">
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1">
+<div class="flex items-center justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-1.5">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-base">
+          groups
+         </span>
+<span class="text-sm font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_grouping">
+          Regroupement
+         </span>
+</div>
+<span class="text-xs text-slate-600 font-medium bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5" data-i18n="legend_grouping">
+         Plein : Classe • Rayé : Groupes
+        </span>
+</div>
+<div class="w-full h-4 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-grouping">
+<div class="timeline-inner" id="timeline-grouping-inner"></div>
+</div>
+</div>
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1">
+<div class="flex items-center justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-1.5">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-base">
+          face
+         </span>
+<span class="text-sm font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_trainer">
+          Formateur
+         </span>
+</div>
+<span class="text-xs text-slate-600 font-medium bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5" data-i18n="legend_trainer">
+         Plein : Présent • Rayé : Absent
+        </span>
+</div>
+<div class="w-full h-4 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-trainer">
+<div class="timeline-inner" id="timeline-trainer-inner"></div>
+</div>
+</div>
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1">
+<div class="flex items-center justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-1.5">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-base">
+          place
+         </span>
+<span class="text-sm font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_place">
+          Lieu
+         </span>
+</div>
+<span class="text-xs text-slate-600 font-medium bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5" data-i18n="legend_place">
+         Plein : Présentiel • Rayé : En ligne
+        </span>
+</div>
+<div class="w-full h-4 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-place">
+<div class="timeline-inner" id="timeline-place-inner"></div>
+</div>
+</div>
+<div class="timeline-track bg-white rounded-xl border border-slate-200 p-1.5 flex flex-col gap-1">
+<div class="flex items-center justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-1.5">
+<span aria-hidden="true" class="material-icons-round text-slate-500 text-base">
+          event
+         </span>
+<span class="text-sm font-bold text-slate-500 uppercase tracking-wider" data-i18n="label_time">
+          Temps
+         </span>
+</div>
+<span class="text-xs text-slate-600 font-medium bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5" data-i18n="legend_time">
+         Plein : Synchrone • Rayé : Asynchrone
+        </span>
+</div>
+<div class="w-full h-4 flex rounded-lg overflow-hidden bg-slate-100 border border-slate-200 cursor-help timeline-zoom-outer" id="timeline-time">
+<div class="timeline-inner" id="timeline-time-inner"></div>
+</div>
+</div>
+</div>
+<div class="w-full h-9 relative mt-1 select-none pointer-events-none rounded-lg bg-transparent timeline-zoom-outer" id="timeline-ruler">
+<div class="timeline-inner" id="timeline-ruler-inner"></div>
+</div>
+<div aria-label="Défilement horizontal des visualisations" class="timeline-hscroll no-print" id="timeline-hscroll" role="scrollbar"><div id="timeline-hscroll-inner"></div><div aria-hidden="true" id="timeline-hscroll-thumb"></div></div></div>
+</div>
+</div>
+<details class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden w-full flex flex-col justify-center ld-page mt-2" id="analysis-tabs-wrap" open role="tabpanel" aria-labelledby="top-tab-btn-analysis"><summary class="w-full px-3 py-2 flex items-center justify-between bg-slate-50 border-b border-slate-200 cursor-pointer select-none"><div class="flex items-center gap-1.5">
+<span class="material-icons-round text-slate-500 text-sm">insights</span>
+<span class="font-bold text-slate-700 uppercase text-xs tracking-wide">Graphiques d'analyse</span>
+</div><span class="material-icons-round text-slate-500 text-sm analysis-chevron">expand_more</span></summary><div class="w-full"><div class="px-3 pt-2">
+<div aria-label="Graphiques d'analyse" class="analysis-tabbar" role="tablist">
+<button aria-selected="true" class="analysis-tab-btn is-active" data-analysis-tab="modalites" data-i18n="tab_modalities">Modalités</button>
+<button aria-selected="false" class="analysis-tab-btn" data-analysis-tab="competences" data-i18n="tab_competences">Compétences</button>
+<button aria-selected="false" class="analysis-tab-btn" data-analysis-tab="aims" data-i18n="tab_aims">Objectifs</button>
+<button aria-selected="false" class="analysis-tab-btn" data-analysis-tab="outcomes" data-i18n="tab_outcomes">Résultats</button>
+</div>
+</div><div class="p-2 pt-1" id="analysis-tabs-content">
+<div class="analysis-tab-pane" data-analysis-pane="competences" id="analysis-pane-competences">
+<div class="panel-content w-full flex flex-col gap-1 mt-1 p-1 rounded-lg border border-slate-200 bg-slate-50" id="competences-charts-panel">
+<!-- Statistiques de competences (Pack 2) -->
+<div class="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2" id="competences-analysis-grid">
+<!-- Couverture + non couvertes -->
+<div class="bg-white rounded-xl border border-slate-200 p-2">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Compétences</div>
+<div class="text-[11px] text-slate-500">Couverture</div>
+</div>
+<div class="mt-2 space-y-1 text-[11px] text-slate-700">
+<div class="flex items-center justify-between gap-2"><span class="font-semibold">Du sujet</span><span class="font-mono" id="comp-coverage-sujet">0/0 (0%)</span></div>
+<div class="flex items-center justify-between gap-2"><span class="font-semibold">Transversales</span><span class="font-mono" id="comp-coverage-trans">0/0 (0%)</span></div>
+</div>
+<details class="mt-2 border border-slate-200 rounded-lg bg-slate-50" id="comp-unused-details">
+<summary class="text-[11px] cursor-pointer select-none px-2 py-1.5 flex items-center gap-1">
+<span class="material-icons-round text-[14px] text-slate-400">rule</span>
+<span class="font-semibold text-slate-600">Compétences non mobilisées</span>
+<span class="ml-auto text-slate-400" id="comp-unused-count">0</span>
+</summary>
+<div class="px-2 pb-2 pt-1">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+<div>
+<div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Du sujet</div>
+<ul class="text-[11px] text-slate-700 list-disc ml-4 space-y-0.5" id="comp-unused-sujet"></ul>
+</div>
+<div>
+<div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Transversales</div>
+<ul class="text-[11px] text-slate-700 list-disc ml-4 space-y-0.5" id="comp-unused-trans"></ul>
+</div>
+</div>
+</div>
+</details>
+</div>
+<!-- Top competences (barres) -->
+<div class="bg-white rounded-xl border border-slate-200 p-2">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Top compétences</div>
+<div class="text-[11px] text-slate-500">(nb d’activités)</div>
+</div>
+<div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+<div class="border border-slate-200 rounded-lg overflow-hidden">
+<div class="px-2 py-1 bg-slate-50 text-[10px] text-slate-500 font-bold uppercase">Du sujet</div>
+<div class="p-1.5">
+<canvas class="w-full hidden" height="220" id="chart-comp-top-sujet"></canvas>
+<div class="w-full" id="chart-comp-top-sujet-html"></div>
+<details class="mt-2">
+<summary class="text-[11px] cursor-pointer select-none text-slate-500">Détails (table)</summary>
+<div class="mt-1 border border-slate-200 rounded-lg overflow-hidden">
+<table class="w-full text-[11px]"><tbody id="comp-top-sujet"></tbody></table>
+</div>
+</details>
+</div>
+</div>
+<div class="border border-slate-200 rounded-lg overflow-hidden">
+<div class="px-2 py-1 bg-slate-50 text-[10px] text-slate-500 font-bold uppercase">Transversales</div>
+<div class="p-1.5">
+<canvas class="w-full hidden" height="220" id="chart-comp-top-trans"></canvas>
+<div class="w-full" id="chart-comp-top-trans-html"></div>
+<details class="mt-2">
+<summary class="text-[11px] cursor-pointer select-none text-slate-500">Détails (table)</summary>
+<div class="mt-1 border border-slate-200 rounded-lg overflow-hidden">
+<table class="w-full text-[11px]"><tbody id="comp-top-trans"></tbody></table>
+</div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Répartition par module (barres empilées) -->
+<div class="mt-2 bg-white rounded-xl border border-slate-200 p-2" id="competences-by-module-card">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Répartition par module</div>
+<div class="text-[11px] text-slate-500">Sélections (Sujet/Transv.)</div>
+</div>
+<div class="mt-2">
+<canvas class="w-full hidden" height="220" id="chart-comp-by-module"></canvas>
+<div class="w-full" id="chart-comp-by-module-html"></div>
+</div>
+<details class="mt-2">
+<summary class="text-[11px] cursor-pointer select-none text-slate-500">Détails (table)</summary>
+<div class="mt-1 border border-slate-200 rounded-lg overflow-hidden">
+<table class="w-full text-[11px]">
+<thead class="bg-slate-50">
+<tr>
+<th class="text-left px-2 py-1 text-[10px] text-slate-500 font-bold uppercase">Module</th>
+<th class="text-right px-2 py-1 text-[10px] text-slate-500 font-bold uppercase">Sujet</th>
+<th class="text-right px-2 py-1 text-[10px] text-slate-500 font-bold uppercase">Transv.</th>
+<th class="text-right px-2 py-1 text-[10px] text-slate-500 font-bold uppercase">% Sujet</th>
+</tr>
+</thead>
+<tbody id="comp-by-module"></tbody>
+</table>
+</div>
+</details>
+</div>
+<!-- Réseau activités ↔ compétences (bipartite) -->
+<div class="mt-2 bg-white rounded-xl border border-slate-200 p-2" id="competences-bipartite-card">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Réseau activités ↔ compétences</div>
+<div class="text-[11px] text-slate-500">Compétences mobilisées uniquement</div>
+</div>
+<div class="mt-2 border border-slate-200 rounded-lg bg-slate-50 overflow-auto h-[340px]" id="competences-bipartite-wrap">
+<svg class="w-full" id="chart-comp-bipartite" preserveaspectratio="xMinYMin meet" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+<div class="mt-1 text-[11px] text-slate-500">Lignes pleines : sujet. Lignes en pointillés : transversales.</div>
+</div>
+</div>
+</div>
+<div class="analysis-tab-pane" data-analysis-pane="aims" id="analysis-pane-aims">
+<div class="panel-content w-full flex flex-col gap-1 mt-1 p-1 rounded-lg border border-slate-200 bg-slate-50" id="aims-charts-panel">
+<div class="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2" id="aims-analysis-grid">
+<!-- Couverture + non mobilisés -->
+<div class="bg-white rounded-xl border border-slate-200 p-2">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Objectifs d'apprentissage</div>
+<div class="text-[11px] text-slate-500">Couverture</div>
+</div>
+<div class="mt-2 space-y-1 text-[11px] text-slate-700">
+<div class="flex items-center justify-between gap-2"><span class="font-semibold">Sélectionnés dans les activités</span><span class="font-mono" id="aim-coverage">0/0 (0%)</span></div>
+</div>
+<details class="mt-2 border border-slate-200 rounded-lg bg-slate-50" id="aim-unused-details">
+<summary class="text-[11px] cursor-pointer select-none px-2 py-1.5 flex items-center gap-1">
+<span class="material-icons-round text-[14px] text-slate-400">rule</span>
+<span class="font-semibold text-slate-600">Objectifs non mobilisés</span>
+<span class="ml-auto text-slate-400" id="aim-unused-count">0</span>
+</summary>
+<div class="px-2 pb-2 pt-1">
+<ul class="text-[11px] text-slate-700 list-disc ml-4 space-y-0.5" id="aim-unused"></ul>
+</div>
+</details>
+</div>
+<!-- Top objectifs -->
+<div class="bg-white rounded-xl border border-slate-200 p-2">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Top objectifs</div>
+<div class="text-[11px] text-slate-500">(nb d’activités)</div>
+</div>
+<div class="mt-2">
+<div class="w-full" id="chart-aim-top-html"></div>
+<details class="mt-2">
+<summary class="text-[11px] cursor-pointer select-none text-slate-500">Détails (table)</summary>
+<div class="mt-1 border border-slate-200 rounded-lg overflow-hidden">
+<table class="w-full text-[11px]"><tbody id="aim-top-table"></tbody></table>
+</div>
+</details>
+</div>
+</div>
+</div>
+<div class="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2">
+<!-- Répartition par catégorie -->
+<div class="bg-white rounded-xl border border-slate-200 p-2" id="aims-by-category-card">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Répartition par catégorie</div>
+<div class="text-[11px] text-slate-500">(nb d’objectifs sélectionnés)</div>
+</div>
+<div class="mt-2">
+<div class="w-full" id="chart-aim-by-category-html"></div>
+</div>
+</div>
+<!-- Répartition par module -->
+<div class="bg-white rounded-xl border border-slate-200 p-2" id="aims-by-module-card">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Répartition par module</div>
+<div class="text-[11px] text-slate-500">(nb d’objectifs sélectionnés)</div>
+</div>
+<div class="mt-2">
+<div class="w-full" id="chart-aim-by-module-html"></div>
+</div>
+</div>
+</div>
+<div class="mt-1 text-[11px] text-slate-500">Ces graphiques analysent les objectifs sélectionnés dans les activités. La liste de référence provient de « Informations et paramètres → 3. Objectifs et résultats ».</div>
+</div>
+</div>
+<div class="analysis-tab-pane" data-analysis-pane="outcomes" id="analysis-pane-outcomes">
+<div class="panel-content w-full flex flex-col gap-1 mt-1 p-1 rounded-lg border border-slate-200 bg-slate-50" id="outcomes-charts-panel">
+<div class="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2" id="outcomes-analysis-grid">
+<!-- Couverture + non mobilisés -->
+<div class="bg-white rounded-xl border border-slate-200 p-2">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Résultats d'apprentissage</div>
+<div class="text-[11px] text-slate-500">Couverture</div>
+</div>
+<div class="mt-2 space-y-1 text-[11px] text-slate-700">
+<div class="flex items-center justify-between gap-2"><span class="font-semibold">Sélectionnés dans les activités</span><span class="font-mono" id="out-coverage">0/0 (0%)</span></div>
+</div>
+<details class="mt-2 border border-slate-200 rounded-lg bg-slate-50" id="out-unused-details">
+<summary class="text-[11px] cursor-pointer select-none px-2 py-1.5 flex items-center gap-1">
+<span class="material-icons-round text-[14px] text-slate-400">rule</span>
+<span class="font-semibold text-slate-600">Résultats non mobilisés</span>
+<span class="ml-auto text-slate-400" id="out-unused-count">0</span>
+</summary>
+<div class="px-2 pb-2 pt-1">
+<ul class="text-[11px] text-slate-700 list-disc ml-4 space-y-0.5" id="out-unused"></ul>
+</div>
+</details>
+</div>
+<!-- Top résultats -->
+<div class="bg-white rounded-xl border border-slate-200 p-2">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Top résultats</div>
+<div class="text-[11px] text-slate-500">(nb d’activités)</div>
+</div>
+<div class="mt-2">
+<div class="w-full" id="chart-out-top-html"></div>
+<details class="mt-2">
+<summary class="text-[11px] cursor-pointer select-none text-slate-500">Détails (table)</summary>
+<div class="mt-1 border border-slate-200 rounded-lg overflow-hidden">
+<table class="w-full text-[11px]"><tbody id="out-top-table"></tbody></table>
+</div>
+</details>
+</div>
+</div>
+</div>
+<div class="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2">
+<!-- Répartition par catégorie -->
+<div class="bg-white rounded-xl border border-slate-200 p-2" id="outcomes-by-category-card">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Répartition par catégorie</div>
+<div class="text-[11px] text-slate-500">(nb de résultats sélectionnés)</div>
+</div>
+<div class="mt-2">
+<div class="w-full" id="chart-out-by-category-html"></div>
+</div>
+</div>
+<!-- Répartition par module -->
+<div class="bg-white rounded-xl border border-slate-200 p-2" id="outcomes-by-module-card">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600">Répartition par module</div>
+<div class="text-[11px] text-slate-500">(nb de résultats sélectionnés)</div>
+</div>
+<div class="mt-2">
+<div class="w-full" id="chart-out-by-module-html"></div>
+</div>
+</div>
+</div>
+<div class="mt-1 text-[11px] text-slate-500">Ces graphiques analysent les résultats sélectionnés dans les activités. La liste de référence provient de « Informations et paramètres → 3. Objectifs et résultats ».</div>
+</div>
+</div>
+<div class="analysis-tab-pane is-active" data-analysis-pane="modalites" id="analysis-pane-modalites">
+<div class="panel-content w-full flex flex-col gap-1 mt-1 p-1 rounded-lg border border-slate-200 bg-slate-50" id="modalites-charts-panel">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+<div class="bg-white rounded-xl border border-slate-200 p-2">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600" data-i18n="chart_learning_types">Types d'apprentissage</div>
+<div class="text-[11px] text-slate-500" data-i18n="chart_percent_duration">(% de durée)</div>
+</div>
+<div class="mt-2 flex gap-2 items-stretch">
+<div class="w-1/2">
+<canvas class="w-full" height="300" id="chart-learning-types"></canvas>
+</div>
+<div class="w-1/2 h-[300px] flex flex-col justify-center gap-1 text-[11px] leading-tight text-slate-700" id="chart-learning-types-legend"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-2">
+<div class="bg-white rounded-xl border border-slate-200 p-1.5">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600" data-i18n="chart_group_modes">Modes de groupes</div>
+<div class="text-[11px] text-slate-500" data-i18n="chart_percent_duration">(% de durée)</div>
+</div>
+<canvas height="80" id="chart-group-modes"></canvas>
+</div>
+<div class="bg-white rounded-xl border border-slate-200 p-1.5">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600" data-i18n="chart_place_modes">Modes de lieu</div>
+<div class="text-[11px] text-slate-500">(% de durée)</div>
+</div>
+<canvas height="80" id="chart-place-modes"></canvas>
+</div>
+<div class="bg-white rounded-xl border border-slate-200 p-1.5">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600" data-i18n="chart_time_modes">Modes de temps</div>
+<div class="text-[11px] text-slate-500">(% de durée)</div>
+</div>
+<canvas height="80" id="chart-time-modes"></canvas>
+</div>
+<div class="bg-white rounded-xl border border-slate-200 p-1.5">
+<div class="flex items-center justify-between">
+<div class="text-xs font-bold text-slate-600" data-i18n="chart_trainer_presence">Présence du formateur</div>
+<div class="text-[11px] text-slate-500">(% de durée)</div>
+</div>
+<canvas height="80" id="chart-trainer-presence"></canvas>
+</div>
+</div>
+</div>
+<div class="mt-1 text-[11px] text-slate-500">Ces graphiques analysent les modalités des activités (types d’apprentissage, regroupement, lieu, temps, présence du formateur) en pondérant par la durée.</div>
+</div>
+</div>
+</div>
+</div></div></details>
+<div class="ld-page" id="view-designer">
+<div class="flex flex-wrap items-center justify-between mb-2 no-print gap-2" id="view-controls-toolbar">
+
+  <!-- SECTION 1: NAVIGATION -->
+  <div class="flex items-center gap-2 flex-shrink-0">
+    <span class="hidden lg:inline text-[10px] font-bold text-slate-500 uppercase tracking-wider" aria-hidden="true">Navigation</span>
+    <select id="jump-to-select" class="ld-control-select min-w-[180px] max-w-[280px] sm:min-w-[240px] sm:max-w-[360px]" aria-label="Navigation rapide vers un élément">
+      <option value="" data-i18n="opt_goto">Aller à…</option>
+    </select>
+    <button id="jump-to-refresh" class="ld-control-btn border-slate-300 hover:border-indigo-400" type="button" title="Actualiser la liste de navigation" aria-label="Actualiser la navigation">
+      <span class="material-icons-round text-[16px]">refresh</span>
+      <span class="hidden sm:inline">Actualiser</span>
+    </button>
+  </div>
+
+  <!-- SÉPARATEUR -->
+  <div class="ld-separator hidden xl:block" role="separator" aria-hidden="true"></div>
+
+  <!-- SECTION 2: CONTRÔLES D'AFFICHAGE -->
+  <div class="flex flex-wrap items-center justify-end gap-2 flex-grow">
+
+    <!-- GROUPE: Niveau d'affichage -->
+    <div class="ld-control-group">
+      <span class="hidden md:inline text-xs text-slate-500 font-extrabold" aria-hidden="true">Niveau</span>
+
+      <div id="ld-view-level-segmented" class="inline-flex rounded-md border border-slate-200 bg-white overflow-hidden" role="group" aria-label="Sélection du niveau d'affichage">
+        <button type="button" class="ld-segmented-btn border-r border-slate-200" data-view-level="modules" data-i18n="btn_view_modules">Modules</button>
+        <button type="button" class="ld-segmented-btn border-r border-slate-200" data-view-level="moments" data-i18n="btn_view_moments">Moments</button>
+        <button type="button" class="ld-segmented-btn border-r border-slate-200" data-view-level="submoments" data-i18n="btn_view_submoments">Sous-moments</button>
+        <button type="button" class="ld-segmented-btn border-r border-slate-200" data-view-level="activities" data-i18n="btn_view_activities">Activités</button>
+        <button type="button" class="ld-segmented-btn" data-view-level="panorama" data-i18n="btn_view_panorama">Panorama</button>
+      </div>
+
+      <button class="ld-control-btn ml-1" id="btn-toggle-all-main" data-action="toggle-all-activities" aria-label="Replier ou déplier tous les modules" title="Replier ou déplier tous les modules">
+        <span class="material-icons-round text-base" id="icon-toggle-all-main">unfold_less</span>
+        <span class="hidden xl:inline" data-i18n="btn_collapse_all" id="text-toggle-all-main">Tout replier</span>
+      </button>
+    </div>
+
+    <!-- SÉPARATEUR -->
+    <div class="ld-separator hidden xl:block" role="separator" aria-hidden="true"></div>
+
+    <!-- GROUPE: Filtres et états -->
+    <div class="ld-control-group">
+      <span class="hidden md:inline text-xs text-slate-500 font-extrabold" aria-hidden="true">Filtre</span>
+
+      <select id="status-filter" class="ld-control-select" title="Filtrer l'affichage par état" aria-label="Filtrer par état de réalisation">
+        <option value="all" selected data-i18n="opt_all_statuses">Tous</option>
+        <option value="review" data-i18n="opt_status_review">À revoir</option>
+        <option value="in_progress" data-i18n="opt_status_inprogress">En cours</option>
+        <option value="done" data-i18n="opt_status_completed">Finalisé</option>
+      </select>
+
+      <button id="status-filter-clear" data-i18n="btn_reset">Réinitialiser</button>
+
+      <button id="btn-toggle-status-summaries" type="button" aria-pressed="true"
+        class="ld-control-btn"
+        title="Afficher ou masquer les synthèses d'état">
+        <span class="material-icons-round text-[16px]" id="icon-toggle-status-summaries">visibility_off</span>
+        <span class="hidden lg:inline" id="text-toggle-status-summaries">Masquer synthèses</span>
+      </button>
+
+      <button id="btn-toggle-status-selectors" type="button" aria-pressed="false"
+        class="ld-control-btn"
+        data-i18n-title="title_toggle_status_selectors"
+        title="Afficher ou masquer les sélecteurs d'état dans les activités">
+        <span class="material-icons-round text-[16px]" id="icon-toggle-status-selectors">visibility</span>
+        <span class="hidden lg:inline" id="text-toggle-status-selectors" data-i18n="btn_show_status_selectors">Afficher états</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+</div>
+<div class="ld-page" id="designer-flow">
+
+<div id="panorama-view" class="hidden mt-2">
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="text-xs font-extrabold text-slate-500">Vue panoramique</div>
+
+      <span class="text-xs text-slate-500 font-extrabold">État :</span>
+      <select id="panorama-status-filter" class="h-[26px] px-2 text-xs border border-slate-200 rounded-md bg-white text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-200" title="Filtrer par état">
+        <option value="all" data-i18n="opt_all_statuses">Tous</option>
+        <option value="review" data-i18n="opt_status_review">À revoir</option>
+        <option value="in_progress" data-i18n="opt_status_inprogress">En cours</option>
+        <option value="done" data-i18n="opt_status_completed">Finalisé</option>
+      </select>
+
+      <span class="text-slate-300 px-1 select-none">|</span>
+
+      <input id="panorama-filter" class="h-[26px] w-64 px-2 rounded-md border border-slate-200 bg-white text-slate-600 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-200" placeholder="Filtrer (module, moment, activité…)" data-i18n-placeholder="ph_panorama_filter"/>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-xs text-slate-500 font-extrabold">Sélection : <span id="panorama-selected-count">0</span></span>
+
+      <span class="text-xs text-slate-500 font-extrabold">→ État :</span>
+      <select id="panorama-batch-status" class="h-[26px] px-2 text-xs border border-slate-200 rounded-md bg-white text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-200" title="Définir l’état des lignes sélectionnées">
+        <option value="review" data-i18n="opt_status_review">À revoir</option>
+        <option value="in_progress" data-i18n="opt_status_inprogress">En cours</option>
+        <option value="done" data-i18n="opt_status_completed">Finalisé</option>
+      </select>
+
+      <button id="panorama-batch-apply" type="button" class="h-[26px] px-2 rounded-md border border-slate-200 bg-white text-slate-600 text-xs font-extrabold hover:text-indigo-700 hover:bg-slate-50 transition-colors" title="Appliquer l’état aux lignes sélectionnées">
+        Appliquer
+      </button>
+
+      <button id="panorama-batch-clear" type="button" class="h-[26px] px-2 rounded-md border border-slate-200 bg-white text-slate-600 text-xs font-extrabold hover:text-indigo-700 hover:bg-slate-50 transition-colors" title="Vider la sélection">
+        Vider
+      </button>
+
+      <button id="panorama-refresh" type="button" class="h-[26px] px-2 rounded-md border border-slate-200 bg-white text-slate-600 text-xs font-extrabold hover:text-indigo-700 hover:bg-slate-50 transition-colors" title="Rafraîchir la vue panoramique">
+        Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <div class="border border-slate-200 rounded-lg bg-white overflow-auto">
+    <table class="w-full text-[11px] leading-tight" id="panorama-table">
+      <colgroup>
+        <col style="width:30px">
+        <col style="width:44px">
+        <col style="width:240px">
+        <col style="width:240px">
+        <col style="width:240px">
+        <col style="width:240px">
+        <col style="width:132px">
+        <col style="width:96px">
+        <col style="width:84px">
+      </colgroup>
+
+      <thead class="sticky top-0 bg-slate-50 border-b border-slate-200">
+        <tr class="text-slate-600">
+          <th class="text-left font-extrabold px-2 py-1 pano-col-select">
+            <input id="panorama-select-all" type="checkbox" class="align-middle" title="Tout sélectionner (lignes visibles)"/>
+          </th>
+          <th class="text-left font-extrabold px-2 py-1 w-12 pano-sortable" data-sort-key="n"><span>#</span><span class="pano-sort-ind"></span></th>
+          <th class="text-left font-extrabold px-2 py-1 min-w-[180px] pano-sortable" data-sort-key="module"><span>Module</span><span class="pano-sort-ind"></span></th>
+          <th class="text-left font-extrabold px-2 py-1 min-w-[160px] pano-sortable" data-sort-key="moment"><span>Moment</span><span class="pano-sort-ind"></span></th>
+          <th class="text-left font-extrabold px-2 py-1 min-w-[160px] pano-sortable" data-sort-key="bloc"><span>Sous-moment</span><span class="pano-sort-ind"></span></th>
+          <th class="text-left font-extrabold px-2 py-1 min-w-[220px] pano-sortable" data-sort-key="activite"><span>Activité</span><span class="pano-sort-ind"></span></th>
+          <th class="text-left font-extrabold px-2 py-1 pano-sortable pano-col-status" data-sort-key="status"><span>État</span><span class="pano-sort-ind"></span></th>
+          <th class="text-left font-extrabold px-2 py-1 w-20 pano-sortable pano-col-duration" data-sort-key="duree"><span>Durée</span><span class="pano-sort-ind"></span></th>
+          <th class="text-left font-extrabold px-2 py-1 w-16">Ouvrir</th>
+        </tr>
+      </thead>
+      <tbody id="panorama-tbody" class="text-slate-700"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="status-filter-empty" class="hidden text-center py-10 bg-white rounded-xl border-2 border-dashed border-slate-300 mt-3">
+  <h3 class="mt-1 text-base font-medium text-slate-900" data-i18n="msg_no_filter_match">Aucun élément ne correspond au filtre.</h3>
+  <p class="mt-0.5 text-xs text-slate-500">Modifiez le filtre ou réinitialisez-le pour tout afficher.</p>
+</div>
+
+<div class="space-y-4" id="activities-root">
+</div>
+<div class="hidden text-center py-12 bg-white rounded-xl border-2 border-dashed border-slate-300" id="empty-state">
+<h3 class="mt-1 text-base font-medium text-slate-900" data-i18n="empty_title">
+      Aucun module conçu
+     </h3>
+<p class="mt-0.5 text-xs text-slate-500" data-i18n="empty_subtitle">
+      Commencez par créer votre premier module.
+     </p>
+<button class="mt-4 inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700" data-i18n-title="title_create_activity" data-action="add-activity">
+<span class="material-icons-round mr-1 text-sm">
+       add
+      </span>
+<span data-i18n="btn_create_activity">
+       Créer un Module
+      </span>
+</button>
+</div>
+</div>
+
+</div>
+<div class="mt-6 mb-4 no-print flex justify-start ld-page">
+<button class="bg-white border border-slate-300 hover:border-indigo-500 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded font-bold shadow-sm flex items-center gap-1.5 transition-all text-xs" data-i18n-title="title_new_activity" data-action="add-activity">
+<span class="material-icons-round text-lg">
+      add_circle
+     </span>
+<span data-i18n="btn_new_activity">
+      Nouveau Module
+     </span>
+</button>
+</div>
+<!-- Footer Mount Point (common footer loads here) -->
+<div id="app-footer-mount"></div>
+</div>
+<div class="hidden fixed inset-0 bg-slate-900 bg-opacity-50 z-50 flex items-center justify-center p-4" id="custom-confirm-modal">
+<div class="bg-white rounded-lg shadow-lg p-4 max-w-sm w-full">
+<h3 class="text-sm font-bold text-slate-800 mb-2" data-i18n="modal_confirm_title">
+     Confirmer l'action
+    </h3>
+<p class="text-slate-600 mb-4 text-xs" id="custom-confirm-msg">
+     Êtes-vous sûr ?
+    </p>
+<div class="flex justify-end gap-2">
+<button class="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded text-xs font-medium transition-colors" data-i18n="btn_cancel" id="custom-confirm-no">
+      Annuler
+     </button>
+<button class="px-3 py-1.5 bg-red-500 text-white hover:bg-red-600 rounded text-xs font-medium transition-colors" data-i18n="btn_delete" id="custom-confirm-yes">
+      Supprimer
+     </button>
+</div>
+</div>
+</div>
+<div aria-labelledby="import-error-title" aria-modal="true" class="hidden fixed inset-0 bg-slate-900 bg-opacity-50 z-50 flex items-center justify-center p-4" id="import-error-modal" role="dialog">
+<div class="bg-white rounded-lg shadow-lg p-4 max-w-lg w-full">
+<h3 class="text-sm font-bold text-slate-800 mb-2" data-i18n="import_error_title" id="import-error-title">Erreur d’import</h3>
+<div class="text-slate-700 text-xs space-y-3" id="import-error-body">
+<!-- filled dynamically -->
+</div>
+<div class="flex justify-end gap-2 mt-4">
+<button class="px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded text-xs font-medium transition-colors" data-i18n="btn_close" id="import-error-close" type="button">Fermer</button>
+<button class="px-3 py-1.5 bg-slate-700 text-white hover:bg-slate-800 rounded text-xs font-medium transition-colors hidden" data-i18n="btn_copy_diagnostic" id="import-error-copy" type="button">Copier le diagnostic</button>
+<button class="px-3 py-1.5 bg-slate-700 text-white hover:bg-slate-800 transition-colors" data-i18n="btn_recover_text" id="import-error-recover">Récupérer version texte</button>
+<button class="px-3 py-1.5 bg-slate-700 text-white hover:bg-slate-800 rounded text-xs font-medium transition-colors hidden" data-i18n="btn_copy_recovery_text" id="import-error-copy-recovery" type="button">Copier le texte récupéré</button>
+<button class="px-3 py-1.5 bg-slate-800 text-white hover:bg-slate-900 rounded text-xs font-medium transition-colors hidden" data-i18n="btn_download_report" id="import-error-download" type="button">Télécharger rapport</button>
+</div>
+</div>
+</div>
+<div class="fixed z-[100] hidden bg-white text-slate-900 text-[11px] px-2 py-1 rounded-lg border border-slate-200 shadow-lg max-w-[220px] whitespace-normal leading-tight" id="global-tooltip">
+</div>
+<div aria-labelledby="module-selection-modal-title" aria-modal="true" class="hidden fixed inset-0 bg-slate-900 bg-opacity-50 z-[120] flex items-center justify-center p-4" id="module-selection-modal" role="dialog">
+<div class="bg-white rounded-lg shadow-lg p-4 max-w-lg w-full">
+<h3 class="text-sm font-bold text-slate-800 mb-2" id="module-selection-modal-title" data-i18n="heading_selection">Sélection</h3>
+<div class="text-xs text-slate-700" id="module-selection-modal-body"></div>
+<div class="flex justify-end gap-2 mt-4">
+<button class="px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded text-xs font-medium transition-colors" id="module-selection-modal-cancel" data-i18n="btn_cancel">Annuler</button>
+<button class="px-3 py-1.5 bg-slate-700 text-white hover:bg-slate-800 rounded text-xs font-medium transition-colors" id="module-selection-modal-apply" data-i18n="btn_apply">Appliquer</button>
+</div>
+</div>
+</div>
+<!-- Global Search Modal -->
+<div aria-labelledby="global-search-modal-title"
+     aria-modal="true"
+     class="fixed inset-0 hidden items-start justify-center p-3 md:p-8 z-[110]"
+     id="global-search-modal"
+     role="dialog">
+  <div class="absolute inset-0 bg-black/30" data-role="global-search-backdrop"></div>
+  <div class="relative w-full max-w-4xl bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white">
+      <div class="flex items-center gap-2">
+        <span class="material-icons-round text-slate-500">search</span>
+        <div class="font-semibold text-sm" id="global-search-modal-title">Recherche globale</div>
+        <div class="text-xs text-slate-500 hidden md:block">Ctrl+K</div>
+      </div>
+      <button class="p-1.5 rounded hover:bg-slate-200 text-slate-600"
+              id="global-search-close-btn"
+              type="button"
+              title="Fermer">
+        <span class="material-icons-round text-[18px]">close</span>
+      </button>
+    </div>
+
+    <div class="px-4 py-3 border-b border-slate-200">
+      <div class="flex flex-col md:flex-row md:items-center gap-2">
+        <input class="flex-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none"
+               id="global-search-input"
+               placeholder="Rechercher dans les modules, activités, contenus…" data-i18n-placeholder="ph_global_search"
+               type="text" />
+        <button class="px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white hover:bg-slate-50"
+                id="global-search-refresh-btn"
+                type="button">Actualiser</button>
+      </div>
+      <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-600">
+        <label class="inline-flex items-center gap-1">
+          <input class="accent-indigo-600" id="global-search-in-tools" type="checkbox" checked />
+          Inclure outils &amp; remarques
+        </label>
+        <label class="inline-flex items-center gap-1">
+          <input class="accent-indigo-600" id="global-search-in-align" type="checkbox" checked />
+          Inclure alignement
+        </label>
+      </div>
+      <div class="mt-2 text-xs text-slate-500" id="global-search-count"></div>
+    </div>
+
+    <div class="max-h-[65vh] overflow-auto">
+      <div class="divide-y divide-slate-100" id="global-search-results"></div>
+      <div class="hidden p-4 text-sm text-slate-500" id="global-search-empty">Aucun résultat.</div>
+    </div>
+  </div>
+</div>
+
+<div aria-labelledby="export-preview-modal-title"
+     aria-modal="true"
+     class="fixed inset-0 hidden items-center justify-center p-4 bg-black/40 z-[100]"
+     id="export-preview-modal"
+     role="dialog">
+  <div class="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-6xl overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white">
+      <div class="flex items-center gap-2">
+        <span class="material-icons-round text-slate-600">visibility</span>
+        <h3 class="text-sm font-bold text-slate-800" id="export-preview-modal-title" data-i18n="heading_export_preview">Aperçu export</h3>
+      </div>
+      <button class="text-slate-500 hover:text-slate-800 p-1 rounded hover:bg-slate-100"
+              data-action="close-export-preview"
+              title="Fermer"
+              type="button">
+        <span class="material-icons-round text-[18px]">close</span>
+      </button>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-0">
+      <!-- Controls -->
+      <div class="w-full lg:w-[360px] border-b lg:border-b-0 lg:border-r border-slate-200 p-4 space-y-4">
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Format</label>
+          <select class="mt-1 w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                  id="export-preview-format">
+            <option value="markdown">Markdown</option>
+            <option value="richtext">HTML</option>
+            <option value="rtf">RTF</option>
+            <option value="docx">DOCX</option>
+            <option value="xlsx">XLSX</option>
+          </select>
+          <div class="mt-1 text-[11px] text-slate-500">L’aperçu s’affiche en Markdown/HTML. Les autres formats restent exportables.</div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Périmètre</label>
+          <div class="mt-2 space-y-2 text-xs text-slate-700">
+            <label class="flex items-center gap-2">
+              <input checked name="export-scope" type="radio" value="all"/>
+              <span>Formation entière</span>
+            </label>
+
+            <label class="flex items-center gap-2">
+              <input name="export-scope" type="radio" value="module"/>
+              <span>Un module</span>
+            </label>
+            <div class="pl-6">
+              <select class="w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                      id="export-preview-scope-module"
+                      disabled>
+              </select>
+            </div>
+
+            <label class="flex items-center gap-2">
+              <input name="export-scope" type="radio" value="activities"/>
+              <span>Activités sélectionnées</span>
+            </label>
+
+            <div class="pl-6 space-y-2">
+              <div class="flex gap-2">
+                <input class="flex-1 px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                       id="export-preview-activity-filter"
+                       placeholder="Filtrer… (titre module/moment/activité)" data-i18n-placeholder="ph_timeline_filter"
+                       type="text"
+                       disabled/>
+                <button class="px-2 py-1.5 text-xs rounded bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        id="export-preview-activities-clear"
+                        type="button"
+                        disabled>Tout décocher</button>
+              </div>
+
+              <div class="max-h-[220px] overflow-auto border border-slate-200 rounded p-2 bg-slate-50"
+                   id="export-preview-activities"
+                   aria-label="Liste des activités"
+                   data-empty="true">
+                <div class="text-[11px] text-slate-500">Aucune activité.</div>
+              </div>
+
+              <div class="text-[11px] text-slate-500" id="export-preview-activities-count"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Options</label>
+          <div class="mt-2 space-y-2 text-xs text-slate-700">
+            <label class="flex items-center gap-2">
+              <input checked id="export-opt-align" type="checkbox"/>
+              <span>Inclure alignement</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input checked id="export-opt-tools" type="checkbox"/>
+              <span>Inclure outils & matériel</span>
+            </label>
+            <label class="flex items-center gap-2 pl-6">
+              <input checked id="export-opt-toolnotes" type="checkbox"/>
+              <span>Inclure remarques outils</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input id="export-opt-empty" type="checkbox"/>
+              <span>Inclure sections vides</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+          <button class="px-3 py-1.5 text-xs rounded bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  data-action="close-export-preview"
+                  type="button">Fermer</button>
+          <button class="px-3 py-1.5 text-xs rounded bg-slate-700 text-white hover:bg-slate-800"
+                  id="export-preview-run"
+                  type="button">Exporter</button>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="flex-1 p-4 bg-white">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Aperçu</div>
+          <div class="text-[11px] text-slate-500" id="export-preview-hint"></div>
+        </div>
+
+        <div class="border border-slate-200 rounded-lg overflow-auto max-h-[70vh] bg-slate-50">
+          <pre class="p-3 text-[12px] leading-relaxed whitespace-pre-wrap text-slate-800"
+               id="export-preview-text"></pre>
+          <div class="hidden p-3 text-sm leading-relaxed text-slate-800"
+               id="export-preview-html"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<template id="activity-template">
+<div class="activity-group relative bg-white rounded-xl shadow-sm border border-slate-200 p-3">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between mb-2 gap-2">
+<div class="flex-1 flex items-center gap-2">
+<div class="drag-handle-activity drag-handle text-slate-300 hover:text-slate-500 no-print flex items-center justify-center w-6 h-6 cursor-grab">
+<span class="material-icons-round text-lg">
+        drag_indicator
+       </span>
+</div>
+<div class="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 activity-index shrink-0 text-xs">
+       1
+      </div>
+<div class="flex-1 w-full">
+<input class="activity-title text-base font-bold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 outline-none w-full py-0.5 transition-colors" data-i18n-placeholder="ph_activity_title" data-action-input="update-stats-debounced" placeholder="Titre du module (ex: Module 1 : Introduction)" type="text"/>
+<div class="flex items-center gap-2 mt-0.5 pr-1">
+<div class="activity-type-bar flex-1 h-1.5 bg-slate-100 border border-slate-200 rounded-full overflow-hidden flex">
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 no-print">
+<div class="flex items-center gap-3 mr-2">
+<div class="flex flex-col items-end">
+<span class="text-[9px] text-slate-400 uppercase font-bold tracking-wider leading-none mb-0.5" data-i18n="label_target">
+         Cible
+        </span>
+<div class="flex items-center gap-1">
+<input class="activity-target-time w-12 px-1 py-0.5 text-xs text-right border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none h-[22px]" min="0" data-action-input="update-stats-debounced" placeholder="0" type="number"/>
+<select class="activity-target-unit w-20 px-0 py-0.5 text-[10px] border border-slate-200 rounded bg-slate-50 focus:ring-1 focus:ring-indigo-500 outline-none h-[22px]" data-action-change="update-stats">
+<option data-i18n="unit_mins" value="60">
+           min
+          </option>
+<option data-i18n="unit_hours" value="3600">
+           Heures
+          </option>
+<option data-i18n="unit_days" value="86400">
+           Jours
+          </option>
+<option data-i18n="unit_weeks" value="604800">
+           Semaines
+          </option>
+<option data-i18n="unit_months" value="2592000">
+           Mois
+          </option>
+</select>
+</div>
+</div>
+<span aria-hidden="true" class="module-time-compare text-xs font-bold bg-transparent mx-1 select-none self-center">=</span>
+<div class="flex flex-col items-end">
+<span class="text-[9px] text-slate-400 uppercase font-bold tracking-wider leading-none mb-0.5" data-i18n="label_designed">
+         Conçu
+        </span>
+<div class="bg-indigo-50 border border-indigo-100 rounded px-2 py-0.5 h-[22px] flex items-center min-w-[3rem] justify-end activity-designed-badge">
+<span class="activity-total-time text-xs font-bold text-indigo-700 font-mono">
+          0m
+         </span>
+</div>
+</div>
+</div>
+<div class="activity-status-summary ld-status-summary ld-status-summary--module" title="Synthèse des états des activités du module"></div>
+
+<button aria-pressed="false" class="text-slate-400 hover:text-indigo-500 p-1 transition-colors" data-action="toggle-module-subblocks" title="Paramètres du module" type="button">
+<span class="material-icons-round text-lg">view_agenda</span>
+</button>
+<div class="h-8 w-px bg-slate-100 mx-1">
+</div>
+<button class="text-slate-400 hover:text-indigo-500 p-1 transition-colors" data-action="toggle-module" data-i18n-title="title_toggle_panel" title="Afficher/Masquer le détail du module">
+<span class="material-icons-round text-lg rotate-icon">
+        expand_more
+       </span>
+</button>
+<button class="text-slate-400 hover:text-indigo-500 p-1 transition-colors" data-action="collapse-module-contents" title="Replier tous les moments et activités de ce module" type="button">
+<span class="material-icons-round text-lg">unfold_less</span>
+</button>
+<button class="text-slate-400 hover:text-indigo-500 p-1 transition-colors" data-action="duplicate-module" data-i18n-title="title_duplicate_activity" title="Dupliquer ce module" type="button">
+<span class="material-icons-round text-lg">
+        content_copy
+       </span>
+</button>
+<button aria-pressed="false" class="text-slate-400 hover:text-indigo-500 p-1 transition-colors" data-action="focus-module" data-i18n-title="title_focus_module" title="Mode focus" type="button">
+<span class="material-icons-round text-lg focus-toggle-icon">center_focus_strong</span>
+</button>
+<button class="text-slate-400 hover:text-red-500 p-1 transition-colors" data-action="delete-module" data-i18n-title="title_delete_activity" title="Supprimer ce module" type="button">
+<span class="material-icons-round text-lg">
+        delete_outline
+       </span>
+</button>
+</div>
+</div>
+<div class="activity-body panel-content open">
+<div class="module-subblocks hidden ml-8 pr-1 mb-2">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+
+    <!-- Carte A — SAISIE -->
+    <section class="rounded-xl border border-indigo-100 bg-white shadow-sm">
+      <div class="flex items-center justify-between px-3 py-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="material-icons-round text-[16px] text-indigo-600">edit</span>
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-600">Saisie du module</span>
+        </div>
+</div>
+
+      <div class="p-3">
+        <div class="compact-label" data-i18n="label_module_objectives">Objectif(s) du module</div>
+        <textarea class="activity-description w-full px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none resize-y bg-slate-50 leading-relaxed" data-i18n-placeholder="ph_activity_desc" placeholder="Objectif(s) du module..." rows="4"></textarea>
+        <p class="text-[11px] text-slate-400 mt-1">Saisie manuelle : ce texte est exporté tel quel.</p>
+
+        <div class="mt-3">
+          <div class="compact-label" data-i18n="label_module_notes">Notes</div>
+          <textarea class="module-notes w-full px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none resize-y bg-white leading-relaxed" data-i18n-placeholder="ph_module_notes" placeholder="Notes..." rows="3"></textarea>
+          <p class="text-[11px] text-slate-400 mt-1" data-i18n="help_module_notes">Remarques diverses du formateur (exportées telles quelles).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Carte B — SYNTHÈSE AUTO -->
+    <section class="rounded-xl border border-slate-200 bg-slate-50 shadow-sm">
+      <div class="flex items-center justify-between px-3 py-2 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <span class="material-icons-round text-[16px] text-slate-500">autorenew</span>
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-600">Synthèse automatique</span>
+        </div>
+        <span class="text-[10px] text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-full">D’après les activités</span>
+      </div>
+
+      <div class="p-2 space-y-2">
+        <details class="module-competence-summary border border-slate-200 rounded-lg bg-white" data-readonly="true">
+<summary class="flex items-center gap-2 cursor-pointer select-none px-2 py-1.5 text-[11px] text-slate-600">
+<span class="material-icons-round text-[14px] text-slate-400">checklist</span>
+<span class="font-semibold">Compétences du module (d'après les activités)</span>
+<span class="ml-auto flex items-center gap-2 text-[10px] text-slate-400 font-normal">
+<span><span class="module-competences-count-sujet">0</span> sujet</span>
+<span>•</span>
+<span><span class="module-competences-count-transv">0</span> transv.</span>
+<span class="material-icons-round text-[16px]">expand_more</span>
+</span>
+</summary>
+<div class="px-2 pb-2 pt-1">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+<div>
+<div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Compétences du sujet</div>
+<div class="module-target-competences-sujet-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[180px] overflow-auto text-[11px] space-y-1"></div>
+<select class="module-target-competences-sujet-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+</div>
+<div>
+<div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Compétences transversales</div>
+<div class="module-target-competences-transv-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[180px] overflow-auto text-[11px] space-y-1"></div>
+<select class="module-target-competences-transv-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+</div>
+</div>
+<p class="text-[11px] text-slate-400 mt-1">Lecture seule : reflète les compétences sélectionnées dans les activités du module.</p>
+<div class="mt-2 flex items-center justify-between gap-2 no-print">
+<div class="text-[10px] text-slate-400 italic">Si une compétence manque, ajoutez-la manuellement.</div>
+<button class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded hover:bg-indigo-100 transition-colors flex items-center gap-1" data-action="add-module-competence-manual" title="Ajouter une compétence dans les paramètres" type="button">
+<span class="material-icons-round text-[14px]">add</span>
+    Ajouter une compétence
+  </button>
+</div>
+</div>
+</details>
+
+        <details class="module-aims-summary border border-slate-200 rounded-lg bg-white" data-readonly="true">
+<summary class="flex items-center gap-2 cursor-pointer select-none px-2 py-1.5 text-[11px] text-slate-600">
+<span class="material-icons-round text-[14px] text-slate-400">flag</span>
+<span class="font-semibold">Objectifs d'apprentissage du module (d'après les activités)</span>
+<span class="ml-auto flex items-center gap-2 text-[10px] text-slate-400 font-normal">
+<span><span class="module-aims-count">0</span> sélectionné(s)</span>
+<span class="material-icons-round text-[16px]">expand_more</span>
+</span>
+</summary>
+<div class="px-2 pb-2 pt-1">
+<div class="module-aims-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[180px] overflow-auto text-[11px] space-y-1"></div>
+<select class="module-aims-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+<p class="text-[11px] text-slate-400 mt-1">Lecture seule : reflète les objectifs sélectionnés dans les activités du module.</p>
+<div class="mt-2 flex items-center justify-between gap-2 no-print">
+<div class="text-[10px] text-slate-400 italic">Si un objectif manque, ajoutez-le manuellement.</div>
+<button class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded hover:bg-indigo-100 transition-colors flex items-center gap-1" data-action="add-module-aim-manual" title="Ajouter un objectif dans les paramètres" type="button">
+<span class="material-icons-round text-[14px]">add</span>
+    Ajouter un objectif
+  </button>
+</div>
+<div class="mt-2 module-aims-chips flex flex-wrap gap-1"></div>
+</div>
+</details>
+
+        <details class="module-outcomes-summary border border-slate-200 rounded-lg bg-white" data-readonly="true">
+<summary class="flex items-center gap-2 cursor-pointer select-none px-2 py-1.5 text-[11px] text-slate-600">
+<span class="material-icons-round text-[14px] text-slate-400">assignment_turned_in</span>
+<span class="font-semibold">Résultats d'apprentissage du module (d'après les activités)</span>
+<span class="ml-auto flex items-center gap-2 text-[10px] text-slate-400 font-normal">
+<span><span class="module-outcomes-count">0</span> sélectionné(s)</span>
+<span class="material-icons-round text-[16px]">expand_more</span>
+</span>
+</summary>
+<div class="px-2 pb-2 pt-1">
+<div class="module-outcomes-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[180px] overflow-auto text-[11px] space-y-1"></div>
+<select class="module-outcomes-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+<p class="text-[11px] text-slate-400 mt-1">Lecture seule : reflète les résultats sélectionnés dans les activités du module.</p>
+<div class="mt-2 flex items-center justify-between gap-2 no-print">
+<div class="text-[10px] text-slate-400 italic">Si un résultat manque, ajoutez-le manuellement.</div>
+<button class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded hover:bg-indigo-100 transition-colors flex items-center gap-1" data-action="add-module-outcome-manual" title="Ajouter un résultat dans les paramètres" type="button">
+<span class="material-icons-round text-[14px]">add</span>
+    Ajouter un résultat
+  </button>
+</div>
+<div class="mt-2 module-outcomes-chips flex flex-wrap gap-1"></div>
+</div>
+</details>
+
+        <p class="text-[11px] text-slate-400 px-1">
+          Pour modifier cette synthèse, ajustez les activités du module.
+        </p>
+      </div>
+    </section>
+
+  </div>
+</div>
+<div class="activity-moments-container ml-4 pl-4 space-y-3 min-h-[20px]"></div>
+<div class="mt-2 pt-1 flex justify-center gap-2 no-print border-t border-slate-100">
+<button class="text-sm font-semibold text-slate-500 hover:text-indigo-700 px-3 py-1 rounded transition-colors flex items-center gap-1 hover:bg-slate-50" data-action="add-step" data-i18n-title="title_add_step" type="button">
+<span class="material-icons-round text-sm">add</span>
+<span data-i18n="btn_add_step">ajouter une activité</span>
+</button>
+<button class="text-sm font-semibold text-slate-500 hover:text-indigo-700 px-3 py-1 rounded transition-colors flex items-center gap-1 hover:bg-slate-50" data-action="add-moment" data-i18n-title="title_add_moment" title="Ajouter un moment" type="button">
+<span class="material-icons-round text-sm">add</span>
+<span data-i18n="btn_add_moment">ajouter un moment</span>
+</button>
+</div>
+</div>
+</div>
+</template>
+<template id="moment-template">
+<div class="moment-group bg-transparent rounded-lg border border-slate-200/60">
+<div class="flex items-center justify-between px-3 py-2">
+<div class="flex items-center gap-2 flex-1 min-w-0">
+<div class="drag-handle-moment drag-handle text-slate-300 hover:text-slate-500 no-print flex items-center justify-center w-6 h-6 cursor-grab">
+<span class="material-icons-round text-lg">drag_indicator</span>
+</div>
+<div class="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 moment-index shrink-0 text-xs">1</div>
+<input class="moment-title flex-1 text-sm font-semibold text-slate-800 bg-transparent focus:outline-none focus:ring-0 border-0 p-0 m-0 min-w-0" placeholder="Nom du moment (ex : Accueil)" type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2">
+<div class="moment-target-wrap flex flex-col items-end">
+<span class="text-[9px] text-slate-400 uppercase font-bold tracking-wider leading-none mb-0.5" data-i18n="label_target">Cible</span>
+<div class="flex gap-1 items-center">
+<input class="moment-target-time w-12 px-1 py-0.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none h-[22px]" min="0" data-action-input="update-stats-debounced" placeholder="0" type="number"/>
+<select class="moment-target-unit w-20 px-1 py-0.5 text-xs border border-slate-200 rounded bg-slate-50 focus:ring-1 focus:ring-indigo-500 outline-none h-[22px]" data-action-change="update-stats">
+<option data-i18n="unit_mins" value="60">min</option>
+<option data-i18n="unit_hours" value="3600">Heures</option>
+<option data-i18n="unit_days" value="86400">Jours</option>
+<option data-i18n="unit_weeks" value="604800">Semaines</option>
+
+<option data-i18n="unit_months" value="2592000">
+           Mois
+          </option>
+</select>
+</div>
+</div>
+<span aria-hidden="true" class="moment-time-compare text-xs font-bold bg-transparent mx-1 select-none self-center">=</span><div class="flex flex-col items-end">
+<span class="text-[9px] text-slate-400 uppercase font-bold tracking-wider leading-none mb-0.5" data-i18n="label_designed">Conçu</span>
+<div class="bg-indigo-50 border border-indigo-100 rounded px-2 py-0.5 h-[22px] flex items-center min-w-[3rem] justify-end moment-designed-badge">
+<span class="moment-total-time text-xs font-bold text-indigo-700 font-mono">0m</span>
+</div>
+</div>
+</div>
+<div class="moment-status-summary ld-status-summary ld-status-summary--moment" title="Synthèse des états des activités du moment"></div>
+
+<button class="no-print text-slate-400 hover:text-indigo-500 p-1 transition-colors" data-action="select-all-moment" title="Tout sélectionner / désélectionner les activités de ce moment" type="button" aria-label="Tout sélectionner dans le moment">
+  <span class="material-icons-round text-lg">done_all</span>
+</button>
+<button aria-expanded="false" class="no-print text-slate-400 hover:text-indigo-500 p-1 transition-colors" data-action="toggle-moment-description" data-i18n-title="title_toggle_description" title="Afficher/Masquer la description" type="button"><span class="material-icons-round text-lg">description</span></button>
+<button aria-expanded="true" class="no-print text-slate-400 hover:text-slate-700 transition-colors" data-action="toggle-moment" title="Replier / déplier ce moment" type="button">
+<span class="material-icons-round text-lg rotate-icon-moment" style="transform: rotate(180deg);">expand_more</span>
+</button>
+<button class="no-print text-slate-400 hover:text-rose-600 transition-colors" data-action="delete-moment" title="Supprimer ce moment" type="button">
+<span class="material-icons-round text-lg">delete_outline</span>
+</button>
+</div>
+</div>
+<div class="moment-body px-3 pb-3">
+<div class="moment-description-wrap hidden mt-2">
+<div class="compact-label" data-i18n="label_description_compact">Description</div>
+<textarea class="moment-description w-full min-h-[64px] resize-y px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Description du moment..." data-i18n-placeholder="ph_moment_description"></textarea>
+</div>
+
+<div class="submoments-container space-y-2 mt-2"></div>
+
+<div class="moment-direct-steps mt-2">
+  <div class="activity-steps-container activity-container space-y-2 min-h-[20px]"></div>
+</div>
+
+<div class="mt-3 pt-2 submoments-controls flex justify-center gap-2 no-print border-t border-slate-100">
+  <button class="no-print text-xs font-semibold text-slate-500 hover:text-indigo-700 px-2 py-1 rounded transition-colors flex items-center gap-1 hover:bg-slate-50" data-action="add-submoment" data-i18n-title="title_add_submoment" title="Ajouter un sous-moment" type="button">
+    <span class="material-icons-round text-sm">add</span>
+    <span data-i18n="btn_add_submoment">ajouter un sous-moment</span>
+  </button>
+</div>
+
+</div>
+</div>
+</template>
+
+<template id="submoment-template">
+  <div class="submoment-card border border-slate-200 rounded-lg bg-slate-50">
+    <div class="flex items-center justify-between px-3 py-2 bg-slate-100 border-b border-slate-100 rounded-t-lg">
+      <div class="flex items-center gap-2 flex-1 min-w-0">
+        <div class="drag-handle-submoment drag-handle text-slate-300 hover:text-slate-500 no-print flex items-center justify-center w-6 h-6 cursor-grab">
+          <span class="material-icons-round text-lg">drag_indicator</span>
+        </div>
+        <input class="submoment-title flex-1 min-w-0 text-sm font-semibold bg-transparent border border-transparent focus:border-indigo-300 rounded px-2 py-1 outline-none" placeholder="Titre du sous-moment" />
+      </div>
+      <div class="submoment-status-summary ld-status-summary" title="Synthèse des états des activités du sous-moment"></div>
+      <div class="flex items-center gap-1">
+        <button class="no-print text-slate-400 hover:text-indigo-700 transition-colors" data-action="add-step-submoment" title="Ajouter une activité au sous-moment" type="button">
+          <span class="material-icons-round text-sm">add</span>
+        </button>
+        <button class="no-print text-slate-400 hover:text-rose-600 transition-colors" data-action="delete-submoment" title="Supprimer ce sous-moment" type="button">
+          <span class="material-icons-round text-sm">delete_outline</span>
+        </button>
+      </div>
+    </div>
+    <div class="submoment-body px-3 py-2">
+      <div class="submoment-steps steps-container space-y-2 min-h-[20px]"></div>
+    </div>
+  </div>
+</template>
+
+<template id="step-template">
+<div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative group flex flex-col">
+<div class="step-header flex items-center gap-2 p-2 bg-slate-50 border-b border-slate-100 transition-colors">
+<div class="drag-handle-step drag-handle flex items-center justify-center text-slate-300 hover:text-slate-500 cursor-grab">
+<span class="material-icons-round text-base">
+       drag_indicator
+      </span>
+</div>
+<label class="no-print flex items-center justify-center mr-1" title="Sélectionner l’activité (actions groupées)">
+  <input type="checkbox" class="step-batch-select w-4 h-4 accent-indigo-600" aria-label="Sélectionner l’activité"/>
+</label>
+<span class="material-icons-round text-amber-500 text-[18px] step-coherence-indicator hidden no-print" title="">warning_amber</span>
+<div class="flex-1">
+<input class="step-input-title w-full px-1 py-0.5 text-sm font-semibold text-slate-800 border-none bg-transparent focus:ring-0 outline-none" data-i18n-placeholder="ph_step_title" placeholder="Titre de l'activité..." type="text"/>
+
+</div>
+<div class="flex items-center gap-1">
+<input class="duration-input w-16 px-2 py-0.5 text-xs font-semibold border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none h-[22px] text-right text-slate-600" min="0" data-action-input="update-stats-debounced" placeholder="0" type="number"/>
+<select class="duration-unit w-24 px-2 py-0.5 text-xs border border-slate-200 rounded bg-slate-50 focus:ring-1 focus:ring-indigo-500 outline-none h-[22px]" data-action-change="update-stats">
+<option data-i18n="unit_mins" value="60">
+        min
+       </option>
+<option data-i18n="unit_hours" value="3600">
+        Heures
+       </option>
+<option data-i18n="unit_days" value="86400">
+        Jours
+       </option>
+<option data-i18n="unit_weeks" value="604800">
+        Semaines
+       </option>
+
+<option data-i18n="unit_months" value="2592000">
+           Mois
+          </option>
+</select>
+</div>
+<div class="w-24 learning-type-container">
+<select class="learning-type-select w-full px-2 py-0.5 text-xs font-semibold border rounded focus:ring-1 focus:ring-indigo-500 outline-none transition-all select-acquisition h-[22px]" data-action-change="update-step-type">
+<option data-i18n="type_none" value="none" class="ld-opt-none" style="background-color:#f1f5f9;color:#64748b;">
+        Aucun
+       </option>
+<option data-i18n="type_acquisition" value="acquisition">
+        Acquisition
+       </option>
+<option data-i18n="type_collaboration" value="collaboration">
+        Collaboration
+       </option>
+<option data-i18n="type_discussion" value="discussion">
+        Discussion
+       </option>
+<option data-i18n="type_investigation" value="investigation">
+        Enquête
+       </option>
+<option data-i18n="type_practice" value="practice">
+        Entraînement
+       </option>
+<option data-i18n="type_production" value="production">
+        Production
+       </option>
+</select>
+</div>
+<div class="w-32">
+<select class="step-status-select w-full px-2 py-0.5 text-xs border border-slate-200 rounded bg-white outline-none focus:ring-2 focus:ring-indigo-200 h-[22px]" data-action-change="update-step-status" aria-label="État" title="État">
+<option value="in_progress">⚪ En cours</option>
+<option value="done">🟢 Finalisé</option>
+<option value="review">🟠 À revoir</option>
+</select>
+</div>
+<div class="flex items-center gap-0.5 no-print">
+<button class="text-slate-400 hover:text-indigo-500 p-0.5" data-action="toggle-step" data-i18n-title="title_toggle_panel" title="Afficher/Masquer les paramètres">
+<span class="material-icons-round text-base rotate-icon">
+        expand_more
+       </span>
+</button>
+<button class="text-slate-400 hover:text-indigo-500 p-0.5" data-action="toggle-step-sections" title="Tout déplier / tout replier (colonne droite)" type="button">
+<span class="material-icons-round text-base" data-role="toggle-step-sections-icon">unfold_more</span>
+</button>
+<button class="text-slate-300 hover:text-indigo-500 p-0.5" data-action="duplicate-step" data-i18n-title="title_duplicate_step" title="Dupliquer cette activité" type="button">
+<span class="material-icons-round text-base">
+        content_copy
+       </span>
+</button>
+<button class="text-slate-300 hover:text-red-400 p-0.5" data-action="delete-step" data-i18n-title="title_delete_step" title="Supprimer cette activité" type="button">
+<span class="material-icons-round text-base">
+        delete_outline
+       </span>
+</button>
+</div>
+</div>
+<div class="step-body panel-content collapsed p-3 pt-2">
+<div class="flex flex-col lg:flex-row gap-3 mt-1">
+<div class="lg:w-[240px] shrink-0 space-y-2">
+<div>
+<label class="compact-label compact-label-lg flex items-center gap-1">
+<span class="material-icons-round text-[10px] text-slate-400">
+          groups
+         </span>
+<span data-i18n="label_grouping">
+          Regroupement
+         </span>
+</label>
+<div class="space-y-1">
+<select class="step-group-mode w-full px-2 py-0.5 text-xs rounded border border-slate-200 bg-white outline-none h-[24px]" data-action-change="toggle-group-mode">
+<option data-i18n="opt_whole_class" value="class">
+           Groupe entier
+          </option>
+<option data-i18n="opt_groups" value="groups">
+           Sous-groupe
+          </option>
+<option data-i18n="opt_individual" value="individual">
+           Individuel
+          </option>
+</select>
+<div class="step-group-details hidden">
+<div class="flex gap-1 mb-1">
+<div class="relative flex-1">
+<input class="step-group-count w-full px-2 py-0.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none h-[24px]" data-i18n-placeholder="ph_nb_groups" min="1" data-action-input="update-group-math" data-group-math="count" placeholder="Nb groupes" type="number"/>
+<span class="absolute right-1 top-1/2 -translate-y-1/2 text-[8px] text-slate-400 pointer-events-none pr-1" data-i18n="label_short_groups">
+            Grps
+           </span>
+</div>
+<div class="relative flex-1">
+<input class="step-group-size w-full px-2 py-0.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none h-[24px]" data-i18n-placeholder="ph_per_group" min="1" data-action-input="update-group-math" data-group-math="size" placeholder="Par groupe" type="number"/>
+<span class="absolute right-1 top-1/2 -translate-y-1/2 text-[8px] text-slate-400 pointer-events-none pr-1" data-i18n="label_short_pers">
+            Pers
+           </span>
+</div>
+</div>
+<textarea class="step-group-details-notes w-full px-2 py-1 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none resize-y" placeholder="Détails du regroupement (composition, critères, etc.)" data-i18n-placeholder="ph_grouping_details" rows="2"></textarea>
+</div>
+</div>
+</div>
+<div class="space-y-1 pt-1 border-t border-slate-100">
+
+<div class="space-y-0.5">
+<span class="text-[10px] w-12 text-slate-400 font-bold uppercase flex items-center gap-0.5 relative z-10">
+<span class="material-icons-round text-[10px]">
+           face
+          </span>
+<span data-i18n="label_trainer">
+           Formateur
+          </span>
+</span>
+<select class="trainer-select w-full px-1 py-0.5 text-[10px] rounded border border-slate-200 bg-white outline-none h-[22px]" data-action-change="update-stats">
+<option data-i18n="opt_present" value="present">
+           Présent
+          </option>
+<option data-i18n="opt_absent" value="absent">
+           Absent
+          </option>
+</select>
+</div>
+<div class="space-y-0.5">
+<span class="text-[10px] w-12 text-slate-400 font-bold uppercase flex items-center gap-0.5 relative z-10">
+<span class="material-icons-round text-[10px]">
+           place
+          </span>
+<span data-i18n="label_place">
+           Lieu
+          </span>
+</span>
+<select class="place-select w-full px-1 py-0.5 text-[10px] rounded border border-slate-200 bg-white outline-none h-[22px]" data-action-change="update-stats">
+<option data-i18n="opt_insitu" value="situ">
+           Présentiel (sur site)
+          </option>
+<option data-i18n="opt_online" value="online">
+           Distanciel (en ligne)
+          </option>
+<option data-i18n="opt_hybrid" value="hybrid">
+           Hybride (sur site et en ligne)
+          </option>
+</select>
+</div>
+<div class="space-y-0.5">
+<span class="text-[10px] w-12 text-slate-400 font-bold uppercase flex items-center gap-0.5 relative z-10">
+<span class="material-icons-round text-[10px]">
+           event
+          </span>
+<span data-i18n="label_time">
+           Temps
+          </span>
+</span>
+<select class="time-select w-full px-1 py-0.5 text-[10px] rounded border border-slate-200 bg-white outline-none h-[22px]" data-action-change="update-stats">
+<option data-i18n="opt_sync" value="sync">
+           Synchrone
+          </option>
+<option data-i18n="opt_async" value="async">
+           Asynchrone
+          </option>
+</select>
+</div>
+<div class="space-y-0.5">
+  <span class="text-[10px] w-12 text-slate-400 font-bold uppercase flex items-center gap-0.5 relative z-10">
+    <span class="material-icons-round text-[10px]">fact_check</span>
+    <span>Évaluation</span>
+  </span>
+  <select class="evaluation-select w-full px-1 py-0.5 text-[10px] rounded border border-slate-200 focus:ring-1 focus:ring-indigo-500 bg-white outline-none h-[22px]" data-action-change="update-stats">
+    <option value="Aucune" selected>Aucune</option>
+    <option value="Diagnostique">Diagnostique</option>
+    <option value="Formative">Formative</option>
+    <option value="Certificative/Sommative">Certificative/Sommative</option>
+  </select>
+</div>
+
+</div>
+</div>
+<div class="lg:flex-1 step-right-col">
+  <!-- Onglets : Déroulé / Alignement / Ressources -->
+  <div class="step-tabs" role="tablist" aria-label="Panneaux de l'activité">
+    <button class="step-tab" type="button" role="tab" aria-selected="true" tabindex="0" data-step-tab="flow" data-i18n="tab_flow">Déroulé</button>
+    <button class="step-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-step-tab="alignment" data-i18n="tab_alignment">Alignement</button>
+    <button class="step-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-step-tab="resources" data-i18n="tab_resources">Ressources</button>
+    <button class="step-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-step-tab="notes" data-i18n="label_notes">Notes</button>
+  </div>
+
+  <div class="step-tabpanels">
+    <!-- Déroulé -->
+    <div class="step-tabpanel mt-2 space-y-2" data-step-panel="flow">
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white" open>
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5">
+          <span class="material-icons-round text-[10px] text-slate-400">flag</span>
+          <span data-i18n="label_step_objective">Description de l'activité</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-1">
+          <textarea class="step-input-objective w-full px-2 py-1.5 text-[12px] border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300 bg-slate-50 text-slate-700" data-i18n-placeholder="ph_step_objective" placeholder="Décrivez l'activité..." rows="2"></textarea>
+        </div>
+      </details>
+
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white" open>
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5">
+          <span class="material-icons-round text-[10px] text-slate-400">assignment</span>
+          <span data-i18n="label_tasks">Ce que les apprenants doivent faire</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-1">
+          <textarea class="step-input-tasks w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none resize-y leading-relaxed" data-i18n-placeholder="ph_tasks" placeholder="Décrivez les étapes, instructions et tâches..." rows="2"></textarea>
+        </div>
+      </details>
+
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white" open>
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5">
+          <span class="material-icons-round text-[10px] text-slate-400">support_agent</span>
+          <span data-i18n="label_trainer_tasks">Ce que le ou les formateurs doivent faire</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-1">
+          <textarea class="step-input-trainer-tasks w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none resize-y leading-relaxed bg-slate-50" data-i18n-placeholder="ph_trainer_tasks" placeholder="Décrivez les actions attendues du formateur..." rows="2"></textarea>
+        </div>
+      </details>
+    </div>
+
+    <!-- Alignement -->
+    <div class="step-tabpanel mt-2 space-y-2" data-step-panel="alignment" hidden>
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white">
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5">
+          <span class="material-icons-round text-[10px] text-slate-400">school</span>
+          <span>Compétences ciblées</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-1">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div>
+              <div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Compétences du sujet</div>
+              <div class="step-competences-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[140px] overflow-auto text-[11px] space-y-1"></div>
+              <select class="step-competences-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Compétences transversales</div>
+              <div class="step-competences-transversales-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[140px] overflow-auto text-[11px] space-y-1"></div>
+              <select class="step-competences-transversales-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Sélection : cochez les compétences concernées</p>
+          <div class="mt-2 flex items-center justify-between gap-2 no-print">
+            <div class="text-[10px] text-slate-400 italic">Si une compétence/objectif manque, ajoutez-la manuellement.</div>
+            <button class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded hover:bg-indigo-100 transition-colors flex items-center gap-1" data-action="open-aims-from-step" title="Ajouter une compétence dans les paramètres" type="button">
+              <span class="material-icons-round text-[14px]">add</span>
+              Ajouter une compétence
+            </button>
+          </div>
+        </div>
+      </details>
+
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white">
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5">
+          <span class="material-icons-round text-[10px] text-slate-400">flag</span>
+          <span>Objectifs ciblés</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-1">
+          <div class="step-aims-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[140px] overflow-auto text-[11px] space-y-1"></div>
+          <select class="step-aims-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+          <p class="text-[11px] text-slate-400 mt-1">Sélection : cochez les objectifs concernés</p>
+          <div class="mt-2 flex items-center justify-between gap-2 no-print">
+            <div class="text-[10px] text-slate-400 italic">Si un objectif manque, ajoutez-le manuellement.</div>
+            <button class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded hover:bg-indigo-100 transition-colors flex items-center gap-1" data-action="open-aims-from-step" title="Ajouter un objectif dans les paramètres" type="button">
+              <span class="material-icons-round text-[14px]">add</span>
+              Ajouter un objectif
+            </button>
+          </div>
+        </div>
+      </details>
+
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white">
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5">
+          <span class="material-icons-round text-[10px] text-slate-400">assignment_turned_in</span>
+          <span>Résultats d'apprentissage ciblés</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-1">
+          <div class="step-outcomes-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[140px] overflow-auto text-[11px] space-y-1"></div>
+          <select class="step-outcomes-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+          <p class="text-[11px] text-slate-400 mt-1">Sélection : cochez les résultats concernés</p>
+          <div class="mt-2 flex items-center justify-between gap-2 no-print">
+            <div class="text-[10px] text-slate-400 italic">Si un résultat manque, ajoutez-le manuellement.</div>
+            <button class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded hover:bg-indigo-100 transition-colors flex items-center gap-1" data-action="open-outcomes-from-step" title="Ajouter un résultat dans les paramètres" type="button">
+              <span class="material-icons-round text-[14px]">add</span>
+              Ajouter un résultat
+            </button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- Ressources -->
+    <div class="step-tabpanel mt-2 space-y-2" data-step-panel="resources" hidden>
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white" data-section="tools-materials">
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5 bg-slate-50 rounded-lg">
+          <span class="material-icons-round text-[10px] text-slate-400">construction</span>
+          <span>Outils et matériel (activité)</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-2">
+          <div class="flex items-center justify-between gap-2 mb-1 text-[11px] text-slate-500">
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" class="tm-show-selected-toggle accent-indigo-600" />
+              <span>Afficher uniquement les sélectionnés</span>
+            </label>
+            <span class="tm-selected-count text-[10px] text-slate-400"></span>
+          </div>
+          <div class="step-tools-materials-checkboxes w-full border border-slate-200 rounded-lg bg-slate-50 p-2 max-h-[160px] overflow-auto text-[11px] space-y-1"></div>
+          <select class="step-tools-materials-select w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none min-h-[74px] hidden" multiple=""></select>
+          <p class="text-[11px] text-slate-400 mt-1">Sélection : cochez les outils et matériels requis pour cette activité (ajoutez une remarque si nécessaire).</p>
+        </div>
+      </details>
+    
+
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white" data-section="links-refs">
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5 bg-slate-50 rounded-lg">
+          <span class="material-icons-round text-[10px] text-slate-400">link</span>
+          <span data-i18n="label_step_links_refs">Liens et références</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-2">
+          <textarea class="step-input-linksrefs w-full px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-y bg-slate-50 text-slate-700"
+                    rows="3"
+                    data-i18n-placeholder="ph_step_links_refs"
+                    placeholder="Liens, références, bibliographie, DOI, normes, etc."></textarea>
+          <p class="text-[11px] text-slate-400 mt-1" data-i18n="hint_step_links_refs">Un lien par ligne, ou une référence courte (auteur, année, page...).</p>
+        </div>
+      </details>
+
+</div>
+
+    <!-- Notes -->
+    <div class="step-tabpanel mt-2 space-y-2" data-step-panel="notes" hidden>
+      <details class="step-right-section border border-slate-200 rounded-lg bg-white" open>
+        <summary class="compact-label flex items-center gap-1 cursor-pointer select-none px-2 py-1.5">
+          <span class="material-icons-round text-[10px] text-slate-400">comment</span>
+          <span data-i18n="label_notes">Notes</span>
+          <span class="ml-auto flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+            <span>Afficher</span>
+            <span class="material-icons-round text-[14px] step-right-chevron">expand_more</span>
+          </span>
+        </summary>
+        <div class="px-2 pb-2 pt-1">
+          <textarea class="step-input-notes w-full px-2 py-1.5 text-xs border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none resize-y bg-slate-50 text-slate-600 italic" data-i18n-placeholder="ph_notes" placeholder="Notes formateur, ressources ou liens..." rows="2"></textarea>
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</template>
+<div id="js-error-banner" style="display:none; position:fixed; bottom:12px; left:12px; right:12px; z-index:9999; background:#fee2e2; color:#7f1d1d; padding:8px 10px; border:1px solid #fecaca; border-radius:10px; font-size:12px; line-height:1.2; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif; box-shadow:0 10px 30px rgba(15,23,42,0.15);">
+<div style="display:flex; gap:10px; align-items:flex-start;">
+<div style="flex:1;">
+<div style="font-weight:700; margin-bottom:3px;">
+      Erreur
+     </div>
+<div data-js-error-text="">
+      Une erreur est survenue.
+     </div>
+</div>
+<button aria-label="Fermer" data-action="hide-js-error-banner" style="background:transparent; border:0; color:#7f1d1d; font-weight:700; cursor:pointer; padding:0 6px; line-height:1;" type="button">
+     ×
+    </button>
+</div>
+
+
+<!-- Diagnostic UI panel -->
+<div id="ui-debug-panel" class="hidden fixed bottom-16 right-4 w-[440px] max-w-[calc(100vw-2rem)] bg-white border border-slate-200 rounded-2xl shadow-2xl z-[9998] no-print">
+  <div class="flex items-center justify-between px-3 py-2 border-b border-slate-200">
+    <div class="text-sm font-semibold text-slate-800">Diagnostic UI</div>
+    <div class="flex items-center gap-2">
+      <button class="text-xs font-semibold px-2 py-1 rounded bg-slate-50 hover:bg-slate-100 border border-slate-200" data-action="copy-debug-report" data-i18n="btn_copy_report">Copier rapport</button>
+      <button class="text-xs font-semibold px-2 py-1 rounded bg-slate-50 hover:bg-slate-100 border border-slate-200" data-action="download-debug-report" data-i18n="btn_download">Télécharger</button>
+      <button class="text-xs font-semibold px-2 py-1 rounded bg-slate-50 hover:bg-slate-100 border border-slate-200" data-action="clear-debug-log" data-i18n="btn_clear">Effacer</button>
+      <button class="text-slate-500 hover:text-slate-800 px-2 py-1 rounded" data-action="toggle-debug-ui" type="button">✕</button>
+    </div>
+  </div>
+  <div class="px-3 py-2 text-[11px] text-slate-600 flex items-center gap-4 border-b border-slate-200">
+    <div><span class="font-bold">Actions:</span> <span id="ui-debug-actions-count">0</span></div>
+    <div><span class="font-bold">Erreurs:</span> <span id="ui-debug-errors-count">0</span></div>
+    <div class="ml-auto text-[10px] text-slate-400">Survol: affiche data-action · Raccourcis: Ctrl+Alt+D/C/S</div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-3">
+    <div class="border border-slate-200 rounded-xl p-2 bg-slate-50">
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Dernières actions</div>
+      <div id="ui-debug-actions" class="max-h-44 overflow-auto text-[11px] font-mono text-slate-700"></div>
+    </div>
+    <div class="border border-slate-200 rounded-xl p-2 bg-slate-50">
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Dernières erreurs</div>
+      <div id="ui-debug-errors" class="max-h-44 overflow-auto text-[11px] font-mono text-slate-700"></div>
+    </div>
+  </div>
+</div>
+<div id="ui-debug-hover" class="hidden fixed z-[9999] pointer-events-none px-2 py-1 rounded-lg bg-white text-slate-900 border border-slate-200 text-[11px] font-mono shadow-lg"></div>
+</div>
+<!-- i18n : Outil de vérification des traductions -->
+<div class="hidden fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4 no-print" data-display="flex" id="i18n-audit-modal">
+<div class="bg-white w-full max-w-3xl rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+<div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+<div>
+<div class="text-sm font-semibold text-slate-800" data-i18n="i18n_audit_title">Vérification des traductions</div>
+<div class="text-xs text-slate-500" data-i18n="i18n_audit_subtitle">Détecte les clés manquantes dans le pack chargé et les textes statiques non couverts par data-i18n.</div>
+</div>
+<button class="text-slate-500 hover:text-slate-800 px-2 py-1 rounded" data-action="close-i18n-audit" type="button">✕</button>
+</div>
+<div class="p-4 space-y-4">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+<div class="border border-slate-200 rounded-lg p-2">
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" data-i18n="i18n_audit_used_label">Clés UI</div>
+<div class="text-lg font-semibold text-slate-800" id="i18n-audit-used">0</div>
+</div>
+<div class="border border-slate-200 rounded-lg p-2">
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" data-i18n="i18n_audit_missing_pack_label">Manquantes (pack)</div>
+<div class="text-lg font-semibold text-slate-800" id="i18n-audit-missing-pack-count">0</div>
+</div>
+<div class="border border-slate-200 rounded-lg p-2">
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" data-i18n="i18n_audit_missing_fr_label">Clés inconnues (FR)</div>
+<div class="text-lg font-semibold text-slate-800" id="i18n-audit-missing-fr-count">0</div>
+</div>
+<div class="border border-slate-200 rounded-lg p-2">
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" data-i18n="i18n_audit_uncovered_label">Textes non couverts</div>
+<div class="text-lg font-semibold text-slate-800" id="i18n-audit-uncovered-count">0</div>
+</div>
+</div>
+<div class="space-y-2">
+<details class="border border-slate-200 rounded-lg p-3" open="">
+<summary class="cursor-pointer text-sm font-semibold text-slate-800" data-i18n="i18n_audit_section_missing_pack">Clés utilisées mais absentes du pack chargé (fallback FR)</summary>
+<pre class="mt-2 text-xs bg-slate-50 border border-slate-200 rounded-md p-2 overflow-auto max-h-44" id="i18n-audit-missing-pack">—</pre>
+</details>
+<details class="border border-slate-200 rounded-lg p-3">
+<summary class="cursor-pointer text-sm font-semibold text-slate-800" data-i18n="i18n_audit_section_missing_fr">Clés utilisées mais absentes du FR (à corriger dans le code)</summary>
+<pre class="mt-2 text-xs bg-slate-50 border border-slate-200 rounded-md p-2 overflow-auto max-h-44" id="i18n-audit-missing-fr">—</pre>
+</details>
+<details class="border border-slate-200 rounded-lg p-3">
+<summary class="cursor-pointer text-sm font-semibold text-slate-800" data-i18n="i18n_audit_section_uncovered">Éléments visibles avec texte statique sans data-i18n (échantillon)</summary>
+<pre class="mt-2 text-xs bg-slate-50 border border-slate-200 rounded-md p-2 overflow-auto max-h-52" id="i18n-audit-uncovered">—</pre>
+</details>
+</div>
+<div class="flex items-center justify-end gap-2 pt-2">
+<button class="px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50" data-i18n="btn_refresh" data-action="run-i18n-audit" type="button">Rafraîchir</button>
+<button class="px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50" data-i18n="btn_download_report" data-action="download-i18n-audit-report" type="button">Télécharger rapport</button>
+<button class="px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-700" data-i18n="btn_close" data-action="close-i18n-audit" type="button">Fermer</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Modèles : Export / Import (DOM réel) -->
+<div class="hidden fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4 no-print" data-display="flex" id="template-export-modal">
+<div class="bg-white w-full max-w-xl rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+<div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+<div>
+<div class="text-sm font-semibold text-slate-800">Exporter un modèle</div>
+<div class="text-xs text-slate-500">Choisissez précisément l’élément à exporter.</div>
+</div>
+<button class="text-slate-500 hover:text-slate-800 px-2 py-1 rounded" id="template-export-close" type="button">✕</button>
+</div>
+<div class="p-4 space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div>
+<label class="text-xs font-medium text-slate-700">Niveau</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="template-export-type">
+<option value="module">Module</option>
+<option value="moment">Moment</option>
+<option value="activity">Activité</option>
+</select>
+</div>
+<div>
+<label class="text-xs font-medium text-slate-700">Élément</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="template-export-item"></select>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 pt-2">
+<button class="px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50" id="template-export-cancel" type="button">Annuler</button>
+<button class="px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-700" id="template-export-do" type="button">Exporter</button>
+</div>
+<div class="hidden text-sm text-red-600" id="template-export-error"></div>
+</div>
+</div>
+</div>
+<!-- Modèles : Import -->
+<div class="hidden fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4 no-print" data-display="flex" id="template-import-modal">
+<div class="bg-white w-full max-w-2xl rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+<div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+<div>
+<div class="text-sm font-semibold text-slate-800">Importer un modèle</div>
+<div class="text-xs text-slate-500">Choisissez précisément où insérer le modèle.</div>
+</div>
+<button class="text-slate-500 hover:text-slate-800 px-2 py-1 rounded" id="template-import-close" type="button">✕</button>
+</div>
+<div class="p-4 space-y-4">
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-700" id="template-import-pick" type="button">Choisir un fichier…</button>
+<div class="text-sm text-slate-600 truncate" id="template-import-filelabel"></div>
+</div>
+<div class="hidden space-y-3" id="template-import-placements">
+<div class="text-xs text-slate-500">Type détecté : <span class="font-semibold text-slate-700" id="template-import-type"></span></div>
+<!-- Placement module -->
+<div class="hidden border border-slate-200 rounded-lg p-3" id="tpl-place-module">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div>
+<label class="text-xs font-medium text-slate-700">Position</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-module-position">
+<option value="start">Au début</option>
+<option value="end">À la fin</option>
+<option value="before">Avant…</option>
+<option value="after">Après…</option>
+</select>
+</div>
+<div>
+<label class="text-xs font-medium text-slate-700">Module de référence</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-module-after"></select>
+</div>
+</div>
+</div>
+<!-- Placement moment -->
+<div class="hidden border border-slate-200 rounded-lg p-3" id="tpl-place-moment">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<div>
+<label class="text-xs font-medium text-slate-700">Module cible</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-moment-module"></select>
+</div>
+<div>
+<label class="text-xs font-medium text-slate-700">Position</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-moment-position">
+<option value="start">Au début</option>
+<option value="end">À la fin</option>
+<option value="before">Avant…</option>
+<option value="after">Après…</option>
+</select>
+</div>
+<div>
+<label class="text-xs font-medium text-slate-700">Moment de référence</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-moment-after"></select>
+</div>
+</div>
+</div>
+<!-- Placement activité -->
+<div class="hidden border border-slate-200 rounded-lg p-3" id="tpl-place-activity">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+<div>
+<label class="text-xs font-medium text-slate-700">Module cible</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-act-module"></select>
+</div>
+<div>
+<label class="text-xs font-medium text-slate-700">Moment cible</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-act-moment"></select>
+</div>
+<div>
+<label class="text-xs font-medium text-slate-700">Position</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-act-position">
+<option value="start">Au début</option>
+<option value="end">À la fin</option>
+<option value="before">Avant…</option>
+<option value="after">Après…</option>
+</select>
+</div>
+<div>
+<label class="text-xs font-medium text-slate-700">Activité de référence</label>
+<select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" id="tpl-act-after"></select>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 pt-2">
+<button class="px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50" id="template-import-cancel" type="button">Annuler</button>
+<button class="px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-700" id="template-import-do" type="button">Importer</button>
+</div>
+</div>
+<div class="hidden text-sm text-red-600" id="template-import-error"></div>
+</div>
+</div>
+</div>
+<!-- Fin Modèles (DOM réel) -->
+<!-- Contextual Side Panel (Activity) -->
+<div class="fixed top-3 right-3 bottom-3 w-[360px] max-w-[92vw] bg-white border border-slate-200 rounded-xl shadow-xl z-[105] hidden flex flex-col"
+     id="context-panel"
+     role="complementary"
+     aria-label="Panneau contextuel">
+  <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white">
+    <div class="flex items-center gap-2">
+      <span class="material-icons-round text-slate-500">view_sidebar</span>
+      <div class="font-semibold text-sm">Panneau contextuel</div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-1.5 rounded hover:bg-slate-200 text-slate-600"
+              id="context-panel-pin"
+              type="button"
+              title="Épingler">
+        <span class="material-icons-round text-[18px]">push_pin</span>
+      </button>
+      <button class="p-1.5 rounded hover:bg-slate-200 text-slate-600"
+              id="context-panel-close"
+              type="button"
+              title="Fermer">
+        <span class="material-icons-round text-[18px]">close</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="px-4 py-3 overflow-auto space-y-3">
+    <div class="text-xs text-slate-500" id="context-panel-path"></div>
+
+    <div>
+      <label class="text-[11px] text-slate-500 font-semibold uppercase">Titre</label>
+      <input class="w-full px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none"
+             id="ctx-title"
+             type="text" />
+    </div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <div>
+        <label class="text-[11px] text-slate-500 font-semibold uppercase">Durée</label>
+        <input class="w-full px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none"
+               id="ctx-duration"
+               type="number"
+               min="0" />
+      </div>
+      <div>
+        <label class="text-[11px] text-slate-500 font-semibold uppercase">Unité</label>
+        <select class="w-full px-2 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                id="ctx-duration-unit">
+          <option value="60">Minutes</option>
+          <option value="3600">Heures</option>
+          <option value="86400">Jours</option>
+          <option value="604800">Semaines</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="text-[11px] text-slate-500 font-semibold uppercase">Évaluation</label>
+      <select class="w-full px-2 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:ring-1 focus:ring-indigo-500 outline-none"
+              id="ctx-evaluation">
+        <option value="Aucune">Aucune</option>
+        <option value="Diagnostique">Diagnostique</option>
+        <option value="Formative">Formative</option>
+        <option value="Certificative/Sommative">Certificative/Sommative</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-[11px] text-slate-500 font-semibold uppercase">Objectif</label>
+      <textarea class="w-full px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none resize-y"
+                id="ctx-objective"
+                rows="2"></textarea>
+    </div>
+
+    <details class="border border-slate-200 rounded-lg bg-white" open>
+      <summary class="cursor-pointer select-none flex items-center justify-between px-3 py-2 text-sm font-semibold text-slate-700">
+        Alignement
+        <span class="material-icons-round text-[16px] text-slate-400">expand_more</span>
+      </summary>
+      <div class="px-3 pb-3 text-sm text-slate-700" id="ctx-align"></div>
+    </details>
+
+    <details class="border border-slate-200 rounded-lg bg-white" open>
+      <summary class="cursor-pointer select-none flex items-center justify-between px-3 py-2 text-sm font-semibold text-slate-700">
+        Outils et matériel
+        <span class="material-icons-round text-[16px] text-slate-400">expand_more</span>
+      </summary>
+      <div class="px-3 pb-3 text-sm text-slate-700" id="ctx-tools"></div>
+    </details>
+  </div>
+
+  <div class="px-4 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+    <div class="text-xs text-slate-500" id="ctx-hint">Cliquez une activité pour afficher ses détails.</div>
+    <button class="px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white hover:bg-slate-50"
+            id="ctx-scroll-to-step"
+            type="button">Aller à l’activité</button>
+  </div>
+</div>
+
+<button class="fixed right-3 bottom-3 z-[104] px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 shadow-sm flex items-center gap-2"
+        id="context-panel-handle"
+        type="button"
+        title="Ouvrir le panneau contextuel">
+  <span class="material-icons-round text-[18px] text-slate-600">view_sidebar</span>
+  <span class="text-xs font-medium text-slate-700 hidden md:inline">Panneau</span>
+</button>
+
+
+<!-- Barre : Actions groupées -->
+<div id="batch-actions-bar" class="fixed bottom-0 left-0 right-0 hidden no-print z-[105]">
+  <div class="ld-page p-2">
+    <div class="batch-actions-inner bg-white border border-slate-200 rounded-xl shadow-lg p-2 flex flex-wrap items-center gap-2">
+      <div class="flex items-center gap-2">
+        <span class="material-icons-round text-slate-400 text-[18px]">done_all</span>
+        <span class="text-xs font-semibold text-slate-700">Actions groupées</span>
+        <span id="batch-selected-count" class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">0</span>
+      </div>
+
+      <div class="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+
+      <div class="flex items-center gap-1">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">Évaluation</span>
+        <select id="batch-evaluation" class="w-48 px-2 py-1 text-xs border border-slate-200 rounded outline-none focus:ring-2 focus:ring-indigo-200">
+          <option value="">— choisir —</option>
+          <option value="Aucune">Aucune</option>
+          <option value="Diagnostique">Diagnostique</option>
+          <option value="Formative">Formative</option>
+          <option value="Certificative/Sommative">Certificative/Sommative</option>
+        </select>
+        <button id="batch-apply-evaluation" type="button" class="px-2 py-1 rounded-md bg-slate-800 text-white text-xs hover:bg-slate-900">Appliquer</button>
+      </div>
+
+      <div class="flex items-center gap-1">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">État</span>
+        <select id="batch-status" class="w-40 px-2 py-1 text-xs border border-slate-200 rounded outline-none focus:ring-2 focus:ring-indigo-200">
+          <option value="">— choisir —</option>
+          <option value="in_progress" data-i18n="opt_status_inprogress">En cours</option>
+          <option value="done" data-i18n="opt_status_completed">Finalisé</option>
+          <option value="review" data-i18n="opt_status_review">À revoir</option>
+        </select>
+        <button id="batch-apply-status" type="button" class="px-2 py-1 rounded-md bg-slate-800 text-white text-xs hover:bg-slate-900">Appliquer</button>
+      </div>
+
+
+      <div class="h-6 w-px bg-slate-200 mx-1 hidden md:block"></div>
+
+      <div class="flex items-center gap-1">
+        <button id="batch-add-tool" type="button" class="px-2 py-1 rounded-md border border-slate-200 text-slate-700 text-xs hover:bg-slate-50">Ajouter outil</button>
+        <button id="batch-remove-tool" type="button" class="px-2 py-1 rounded-md border border-slate-200 text-slate-700 text-xs hover:bg-slate-50">Retirer outil</button>
+      </div>
+      <div class="h-6 w-px bg-slate-200 mx-1 hidden lg:block"></div>
+
+      <div class="flex items-center gap-1">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">Alignement</span>
+        <select id="batch-alignment-kind" class="w-56 px-2 py-1 text-xs border border-slate-200 rounded outline-none focus:ring-2 focus:ring-indigo-200">
+          <option value="aim">Objectif</option>
+          <option value="outcome">Résultat</option>
+          <option value="comp">Compétence</option>
+          <option value="compT">Compétence transversale</option>
+        </select>
+        <button id="batch-add-alignment" type="button" class="px-2 py-1 rounded-md border border-slate-200 text-slate-700 text-xs hover:bg-slate-50">Ajouter</button>
+        <button id="batch-remove-alignment" type="button" class="px-2 py-1 rounded-md border border-slate-200 text-slate-700 text-xs hover:bg-slate-50">Retirer</button>
+      </div>
+
+      <div class="h-6 w-px bg-slate-200 mx-1 hidden xl:block"></div>
+
+      <div class="flex items-center gap-1">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">Déplacement</span>
+        <select id="batch-move-target" class="w-80 px-2 py-1 text-xs border border-slate-200 rounded outline-none focus:ring-2 focus:ring-indigo-200" title="Déplacer les activités sélectionnées vers un module, un moment ou un sous-moment">
+          <option value="">— choisir —</option>
+        </select>
+        <button id="batch-apply-move" type="button" class="px-2 py-1 rounded-md border border-slate-200 text-slate-700 text-xs hover:bg-slate-50">Déplacer</button>
+      </div>
+
+      <div class="flex-1"></div>
+
+      <button id="batch-clear-selection" type="button" class="px-2 py-1 rounded-md border border-slate-200 text-slate-700 text-xs hover:bg-slate-50">Désélectionner</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<script src="js/designer.js"></script>
+<script src="js/components-loader.js" defer></script>
+</body>
+</html>

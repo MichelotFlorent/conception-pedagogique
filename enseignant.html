@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="teacher_page_title">Canevas Persona : Personnel d'éducation</title>
+
+    <!-- Performance: Preconnect to font domains and CDN -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Tailwind CDN + Concordia theme -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'concordia-burgundy': '#912338',
+            'concordia-gold': '#FFD700',
+            indigo: {
+              50: '#fef2f4',
+              100: '#fde6ea',
+              200: '#f9c0ca',
+              300: '#f5949f',
+              400: '#d4475a',
+              500: '#b52e47',
+              600: '#912338',
+              700: '#6d1a2a',
+              800: '#5a1523',
+              900: '#48101c',
+              950: '#350c14',
+            }
+          }
+        }
+      }
+    }
+    </script>
+
+    <!-- Material Icons Round -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <!-- Import de html2pdf.js pour l'export PDF.
+         Performance: Added 'defer' to prevent blocking DOM parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="p-4 md:p-8" id="contentToPrint">
+    <!-- Header Mount Point -->
+    <div id="app-header-mount"></div>
+
+    <div class="max-w-5xl mx-auto">
+        <header class="mb-8">
+            <!-- Title -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight" data-i18n="teacher_heading">Canevas de Persona pour le personnel d'éducation</h1>
+                <p class="text-slate-500 mt-1" data-i18n="teacher_subtitle">Prototype pour aider à concevoir des formations adaptées à la réalité terrain.</p>
+            </div>
+
+            <!-- Toolbars -->
+            <div class="flex flex-wrap gap-4" data-html2canvas-ignore="true">
+                <!-- Options group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_options">Options</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-3 shadow-sm h-[52px]">
+                        <label class="switch-label flex items-center gap-1 px-2">
+                            <span class="text-sm text-slate-600" data-i18n="teacher_lbl_basic">Basique</span>
+                            <label class="switch">
+                                <input type="checkbox" id="contextToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="text-sm text-slate-600" data-i18n="teacher_lbl_advanced">Avancé</span>
+                        </label>
+                        <div class="w-px bg-slate-200 h-6 mx-1"></div>
+                        <label class="switch-label flex items-center gap-1 px-2">
+                            <span class="text-sm text-slate-600" data-i18n="teacher_lbl_suggestions">Suggestions</span>
+                            <label class="switch">
+                                <input type="checkbox" id="suggestionsToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- I/O group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_io">Import & Export</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="document.getElementById('fileInput').click()" class="text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_load" title="Charger une sauvegarde (JSON)">
+                            <span class="material-icons-round text-xl">folder_open</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_load">charger</span>
+                        </button>
+                        <button onclick="saveData()" class="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_save" title="Sauvegarder (JSON)">
+                            <span class="material-icons-round text-xl">save</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_save">sauvegarder</span>
+                        </button>
+                        <button onclick="exportPDF()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_pdf" title="Exporter en PDF">
+                            <span class="material-icons-round text-xl">picture_as_pdf</span>
+                            <span class="text-sm font-semibold hidden md:inline">PDF</span>
+                        </button>
+                        <button onclick="exportMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_md" title="Exporter Profil (Markdown)">
+                            <span class="material-icons-round text-xl">description</span>
+                            <span class="text-sm font-semibold hidden md:inline">MD</span>
+                        </button>
+                        <button onclick="exportFullMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_full_md" title="Exporter Canevas Complet (Markdown)">
+                            <span class="material-icons-round text-xl">list_alt</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_full_md">complet</span>
+                        </button>
+                        <input id="fileInput" type="file" accept=".json" class="hidden" onchange="loadData(this)">
+                        <div class="w-px bg-slate-200 h-6 mx-1"></div>
+                        <button onclick="resetForm()" class="text-slate-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_reset" title="Réinitialiser le canevas">
+                            <span class="material-icons-round text-xl">restart_alt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Aide group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_help">Aide</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="openSuggestionsModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_suggest" title="Proposer une amélioration (export local)">
+                            <span class="material-icons-round text-xl">feedback</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_suggest">Feedback</span>
+                        </button>
+                        <button onclick="openHelpModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_guide" title="Guide d'utilisation">
+                            <span class="material-icons-round text-xl">help</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_help">aide</span>
+                        </button>
+                        <button onclick="openInfoModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_about" title="À propos">
+                            <span class="material-icons-round text-xl">info</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_info">infos</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Language selector -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_language">Langue</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <select id="langSelect" onchange="switchLang(this.value)" class="text-sm text-slate-600 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1">
+                            <option value="fr">Français</option>
+                            <option value="en-CA">English (CA)</option>
+                        </select>
+                        <button onclick="document.getElementById('langFileInput').click()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-2 rounded-lg transition-colors" data-i18n-tooltip="teacher_tip_load_lang" title="Charger un pack de langue">
+                            <span class="material-icons-round text-xl">translate</span>
+                        </button>
+                        <input id="langFileInput" type="file" accept=".json" class="hidden" onchange="loadLangPack(event)">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+    <div class="container">
+        <form id="personaForm" class="canvas-grid">
+
+            <!-- 1. IDENTITÉ -->
+            <div class="card">
+                <h2><span class="material-icons-round">badge</span> <span data-i18n="teacher_card_identity">Identité</span></h2>
+                <div class="card-desc" data-i18n="teacher_desc_identity">Profil administratif et personnel.</div>
+
+                <!-- Base -->
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_firstname">Prénom</label>
+                    <input type="text" data-i18n-placeholder="teacher_ph_firstname" placeholder="Ex: Julie" id="name">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_education_sector">Secteur d'éducation</label>
+                    <select id="educationSector" onchange="handleSectorChange(this.value)">
+                        <option value="" data-i18n="teacher_opt_select">Sélectionner...</option>
+                        <optgroup label="Enseignement préscolaire et primaire" data-i18n-label="teacher_optgrp_preprimary">
+                            <option value="Préscolaire" data-i18n="teacher_opt_preschool">Préscolaire / Maternelle</option>
+                            <option value="Primaire" data-i18n="teacher_opt_primary">Primaire / Élémentaire</option>
+                        </optgroup>
+                        <optgroup label="Enseignement secondaire" data-i18n-label="teacher_optgrp_secondary">
+                            <option value="Secondaire (premier cycle / inférieur)" data-i18n="teacher_opt_middle">Secondaire (premier cycle / inférieur)</option>
+                            <option value="Secondaire (deuxième cycle / supérieur) — général" data-i18n="teacher_opt_high_general">Secondaire (deuxième cycle / supérieur) — général</option>
+                            <option value="Secondaire — technique et professionnel" data-i18n="teacher_opt_high_vocational">Secondaire — technique et professionnel</option>
+                        </optgroup>
+                        <optgroup label="Enseignement supérieur" data-i18n-label="teacher_optgrp_higher">
+                            <option value="Université" data-i18n="teacher_opt_university">Université</option>
+                            <option value="Haute école / École spécialisée" data-i18n="teacher_opt_grande_ecole">Haute école / École spécialisée</option>
+                            <option value="Collège / CÉGEP / Institut technologique" data-i18n="teacher_opt_technical">Collège / CÉGEP / Institut technologique</option>
+                        </optgroup>
+                        <optgroup label="Formation continue" data-i18n-label="teacher_optgrp_continuing">
+                            <option value="Formation adultes" data-i18n="teacher_opt_adult_training">Formation d'adultes / Continue</option>
+                            <option value="Formation professionnelle / Apprentissage" data-i18n="teacher_opt_vocational_training">Formation professionnelle / Apprentissage</option>
+                        </optgroup>
+                        <optgroup label="Autre" data-i18n-label="teacher_optgrp_other">
+                            <option value="Éducation spécialisée / adaptation scolaire" data-i18n="teacher_opt_specialized">Éducation spécialisée / adaptation scolaire</option>
+                            <option value="Autre" data-i18n="teacher_opt_other">Autre contexte éducatif</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group" id="disciplineField">
+                    <label data-i18n="teacher_lbl_discipline">Discipline / Spécialité</label>
+                    <input type="text" data-i18n-placeholder="teacher_ph_discipline" placeholder="Ex: Mathématiques, Histoire-Géo, Informatique..." id="discipline">
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_status">Statut</label>
+                    <select id="status">
+                        <option value="" data-i18n="teacher_opt_select">Sélectionner...</option>
+                        <option value="Permanent" data-i18n="teacher_opt_tenured">Permanent</option>
+                        <option value="Contractuel" data-i18n="teacher_opt_contract">Contractuel·le</option>
+                        <option value="Formation initiale" data-i18n="teacher_opt_trainee">En formation initiale (stage / insertion)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_experience">Années d'expérience</label>
+                    <input type="text" data-i18n-placeholder="teacher_ph_experience" placeholder="Ex: 5 ans, Débutant..." id="experience">
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="advanced-context">
+                    <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_career_path">Parcours professionnel</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="radio" name="careerPath" value="Local"> <span data-i18n="teacher_opt_local_hire">Recrutement local</span></label>
+                            <label class="checkbox-item"><input type="radio" name="careerPath" value="Transfer"> <span data-i18n="teacher_opt_transfer">Mutation / Mobilité internationale</span></label>
+                            <label class="checkbox-item"><input type="radio" name="careerPath" value="Reconversion"> <span data-i18n="teacher_opt_career_change">Reconversion professionnelle</span></label>
+                            <label class="checkbox-item"><input type="radio" name="careerPath" value="International"> <span data-i18n="teacher_opt_international">Coopération internationale / Expatriation</span></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_institution_tenure">Ancienneté dans l'établissement</label>
+                        <select id="institutionTenure">
+                            <option value="" data-i18n="teacher_opt_select">Sélectionner...</option>
+                            <option value="Nouveau" data-i18n="teacher_opt_newcomer">Nouvel arrivant (&lt; 1 an)</option>
+                            <option value="Récent" data-i18n="teacher_opt_recent">1 à 3 ans</option>
+                            <option value="Établi" data-i18n="teacher_opt_established">Plus de 3 ans</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. CONTEXTE D'EXERCICE -->
+            <div class="card">
+                <h2><span class="material-icons-round">place</span> <span data-i18n="teacher_card_context">Localisation & classe</span></h2>
+                <div class="card-desc" data-i18n="teacher_desc_context">Environnement et conditions d'exercice.</div>
+
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_details">Détails</label>
+                    <textarea id="contextDetails" data-i18n-placeholder="teacher_ph_details" placeholder="Détails"></textarea>
+                </div>
+
+                <!-- Base -->
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_school_type">Type d'établissement</label>
+                    <input type="text" data-i18n-placeholder="teacher_ph_school_type" placeholder="Ex: École de quartier..." id="schoolType">
+                </div>
+                <div class="suggestions-panel">
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_class_profile">Profil général de la classe</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="heterogeneity"> <span data-i18n="teacher_chk_heterogeneity">Hétérogénéité scolaire</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="climate"> <span data-i18n="teacher_chk_climate">Gestion de classe difficile</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="multilevel"> <span data-i18n="teacher_chk_multilevel">Classe à double ou triple niveau</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="overcrowded"> <span data-i18n="teacher_chk_overcrowded">Classe surchargée / Faible effectif</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="inclusion"> <span data-i18n="teacher_chk_inclusion">Élèves à besoins particuliers (ULIS, EBEP)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="social"> <span data-i18n="teacher_chk_social">Précarité sociale des familles</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="turnover_students"> <span data-i18n="teacher_chk_turnover_students">Fort turnover des élèves</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="advanced-context">
+                    <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_geographic_context">Contexte géographique</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="rural"> <span data-i18n="teacher_chk_rural">Zone rurale / Isolement géographique</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="priority_zone"> <span data-i18n="teacher_chk_priority_zone">Zone défavorisée / Quartier sensible</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="remote"> <span data-i18n="teacher_chk_remote_access">Accès difficile (montagne, île, forêt, etc.)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="displaced"> <span data-i18n="teacher_chk_displaced">Population déplacée / Réfugiés</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="conflict"> <span data-i18n="teacher_chk_conflict">Zone de conflit / Post-conflit</span></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_linguistic_context">Contexte linguistique</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="multilingual"> <span data-i18n="teacher_chk_multilingual">Classes plurilingues</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="allophone"> <span data-i18n="teacher_chk_allophone">Élèves non-francophones</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="regional_lang"> <span data-i18n="teacher_chk_regional_lang">Langue locale dominante (français langue seconde)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="creole"> <span data-i18n="teacher_chk_creole">Créole / Dialecte régional</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="bilingual"> <span data-i18n="teacher_chk_bilingual">Programme bilingue / immersion</span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. COMPÉTENCES NUMÉRIQUES -->
+            <div class="card">
+                <h2><span class="material-icons-round">devices</span> <span data-i18n="teacher_card_digital">Numérique</span></h2>
+                <div class="card-desc" data-i18n="teacher_desc_digital">Équipement et compétences technologiques.</div>
+
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_details">Détails</label>
+                    <textarea id="digitalDetails" data-i18n-placeholder="teacher_ph_details" placeholder="Détails"></textarea>
+                </div>
+                <!-- Base -->
+                <div class="suggestions-panel">
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_tools_usage">Outils & Usages</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="office"> <span data-i18n="teacher_chk_office">Bureautique (Word/PPT)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="institution"> <span data-i18n="teacher_chk_institution">Outils institutionnels (portail, ENA/LMS)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="smartphone"> <span data-i18n="teacher_chk_smartphone">Smartphone uniquement</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="no_computer"> <span data-i18n="teacher_chk_no_computer">Pas d'ordi perso / Partage équipement</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="basic_training"> <span data-i18n="teacher_chk_basic_training">Besoin formation bases (fichiers, mails)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="paper_only"> <span data-i18n="teacher_chk_paper_only">Privilégie le papier / Réticent numérique</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="social_watch"> <span data-i18n="teacher_chk_social_watch">Veille via réseaux sociaux (Insta/TikTok)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="ai_curious"> <span data-i18n="teacher_chk_ai_curious">Curieux/Utilisateur IA générative</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="cloud_academic"> <span data-i18n="teacher_chk_cloud_academic">Utilise le cloud académique (Nuage/Apps)</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="advanced-context">
+                    <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_equipment_challenges">Défis matériels spécifiques</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="shared_devices"> <span data-i18n="teacher_chk_shared_devices">Équipements partagés entre collègues</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="byod_required"> <span data-i18n="teacher_chk_byod">Utilisation d'équipement personnel obligatoire (BYOD)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="outdated_tech"> <span data-i18n="teacher_chk_outdated">Matériel obsolète ou en panne</span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. MOTIVATIONS -->
+            <div class="card">
+                <h2><span class="material-icons-round">psychology</span> <span data-i18n="teacher_card_motivations">Motivations</span></h2>
+                <div class="card-desc" data-i18n="teacher_desc_motivations">Besoins et attentes vis-à-vis de la formation.</div>
+
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_details">Détails</label>
+                    <textarea id="motivationDetails" data-i18n-placeholder="teacher_ph_details" placeholder="Détails"></textarea>
+                </div>
+                <!-- Base -->
+                <div class="suggestions-panel">
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_why_train">Pourquoi se former ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="classManagement"> <span data-i18n="teacher_chk_class_mgmt">Gestion de classe / Autorité</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="security"> <span data-i18n="teacher_chk_exam_prep">Préparation aux concours</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="time"> <span data-i18n="teacher_chk_time_saving">Gain de temps (Ressources prêtes)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="innovation"> <span data-i18n="teacher_chk_innovation">Tester de nouvelles approches (Ludification, etc.)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="wellbeing"> <span data-i18n="teacher_chk_wellbeing">Climat de classe / Bien-être</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="mutation"> <span data-i18n="teacher_chk_career">Évolution de carrière/perspectives</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="project"> <span data-i18n="teacher_chk_project">Monter un projet (Sortie, échange)</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="advanced-context">
+                    <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_infrastructure">Contraintes d'infrastructure</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="power_issues"> <span data-i18n="teacher_chk_power">Coupures électriques fréquentes</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="building_issues"> <span data-i18n="teacher_chk_building">Locaux vétustes ou inadaptés</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="climate_extreme"> <span data-i18n="teacher_chk_climate_extreme">Climat extrême (chaleur, froid, humidité)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="seasonal_access"> <span data-i18n="teacher_chk_seasonal_access">Accès saisonnier difficile</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="water_sanitation"> <span data-i18n="teacher_chk_water">Accès limité à l'eau potable / sanitaires</span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. FREINS -->
+            <div class="card">
+                <h2><span class="material-icons-round">warning</span> <span data-i18n="teacher_card_obstacles">Freins</span></h2>
+                <div class="card-desc" data-i18n="teacher_desc_obstacles">Obstacles potentiels à l'apprentissage.</div>
+
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_details">Détails</label>
+                    <textarea id="obstacleDetails" data-i18n-placeholder="teacher_ph_details" placeholder="Détails"></textarea>
+                </div>
+                <!-- Base -->
+                <div class="suggestions-panel">
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_obstacles">Obstacles à la formation</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="workload"> <span data-i18n="teacher_chk_workload">Charge de travail</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="training_gap"> <span data-i18n="teacher_chk_training_gap">Offre de formation inadaptée</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="logistics"> <span data-i18n="teacher_chk_logistics">Transport / Logistique (Accès formation)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="language_barrier"> <span data-i18n="teacher_chk_language_barrier">Barrière de la langue (Enseignant/Élèves)</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="advanced-context">
+                    <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" id="internet"> <span data-i18n="teacher_chk_unstable_internet">Connexion domicile instable/inexistante</span></label>
+                        <label class="checkbox-item"><input type="checkbox" id="turnover"> <span data-i18n="teacher_chk_low_motivation">Faible motivation</span></label>
+                        <label class="checkbox-item"><input type="checkbox" id="jetlag"> <span data-i18n="teacher_chk_jetlag">Décalage horaire (si formateur distant)</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. PRÉFÉRENCES (FORMAT) -->
+            <div class="card">
+                <h2><span class="material-icons-round">headphones</span> <span data-i18n="teacher_card_format">Format</span></h2>
+                <div class="card-desc" data-i18n="teacher_desc_format">Modalités pédagogiques préférées.</div>
+
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_details">Détails</label>
+                    <textarea id="formatDetails" data-i18n-placeholder="teacher_ph_details" placeholder="Détails"></textarea>
+                </div>
+                <!-- Base -->
+                <div class="suggestions-panel">
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_preferred_formats">Formats préférés</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="micro"> <span data-i18n="teacher_chk_micro">Micro-learning (5-10 min)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="mobile"> <span data-i18n="teacher_chk_mobile">Mobile Learning</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="visio"> <span data-i18n="teacher_chk_visio">Visio-conférence (Synchrones)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="hybrid"> <span data-i18n="teacher_chk_hybrid">Hybride (Présentiel + Distanciel)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="tutoring"> <span data-i18n="teacher_chk_tutoring">Tutorat / Accompagnement individuel</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="resources"> <span data-i18n="teacher_chk_resources">Banque de ressources libre accès</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="advanced-context">
+                    <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" id="offline"> <span data-i18n="teacher_chk_offline">Mode "Hors-ligne" (Téléchargement)</span></label>
+                        <label class="checkbox-item"><input type="checkbox" id="whatsapp"> <span data-i18n="teacher_chk_whatsapp">WhatsApp (Faible débit / Informalité)</span></label>
+                        <label class="checkbox-item"><input type="checkbox" id="peer"> <span data-i18n="teacher_chk_peer">Pair-à-pair local (Témoignages crédibles)</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. SCÉNARIO TYPE (Full Width) -->
+            <div class="card full-width">
+                <h2><span class="material-icons-round">edit_note</span> <span data-i18n="teacher_card_scenario">Scénario / Journée Type</span></h2>
+                <div class="card-desc" data-i18n="teacher_desc_scenario">Déroulé d'une journée type et disponibilités.</div>
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_scenario">Racontez sa journée pour identifier les créneaux disponibles et les contraintes techniques.</label>
+                    <textarea id="scenario" data-i18n-placeholder="teacher_ph_scenario" placeholder="Ex: Finit la classe à 13h à cause de la chaleur. Pas de réseau le soir..."></textarea>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    </div><!-- /max-w-5xl -->
+
+    <!-- Footer Mount Point -->
+    <div id="app-footer-mount"></div>
+
+    <!-- Modal Help (Ignored in PDF) -->
+    <div id="helpModal" class="modal" data-html2canvas-ignore="true">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-btn" onclick="closeHelpModal()">&times;</span>
+            <h2 style="border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 15px;" data-i18n="teacher_help_title">Guide d'utilisation</h2>
+
+            <div style="font-size: 0.95rem; line-height: 1.6; color: #404040;" data-i18n="teacher_help_body">
+<p><strong>1. Objectif</strong><br>
+Ce canevas sert à décrire un profil type (persona) afin de concevoir des formations réellement adaptées aux besoins, motivations, contraintes et contextes d'exercice.</p>
+
+<p><strong>2. Basculer les vues (en haut de page)</strong><br>
+Deux interrupteurs pilotent l'affichage :
+<ul style="margin-top: 5px; margin-bottom: 10px;">
+    <li><strong><span data-i18n="teacher_lbl_basic">Basique</span> / <span style="color: #b52e47; font-weight: bold;" data-i18n="teacher_lbl_advanced">Avancé</span> :</strong> <span data-i18n="teacher_help_advanced_toggle">active les options avancées pour spécifier des contextes particuliers (géographie, infrastructure, défis spécifiques, etc.).</span></li>
+    <li><strong>Suggestions :</strong> affiche (ou masque) d'un seul coup les listes de cases à cocher "Suggestions" dans tous les blocs.</li>
+</ul>
+</p>
+
+<p><strong>3. Renseigner le persona</strong><br>
+<ul>
+    <li><strong>Texte libre :</strong> décrivez les éléments qualitatifs (exemples, anecdotes, précisions de contexte).</li>
+    <li><strong>Suggestions (cases à cocher) :</strong> activez l'interrupteur <strong>Suggestions</strong> pour faire apparaître les options, puis cochez ce qui correspond au profil.</li>
+</ul>
+</p>
+
+<p><strong>4. Import & Export</strong><br>
+Le bloc <strong>IMPORT & EXPORT</strong> regroupe les actions de partage et de sauvegarde :
+<ul>
+    <li><strong><span class="material-icons-round" style="font-size: 14px; vertical-align: middle;">save</span> Sauvegarder (.json)</strong> : enregistre l'état du formulaire (y compris les interrupteurs) pour le reprendre plus tard.</li>
+    <li><strong><span class="material-icons-round" style="font-size: 14px; vertical-align: middle;">upload_file</span> Charger une sauvegarde (.json)</strong> : recharge un fichier précédemment sauvegardé.</li>
+    <li><strong><span class="material-icons-round" style="font-size: 14px; vertical-align: middle;">picture_as_pdf</span> PDF</strong> : génère une fiche persona imprimable/partageable.</li>
+    <li><strong><span class="material-icons-round" style="font-size: 14px; vertical-align: middle;">integration_instructions</span> Markdown</strong> : produit un texte structuré, utile pour copier-coller dans un assistant IA afin de générer un scénario ou un plan de formation contextualisé.</li>
+</ul>
+</p>
+
+<p style="margin-top: 12px;"><strong>Note</strong><br>
+Cet outil est un <strong>prototype non officiel</strong> : n'hésitez pas à partager vos retours et suggestions d'amélioration.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal Suggestions (Ignored in PDF) -->
+    <div id="suggestionsModal" class="modal" data-html2canvas-ignore="true">
+        <div class="modal-content" style="max-width: 720px;">
+            <span class="close-btn" onclick="closeSuggestionsModal()">&times;</span>
+            <h2 style="border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 15px;" data-i18n="teacher_suggest_title">Proposer une amélioration</h2>
+
+            <div style="font-size: 0.95rem; line-height: 1.6; color: #404040;">
+                <p style="margin-top: 0;" data-i18n="teacher_suggest_intro">
+                    Cet espace permet de proposer des améliorations sur le contenu ou l'interface. Les suggestions sont stockées localement dans votre navigateur et peuvent être exportées en fichier (JSON) afin de les partager.
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; margin: 14px 0;">
+                    <div>
+                        <label for="suggestionCategory" style="display:block; font-weight: 600; margin-bottom: 6px;" data-i18n="teacher_suggest_lbl_category">Catégorie</label>
+                        <select id="suggestionCategory" class="input" style="width: 100%;">
+                            <option value="Contenu des blocs" data-i18n="teacher_suggest_cat_content">Contenu des blocs</option>
+                            <option value="Libellés / vocabulaire" data-i18n="teacher_suggest_cat_labels">Libellés / vocabulaire</option>
+                            <option value="Suggestions proposées" data-i18n="teacher_suggest_cat_suggestions">Suggestions proposées</option>
+                            <option value="Ergonomie / interface" data-i18n="teacher_suggest_cat_ux">Ergonomie / interface</option>
+                            <option value="Autre" data-i18n="teacher_suggest_cat_other">Autre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="suggestionPriority" style="display:block; font-weight: 600; margin-bottom: 6px;" data-i18n="teacher_suggest_lbl_priority">Priorité</label>
+                        <select id="suggestionPriority" class="input" style="width: 100%;">
+                            <option value="À discuter" data-i18n="teacher_suggest_prio_discuss">À discuter</option>
+                            <option value="Faible" data-i18n="teacher_suggest_prio_low">Faible</option>
+                            <option value="Moyenne" data-i18n="teacher_suggest_prio_medium">Moyenne</option>
+                            <option value="Élevée" data-i18n="teacher_suggest_prio_high">Élevée</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin: 12px 0;">
+                    <label for="suggestionText" style="display:block; font-weight: 600; margin-bottom: 6px;" data-i18n="teacher_suggest_lbl_text">Suggestion</label>
+                    <textarea id="suggestionText" class="input" rows="5" style="width: 100%; resize: vertical;" data-i18n-placeholder="teacher_suggest_ph_text" placeholder="Décrivez votre proposition de manière précise (ex. libellé à modifier, option à ajouter/supprimer, clarification à apporter, etc.)."></textarea>
+                    <div style="font-size: 0.82rem; color: #757575; margin-top: 6px;" data-i18n="teacher_suggest_disclaimer">
+                        Merci d'éviter toute donnée personnelle. Objectif : améliorer le contenu et l'ergonomie.
+                    </div>
+                </div>
+
+                <div style="display:flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px;">
+                    <button class="btn btn-primary" onclick="addSuggestion()">
+                        <span class="material-icons-round" style="vertical-align: middle;">add</span>
+                        <span data-i18n="teacher_btn_add">Ajouter</span>
+                    </button>
+                    <button class="btn btn-outline" onclick="exportSuggestions()" id="exportSuggestionsBtn">
+                        <span class="material-icons-round" style="vertical-align: middle;">download</span>
+                        <span data-i18n="teacher_btn_export_suggestions">Exporter les suggestions</span>
+                    </button>
+                    <button class="btn btn-reset" onclick="clearSuggestions()" id="clearSuggestionsBtn" data-tooltip="Supprimer toutes les suggestions locales" data-i18n-tooltip="teacher_tip_clear_suggestions">
+                        <span class="material-icons-round">delete</span>
+                    </button>
+                    <span id="suggestionsCount" style="margin-left: auto; font-weight: 600; color:#1a1a1a;">0 suggestion</span>
+                </div>
+
+                <div style="margin-top: 14px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 10px; background: #f8f8f8;">
+                    <div style="font-weight: 700; margin-bottom: 6px;" data-i18n="teacher_suggest_share_title">Partager le fichier</div>
+                    <div style="font-size: 0.92rem; color:#334155;" data-i18n="teacher_suggest_share_text">
+                        Après export, merci de partager le fichier <strong>JSON</strong> (par exemple en pièce jointe dans un e-mail ou via votre canal habituel) afin de contribuer à l'amélioration du prototype.
+                    </div>
+                </div>
+
+                <div id="suggestionsList" style="margin-top: 14px;"></div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Modal Info (Ignored in PDF) -->
+    <div id="infoModal" class="modal" data-html2canvas-ignore="true">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeInfoModal()">&times;</span>
+            <h2 data-i18n="teacher_about_title">À propos</h2>
+            <p data-i18n="teacher_about_text">Cet outil permet de modéliser les besoins, motivations et contraintes des personnels d'éducation afin de concevoir des formations adaptées.</p>
+            <p data-i18n="teacher_about_prototype">Ce document est un prototype non officiel, partagé à des fins de collecte de suggestions d'amélioration.</p>
+            <p data-i18n="teacher_about_privacy"><strong>Traitement local :</strong> toutes les données restent sur votre navigateur, rien n'est envoyé en ligne.</p>
+            <div class="modal-footer" data-i18n="teacher_about_credits">
+                Développé par Florent Michelot, inspiré des travaux de F. Jourde & J. Dubois (2026) • CC BY-SA
+            </div>
+        </div>
+    </div>
+
+    <script src="js/i18n-core.js"></script>
+    <script src="js/enseignant.js"></script>
+    <script src="js/components-loader.js" defer></script>
+</body>
+</html>

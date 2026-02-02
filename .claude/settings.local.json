@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api:*)",
+      "Bash(curl:*)",
+      "Bash(node extract_js.js:*)",
+      "Bash(where:*)",
+      "Bash(python3:*)",
+      "Bash(py:*)",
+      "Bash(python:*)",
+      "Bash(git mv:*)",
+      "Bash(copy \"C:\\\\Users\\\\FMICHELO\\\\OneDrive - Concordia University - Canada\\\\Bureau\\\\Scripts\\\\DesignPedagogique\\\\learning-designer\\\\js\\\\persona.js\" \"C:\\\\Users\\\\FMICHELO\\\\OneDrive - Concordia University - Canada\\\\Bureau\\\\Scripts\\\\DesignPedagogique\\\\learning-designer\\\\js\\\\enseignant.js\")",
+      "Bash(copy \"C:\\\\Users\\\\FMICHELO\\\\OneDrive - Concordia University - Canada\\\\Bureau\\\\Scripts\\\\DesignPedagogique\\\\learning-designer\\\\persona.html\" \"C:\\\\Users\\\\FMICHELO\\\\OneDrive - Concordia University - Canada\\\\Bureau\\\\Scripts\\\\DesignPedagogique\\\\learning-designer\\\\enseignant.html\")",
+      "Bash(node:*)",
+      "Bash(tree:*)"
+    ]
+  }
+}
