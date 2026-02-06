@@ -13,7 +13,12 @@
       "Bash(copy \"C:\\\\Users\\\\FMICHELO\\\\OneDrive - Concordia University - Canada\\\\Bureau\\\\Scripts\\\\DesignPedagogique\\\\learning-designer\\\\js\\\\persona.js\" \"C:\\\\Users\\\\FMICHELO\\\\OneDrive - Concordia University - Canada\\\\Bureau\\\\Scripts\\\\DesignPedagogique\\\\learning-designer\\\\js\\\\enseignant.js\")",
       "Bash(copy \"C:\\\\Users\\\\FMICHELO\\\\OneDrive - Concordia University - Canada\\\\Bureau\\\\Scripts\\\\DesignPedagogique\\\\learning-designer\\\\persona.html\" \"C:\\\\Users\\\\FMICHELO\\\\OneDrive - Concordia University - Canada\\\\Bureau\\\\Scripts\\\\DesignPedagogique\\\\learning-designer\\\\enseignant.html\")",
       "Bash(node:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat\\(designer\\): add structure control panel for quantity planning\n\n- Add HTML for structure control panel with quantity inputs\n- Include inputs for modules, activities, moments, submoments\n- Add generate button and progress bar\n- Add preview summary of structure to be created\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\ni18n: add English translations for structure panel\n\n- Add keys for structure_title, structure_modules, etc.\n- Add btn_generate and progress_generating translations\n- Add error messages and summary template\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nstyle: add CSS for structure control panel\n\n- Add .structure-control-panel with Concordia gradient\n- Style quantity inputs and +/- buttons\n- Add .btn-generate with bordeaux gradient\n- Add progress bar with bordeaux-to-gold gradient\n- Include responsive adjustments for mobile\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat\\(designer\\): implement generateStructure\\(\\) for quantity planning\n\n- Add initStructurePanel\\(\\) for quantity +/- buttons\n- Add updateStructureSummary\\(\\) for live preview\n- Add createModuleProgrammatically\\(\\) for bulk creation\n- Add createMomentProgrammatically\\(\\) and createSubmomentProgrammatically\\(\\)\n- Implement generateStructure\\(\\) with progress bar and async support\n- Add ''generate-structure'' action to event delegation\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
