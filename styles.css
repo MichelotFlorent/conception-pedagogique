@@ -2014,3 +2014,212 @@ html.ui-dark .persona-count-group {
 .submoment-body.collapsed {
   display: none;
 }
+
+/* ============================================
+   STRUCTURE CONTROL PANEL - Quantity Planning UI
+   ============================================ */
+.structure-control-panel {
+  background: linear-gradient(135deg, rgba(145, 35, 56, 0.03) 0%, rgba(255, 255, 255, 1) 100%);
+  border: 2px solid rgba(145, 35, 56, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 0.75rem 0 1.5rem 0;
+  box-shadow: 0 2px 8px rgba(145, 35, 56, 0.08);
+}
+
+.structure-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: #912338;
+}
+
+.structure-panel-header .material-icons-round {
+  font-size: 1.5rem;
+}
+
+.structure-panel-header h2 {
+  font-family: 'Advent Pro', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  text-transform: lowercase;
+}
+
+.structure-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.structure-inputs .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.structure-inputs .input-group label {
+  font-family: 'Advent Pro', sans-serif;
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.8rem;
+  text-transform: lowercase;
+}
+
+.structure-inputs .input-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.structure-inputs .qty-input {
+  width: 60px;
+  padding: 0.4rem 0.5rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  color: #912338;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+
+.structure-inputs .qty-input::-webkit-outer-spin-button,
+.structure-inputs .qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.structure-inputs .qty-input:focus {
+  outline: none;
+  border-color: #912338;
+  box-shadow: 0 0 0 3px rgba(145, 35, 56, 0.1);
+}
+
+.structure-inputs .qty-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #912338;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.structure-inputs .qty-btn:hover {
+  background: #6d1a2a;
+}
+
+.structure-inputs .qty-btn:active {
+  transform: scale(0.95);
+}
+
+.structure-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-generate {
+  background: linear-gradient(135deg, #912338, #6d1a2a);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'Advent Pro', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(145, 35, 56, 0.25);
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-transform: lowercase;
+}
+
+.btn-generate:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(145, 35, 56, 0.35);
+}
+
+.btn-generate:active {
+  transform: translateY(0);
+}
+
+.btn-generate .material-icons-round {
+  font-size: 1.1rem;
+}
+
+.structure-preview {
+  font-family: 'Antic', sans-serif;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.structure-preview strong {
+  color: #912338;
+  font-weight: 700;
+}
+
+.structure-control-panel .progress-bar {
+  margin-top: 1rem;
+  background: #f1f5f9;
+  border-radius: 6px;
+  height: 32px;
+  overflow: hidden;
+  position: relative;
+}
+
+.structure-control-panel .progress-bar.hidden {
+  display: none;
+}
+
+.structure-control-panel .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #912338, #FFD700);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.structure-control-panel .progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.8rem;
+  font-family: 'Advent Pro', sans-serif;
+}
+
+/* Responsive adjustments for structure panel */
+@media (max-width: 640px) {
+  .structure-control-panel {
+    padding: 1rem;
+  }
+
+  .structure-inputs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .structure-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-generate {
+    justify-content: center;
+  }
+}
