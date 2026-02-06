@@ -2016,7 +2016,155 @@ html.ui-dark .persona-count-group {
 }
 
 /* ============================================
-   STRUCTURE CONTROL PANEL - Quantity Planning UI
+   MODULES CONTROL PANEL - Global control
+   ============================================ */
+.modules-control-panel {
+  background: linear-gradient(135deg, rgba(145, 35, 56, 0.04) 0%, rgba(255, 255, 255, 1) 100%);
+  border: 2px solid rgba(145, 35, 56, 0.15);
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  margin: 0.5rem 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.modules-control-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #912338;
+}
+
+.modules-control-header .material-icons-round {
+  font-size: 1.25rem;
+}
+
+.modules-control-header label {
+  font-family: 'Advent Pro', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.modules-control-input {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.modules-control-info {
+  flex: 1;
+  text-align: right;
+}
+
+/* ============================================
+   INLINE NUMERIC CONTROLS - Contextual controls
+   ============================================ */
+.module-moments-control,
+.moment-submoments-control,
+.submoment-activities-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.module-moments-control {
+  background: rgba(145, 35, 56, 0.03);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.moment-submoments-control {
+  background: rgba(100, 116, 139, 0.05);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.submoment-activities-control {
+  padding: 0.25rem 0;
+}
+
+/* Inline quantity buttons and inputs */
+.qty-btn-inline,
+.qty-btn-inline-sm {
+  border: none;
+  background: #912338;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn-inline {
+  width: 24px;
+  height: 24px;
+  font-size: 0.9rem;
+}
+
+.qty-btn-inline-sm {
+  width: 20px;
+  height: 20px;
+  font-size: 0.8rem;
+}
+
+.qty-btn-inline:hover,
+.qty-btn-inline-sm:hover {
+  background: #6d1a2a;
+}
+
+.qty-btn-inline:active,
+.qty-btn-inline-sm:active {
+  transform: scale(0.95);
+}
+
+.qty-input-inline,
+.qty-input-inline-sm {
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-weight: 700;
+  text-align: center;
+  color: #912338;
+  -moz-appearance: textfield;
+}
+
+.qty-input-inline {
+  width: 48px;
+  height: 24px;
+  font-size: 0.85rem;
+  padding: 0 0.25rem;
+}
+
+.qty-input-inline-sm {
+  width: 40px;
+  height: 20px;
+  font-size: 0.75rem;
+  padding: 0 0.2rem;
+}
+
+.qty-input-inline::-webkit-outer-spin-button,
+.qty-input-inline::-webkit-inner-spin-button,
+.qty-input-inline-sm::-webkit-outer-spin-button,
+.qty-input-inline-sm::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.qty-input-inline:focus,
+.qty-input-inline-sm:focus {
+  outline: none;
+  border-color: #912338;
+  box-shadow: 0 0 0 2px rgba(145, 35, 56, 0.1);
+}
+
+/* ============================================
+   STRUCTURE CONTROL PANEL - Legacy (kept for compatibility)
    ============================================ */
 .structure-control-panel {
   background: linear-gradient(135deg, rgba(145, 35, 56, 0.03) 0%, rgba(255, 255, 255, 1) 100%);
