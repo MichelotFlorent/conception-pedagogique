@@ -4988,61 +4988,260 @@ initSortableSteps(moment.querySelector('.activity-steps-container'));
 // STRUCTURE GENERATION - Quantity Planning UI
 // ============================================
 
+// ============================================
+// CONTEXTUAL NUMERIC CONTROLS - Sync System
+// ============================================
+
 /**
- * Initialize structure panel controls (quantity +/- buttons and live preview)
+ * Initialize numeric controls for contextual sync
  */
-function initStructurePanel() {
-    // Handle +/- buttons for quantity inputs
-    document.querySelectorAll('.qty-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-qty-target');
-            const delta = parseInt(this.getAttribute('data-qty-delta')) || 0;
-            const input = document.getElementById(targetId);
-            if (!input) return;
+function initNumericControls() {
+    // Global +/- buttons (modules control)
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('[data-qty-action]');
+        if (!btn) return;
 
-            const min = parseInt(input.min) || 0;
-            const max = parseInt(input.max) || 999;
-            const current = parseInt(input.value) || 0;
-            const newVal = Math.max(min, Math.min(max, current + delta));
+        const action = btn.getAttribute('data-qty-action');
+        const targetId = btn.getAttribute('data-qty-target-id');
+        const targetClass = btn.getAttribute('data-qty-target-class');
+
+        let input;
+        if (targetId) {
+            input = document.getElementById(targetId);
+        } else if (targetClass) {
+            input = btn.closest('.input-controls, .modules-control-input, .module-moments-control, .moment-submoments-control, .submoment-activities-control')?.querySelector('.' + targetClass);
+        }
+
+        if (!input) return;
+
+        const min = parseInt(input.min) || 0;
+        const max = parseInt(input.max) || 20;
+        const current = parseInt(input.value) || 0;
+        const delta = action === 'increase' ? 1 : -1;
+        const newVal = Math.max(min, Math.min(max, current + delta));
+
+        if (newVal !== current) {
             input.value = newVal;
-
-            updateStructureSummary();
-        });
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
     });
 
-    // Update summary on input change
-    document.querySelectorAll('.qty-input').forEach(input => {
-        input.addEventListener('input', updateStructureSummary);
-        input.addEventListener('change', updateStructureSummary);
+    // Global change handler for all numeric inputs
+    document.addEventListener('change', function(e) {
+        const input = e.target;
+        if (!input.matches('[data-sync-type]')) return;
+
+        const syncType = input.getAttribute('data-sync-type');
+        const value = parseInt(input.value) || 0;
+
+        switch (syncType) {
+            case 'modules':
+                syncModules(value);
+                break;
+            case 'moments':
+                const moduleEl = input.closest('.activity-group');
+                if (moduleEl) syncMoments(moduleEl, value);
+                break;
+            case 'submoments':
+                const momentEl = input.closest('.moment-group');
+                if (momentEl) syncSubmoments(momentEl, value);
+                break;
+            case 'activities':
+                const submomentEl = input.closest('.submoment-card');
+                if (submomentEl) syncActivities(submomentEl, value);
+                break;
+        }
     });
 
-    // Initial summary
-    updateStructureSummary();
+    // Create default structure on init (2 modules, each with 2 moments, 2 submoments, 1 activity)
+    setTimeout(initDefaultStructure, 100);
 }
 
 /**
- * Update the structure preview summary
+ * Initialize default structure: 2 modules with 2 moments each, 2 submoments each, 1 activity each
  */
-function updateStructureSummary() {
-    const qtyModules = parseInt(document.getElementById('qty-modules')?.value) || 1;
-    const qtyActivities = parseInt(document.getElementById('qty-activities')?.value) || 1;
-    const qtyMoments = parseInt(document.getElementById('qty-moments')?.value) || 1;
-    const qtySubmoments = parseInt(document.getElementById('qty-submoments')?.value) || 0;
+function initDefaultStructure() {
+    const root = document.getElementById('activities-root');
+    if (!root) return;
 
-    const totalModules = qtyModules;
-    const totalActivities = qtyModules * qtyActivities;
-    const totalMoments = totalActivities * qtyMoments;
-    const totalSubmoments = totalMoments * qtySubmoments;
+    // Only init if empty
+    if (root.querySelectorAll('.activity-group').length > 0) return;
 
-    let summary = `${totalModules} module${totalModules > 1 ? 's' : ''}, `;
-    summary += `${totalActivities} activité${totalActivities > 1 ? 's' : ''}, `;
-    summary += `${totalMoments} moment${totalMoments > 1 ? 's' : ''}`;
-    if (totalSubmoments > 0) {
-        summary += `, ${totalSubmoments} sous-moment${totalSubmoments > 1 ? 's' : ''}`;
+    const numModulesInput = document.getElementById('num-modules-global');
+    const targetModules = numModulesInput ? parseInt(numModulesInput.value) || 2 : 2;
+
+    syncModules(targetModules);
+}
+
+/**
+ * Sync modules to target count
+ */
+function syncModules(targetCount) {
+    const root = document.getElementById('activities-root');
+    if (!root) return;
+
+    targetCount = Math.max(1, Math.min(20, targetCount));
+
+    const currentModules = root.querySelectorAll(':scope > .activity-group');
+    const currentCount = currentModules.length;
+
+    if (targetCount > currentCount) {
+        // Add modules
+        for (let i = currentCount; i < targetCount; i++) {
+            const module = createModuleProgrammatically();
+            if (module) {
+                // Trigger moments sync with default value
+                const numMomentsInput = module.querySelector('.num-moments-input');
+                if (numMomentsInput) {
+                    const defaultMoments = parseInt(numMomentsInput.value) || 2;
+                    syncMoments(module, defaultMoments);
+                }
+            }
+        }
+    } else if (targetCount < currentCount) {
+        // Remove modules from end
+        for (let i = currentCount - 1; i >= targetCount; i--) {
+            currentModules[i].remove();
+        }
     }
 
-    const summaryEl = document.getElementById('structure-summary');
-    if (summaryEl) summaryEl.textContent = summary;
+    updateActivityIndexes();
+    try { updateStats(); } catch (_) {}
+}
+
+/**
+ * Sync moments in a module to target count
+ */
+function syncMoments(moduleEl, targetCount) {
+    if (!moduleEl) return;
+
+    const container = moduleEl.querySelector('.activity-moments-container');
+    if (!container) return;
+
+    targetCount = Math.max(0, Math.min(20, targetCount));
+
+    const currentMoments = container.querySelectorAll(':scope > .moment-group');
+    const currentCount = currentMoments.length;
+
+    if (targetCount > currentCount) {
+        // Add moments
+        for (let i = currentCount; i < targetCount; i++) {
+            const moment = createMomentProgrammatically(moduleEl);
+            if (moment) {
+                // Trigger submoments sync with default value
+                const numSubInput = moment.querySelector('.num-submoments-input');
+                if (numSubInput) {
+                    const defaultSubs = parseInt(numSubInput.value) || 2;
+                    syncSubmoments(moment, defaultSubs);
+                }
+            }
+        }
+    } else if (targetCount < currentCount) {
+        // Remove moments from end
+        for (let i = currentCount - 1; i >= targetCount; i--) {
+            currentMoments[i].remove();
+        }
+    }
+
+    updateMomentIndexes(moduleEl);
+    try { syncSoloMomentUI(moduleEl); } catch (_) {}
+    try { updateStats(); } catch (_) {}
+}
+
+/**
+ * Sync submoments in a moment to target count
+ */
+function syncSubmoments(momentEl, targetCount) {
+    if (!momentEl) return;
+
+    const container = momentEl.querySelector('.submoments-container');
+    if (!container) return;
+
+    targetCount = Math.max(0, Math.min(20, targetCount));
+
+    const currentSubs = container.querySelectorAll(':scope > .submoment-card');
+    const currentCount = currentSubs.length;
+
+    if (targetCount > currentCount) {
+        // Add submoments
+        for (let i = currentCount; i < targetCount; i++) {
+            const submoment = createSubmomentProgrammatically(momentEl);
+            if (submoment) {
+                // Trigger activities sync with default value
+                const numActInput = submoment.querySelector('.num-activities-input');
+                if (numActInput) {
+                    const defaultActs = parseInt(numActInput.value) || 1;
+                    syncActivities(submoment, defaultActs);
+                }
+            }
+        }
+    } else if (targetCount < currentCount) {
+        // Remove submoments from end
+        for (let i = currentCount - 1; i >= targetCount; i--) {
+            currentSubs[i].remove();
+        }
+    }
+
+    try { syncMomentSubmomentsUI(momentEl); } catch (_) {}
+    try { updateStats(); } catch (_) {}
+}
+
+/**
+ * Sync activities (steps) in a submoment to target count
+ */
+function syncActivities(submomentEl, targetCount) {
+    if (!submomentEl) return;
+
+    const container = submomentEl.querySelector('.submoment-steps');
+    if (!container) return;
+
+    targetCount = Math.max(0, Math.min(20, targetCount));
+
+    const currentSteps = container.querySelectorAll(':scope > .step-card');
+    const currentCount = currentSteps.length;
+
+    if (targetCount > currentCount) {
+        // Add steps
+        for (let i = currentCount; i < targetCount; i++) {
+            createStepProgrammatically(submomentEl);
+        }
+    } else if (targetCount < currentCount) {
+        // Remove steps from end
+        for (let i = currentCount - 1; i >= targetCount; i--) {
+            currentSteps[i].remove();
+        }
+    }
+
+    try { updateStats(); } catch (_) {}
+}
+
+/**
+ * Create a step (activity) programmatically in a submoment
+ */
+function createStepProgrammatically(submomentEl) {
+    if (!submomentEl) return null;
+
+    const container = submomentEl.querySelector('.submoment-steps');
+    if (!container) return null;
+
+    const template = document.getElementById('step-template');
+    if (!template) return null;
+
+    const clone = template.content.cloneNode(true);
+    container.appendChild(clone);
+    const step = container.lastElementChild;
+
+    // Initialize step status
+    try { applyStepStatus(step, 'in_progress'); } catch (_) {}
+
+    // Initialize selects
+    try { populateStepCompetencesSelect(step, []); } catch (_) {}
+    try { populateStepCompetencesTransversalesSelect(step, []); } catch (_) {}
+    try { populateStepAimsSelect(step, []); } catch (_) {}
+    try { populateStepOutcomesSelect(step, []); } catch (_) {}
+    try { populateStepToolsMaterialsSelect(step, []); } catch (_) {}
+
+    return step;
 }
 
 /**
@@ -5284,12 +5483,16 @@ async function generateStructure() {
     console.log('[Structure] Generated:', qtyModules, 'modules,', qtyMoments * qtyModules, 'moments,', qtySubmoments * qtyMoments * qtyModules, 'submoments');
 }
 
-// Initialize structure panel on DOM ready
-document.addEventListener('DOMContentLoaded', initStructurePanel, { once: true });
+// Initialize numeric controls on DOM ready
+document.addEventListener('DOMContentLoaded', initNumericControls, { once: true });
 
-// Export to window for action dispatcher
-window.generateStructure = generateStructure;
-window.updateStructureSummary = updateStructureSummary;
+// Export sync functions to window for action dispatcher
+window.syncModules = syncModules;
+window.syncMoments = syncMoments;
+window.syncSubmoments = syncSubmoments;
+window.syncActivities = syncActivities;
+window.initDefaultStructure = initDefaultStructure;
+window.createStepProgrammatically = createStepProgrammatically;
 
 // ---- Explicit window exports for moment/submoment handlers ----
 // The IIFE-based event delegation uses window[name] lookup via call().
