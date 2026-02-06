@@ -511,6 +511,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
       'select-all-moment': ({btn}) => { try { if (typeof window.selectAllStepsInMoment === 'function') window.selectAllStepsInMoment(btn); } catch(_){} },
       'focus-module': ({btn}) => call('toggleFocusModule', btn),
 
+      // Structure generation (quantity planning UI)
+      'generate-structure': () => call('generateStructure'),
+
       // Key params helpers
       'add-outcome': () => call('safeAddOutcome'),
       'add-aim-item': () => call('safeAddAimItem'),
@@ -4980,6 +4983,313 @@ initSortableSteps(moment.querySelector('.activity-steps-container'));
             try { updateStats(); } catch (_) {}
         }
         /* END_SUBMOMENT_HELPERS_V1 */
+
+// ============================================
+// STRUCTURE GENERATION - Quantity Planning UI
+// ============================================
+
+/**
+ * Initialize structure panel controls (quantity +/- buttons and live preview)
+ */
+function initStructurePanel() {
+    // Handle +/- buttons for quantity inputs
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-qty-target');
+            const delta = parseInt(this.getAttribute('data-qty-delta')) || 0;
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            const min = parseInt(input.min) || 0;
+            const max = parseInt(input.max) || 999;
+            const current = parseInt(input.value) || 0;
+            const newVal = Math.max(min, Math.min(max, current + delta));
+            input.value = newVal;
+
+            updateStructureSummary();
+        });
+    });
+
+    // Update summary on input change
+    document.querySelectorAll('.qty-input').forEach(input => {
+        input.addEventListener('input', updateStructureSummary);
+        input.addEventListener('change', updateStructureSummary);
+    });
+
+    // Initial summary
+    updateStructureSummary();
+}
+
+/**
+ * Update the structure preview summary
+ */
+function updateStructureSummary() {
+    const qtyModules = parseInt(document.getElementById('qty-modules')?.value) || 1;
+    const qtyActivities = parseInt(document.getElementById('qty-activities')?.value) || 1;
+    const qtyMoments = parseInt(document.getElementById('qty-moments')?.value) || 1;
+    const qtySubmoments = parseInt(document.getElementById('qty-submoments')?.value) || 0;
+
+    const totalModules = qtyModules;
+    const totalActivities = qtyModules * qtyActivities;
+    const totalMoments = totalActivities * qtyMoments;
+    const totalSubmoments = totalMoments * qtySubmoments;
+
+    let summary = `${totalModules} module${totalModules > 1 ? 's' : ''}, `;
+    summary += `${totalActivities} activité${totalActivities > 1 ? 's' : ''}, `;
+    summary += `${totalMoments} moment${totalMoments > 1 ? 's' : ''}`;
+    if (totalSubmoments > 0) {
+        summary += `, ${totalSubmoments} sous-moment${totalSubmoments > 1 ? 's' : ''}`;
+    }
+
+    const summaryEl = document.getElementById('structure-summary');
+    if (summaryEl) summaryEl.textContent = summary;
+}
+
+/**
+ * Check if there's existing structure in the designer
+ */
+function hasExistingStructure() {
+    const root = document.getElementById('activities-root');
+    if (!root) return false;
+    return root.querySelectorAll('.activity-group').length > 0;
+}
+
+/**
+ * Clear existing structure
+ */
+function clearExistingStructure() {
+    const root = document.getElementById('activities-root');
+    if (!root) return;
+    root.innerHTML = '';
+}
+
+/**
+ * Show the progress bar
+ */
+function showProgressBar() {
+    const bar = document.getElementById('generation-progress');
+    if (bar) {
+        bar.classList.remove('hidden');
+        const fill = bar.querySelector('.progress-fill');
+        if (fill) fill.style.width = '0%';
+    }
+}
+
+/**
+ * Update progress bar
+ */
+function updateProgress(current, total) {
+    const bar = document.getElementById('generation-progress');
+    if (!bar) return;
+    const percent = Math.round((current / total) * 100);
+    const fill = bar.querySelector('.progress-fill');
+    const text = bar.querySelector('.progress-text');
+    if (fill) fill.style.width = `${percent}%`;
+    if (text) text.textContent = `${current} / ${total}`;
+}
+
+/**
+ * Hide the progress bar
+ */
+function hideProgressBar() {
+    setTimeout(() => {
+        const bar = document.getElementById('generation-progress');
+        if (bar) bar.classList.add('hidden');
+    }, 800);
+}
+
+/**
+ * Create a module programmatically
+ * Returns the created module element
+ */
+function createModuleProgrammatically() {
+    const root = document.getElementById('activities-root');
+    if (!root) return null;
+
+    const template = document.getElementById('module-template');
+    if (!template) return null;
+
+    const clone = template.content.cloneNode(true);
+    root.appendChild(clone);
+    const module = root.lastElementChild;
+
+    // Initialize sortable for moments container
+    try {
+        const momentsContainer = module.querySelector('.activity-moments-container');
+        if (momentsContainer && typeof initSortableMoments === 'function') {
+            initSortableMoments(momentsContainer);
+        }
+    } catch (_) {}
+
+    return module;
+}
+
+/**
+ * Create a moment in a module programmatically
+ * Returns the created moment element
+ */
+function createMomentProgrammatically(moduleEl) {
+    if (!moduleEl) return null;
+
+    const momentsContainer = moduleEl.querySelector('.activity-moments-container');
+    if (!momentsContainer) return null;
+
+    const template = document.getElementById('moment-template');
+    if (!template) return null;
+
+    const clone = template.content.cloneNode(true);
+    momentsContainer.appendChild(clone);
+    const moment = momentsContainer.lastElementChild;
+
+    // Initialize sortable for steps
+    try {
+        const stepsContainer = moment.querySelector('.activity-steps-container');
+        if (stepsContainer && typeof initSortableSteps === 'function') {
+            initSortableSteps(stepsContainer);
+        }
+    } catch (_) {}
+
+    // Initialize sortable for submoments
+    try {
+        const subContainer = moment.querySelector('.submoments-container');
+        if (subContainer && typeof initSortableSubmoments === 'function') {
+            initSortableSubmoments(subContainer);
+        }
+    } catch (_) {}
+
+    return moment;
+}
+
+/**
+ * Create a submoment in a moment programmatically
+ * Returns the created submoment element
+ */
+function createSubmomentProgrammatically(momentEl) {
+    if (!momentEl) return null;
+
+    const container = momentEl.querySelector('.submoments-container');
+    if (!container) return null;
+
+    const template = document.getElementById('submoment-template');
+    if (!template) return null;
+
+    const clone = template.content.cloneNode(true);
+    container.appendChild(clone);
+    const submoment = container.lastElementChild;
+
+    // Initialize sortable for steps
+    try {
+        const stepsContainer = submoment.querySelector('.submoment-steps');
+        if (stepsContainer && typeof initSortableSteps === 'function') {
+            initSortableSteps(stepsContainer);
+        }
+    } catch (_) {}
+
+    return submoment;
+}
+
+/**
+ * Main function: Generate the entire structure based on quantities
+ */
+async function generateStructure() {
+    // 1. Get quantities
+    const qtyModules = parseInt(document.getElementById('qty-modules')?.value) || 1;
+    const qtyActivities = parseInt(document.getElementById('qty-activities')?.value) || 1;
+    const qtyMoments = parseInt(document.getElementById('qty-moments')?.value) || 1;
+    const qtySubmoments = parseInt(document.getElementById('qty-submoments')?.value) || 0;
+
+    // 2. Validate
+    if (qtyModules < 1 || qtyModules > 20) {
+        alert('Nombre de modules : entre 1 et 20');
+        return;
+    }
+
+    // 3. Confirm if structure exists
+    if (hasExistingStructure()) {
+        const confirmed = confirm('Remplacer la structure existante ?');
+        if (!confirmed) return;
+    }
+
+    // 4. Calculate total elements for progress
+    const totalElements = qtyModules + (qtyModules * qtyMoments) + (qtyModules * qtyMoments * qtySubmoments);
+    let createdElements = 0;
+
+    // 5. Show progress bar
+    showProgressBar();
+
+    // 6. Clear existing structure
+    clearExistingStructure();
+
+    // 7. Generate structure with small delays for UI responsiveness
+    for (let m = 0; m < qtyModules; m++) {
+        const module = createModuleProgrammatically();
+        if (!module) continue;
+
+        // Update module index
+        const indexBadge = module.querySelector('.activity-index');
+        if (indexBadge) indexBadge.textContent = String(m + 1);
+
+        createdElements++;
+        updateProgress(createdElements, totalElements);
+
+        // Create moments in this module
+        for (let mo = 0; mo < qtyMoments; mo++) {
+            const moment = createMomentProgrammatically(module);
+            if (!moment) continue;
+
+            // Update moment index
+            const momentIndex = moment.querySelector('.moment-index');
+            if (momentIndex) momentIndex.textContent = `${m + 1}.${mo + 1}`;
+
+            createdElements++;
+            updateProgress(createdElements, totalElements);
+
+            // Create submoments in this moment
+            for (let s = 0; s < qtySubmoments; s++) {
+                createSubmomentProgrammatically(moment);
+                createdElements++;
+                updateProgress(createdElements, totalElements);
+
+                // Small delay for large structures to keep UI responsive
+                if (createdElements % 20 === 0) {
+                    await new Promise(r => setTimeout(r, 10));
+                }
+            }
+
+            // Sync submoment UI
+            try { syncMomentSubmomentsUI(moment); } catch (_) {}
+        }
+
+        // Update module numbering
+        try { updateActivityIndexes(); } catch (_) {}
+    }
+
+    // 8. Finalize
+    hideProgressBar();
+
+    // Apply translations for any i18n elements
+    try { applyTranslations(); } catch (_) {}
+
+    // Update statistics
+    try { updateStats(); } catch (_) {}
+
+    // Initialize sortable for all modules
+    try {
+        const root = document.getElementById('activities-root');
+        if (root && typeof Sortable !== 'undefined') {
+            // Sortable is already initialized via initSortableModules if it exists
+        }
+    } catch (_) {}
+
+    console.log('[Structure] Generated:', qtyModules, 'modules,', qtyMoments * qtyModules, 'moments,', qtySubmoments * qtyMoments * qtyModules, 'submoments');
+}
+
+// Initialize structure panel on DOM ready
+document.addEventListener('DOMContentLoaded', initStructurePanel, { once: true });
+
+// Export to window for action dispatcher
+window.generateStructure = generateStructure;
+window.updateStructureSummary = updateStructureSummary;
 
 // ---- Explicit window exports for moment/submoment handlers ----
 // The IIFE-based event delegation uses window[name] lookup via call().
