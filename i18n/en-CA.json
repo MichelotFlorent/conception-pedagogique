@@ -970,6 +970,20 @@
     "analysis_about_text": "This tool enables a structured training needs analysis, adapted for various educational and professional contexts.",
     "analysis_about_prototype": "This document is an unofficial prototype, shared for experimentation purposes.",
     "analysis_about_privacy": "<strong>Local processing:</strong> all data stays in your browser, nothing is sent online.",
-    "analysis_about_credits": "Developed by Florent Michelot, inspired by the work of F. Jourde & J. Dubois (2026) • CC BY-SA"
+    "analysis_about_credits": "Developed by Florent Michelot, inspired by the work of F. Jourde & J. Dubois (2026) • CC BY-SA",
+
+    "structure_title": "structure planning",
+    "structure_modules": "number of modules",
+    "structure_activities": "activities per module",
+    "structure_moments": "moments per activity",
+    "structure_submoments": "submoments per moment",
+    "btn_generate": "generate structure",
+    "structure_preview": "preview:",
+    "progress_generating": "generating...",
+    "structure_confirm_replace": "Replace existing structure?",
+    "structure_success": "Structure generated successfully!",
+    "structure_error_min_modules": "At least 1 module required",
+    "structure_error_max_modules": "Maximum 20 modules allowed",
+    "structure_summary_template": "{modules} module(s), {activities} activity(ies), {moments} moment(s)"
   }
 }
