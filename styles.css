@@ -1915,3 +1915,102 @@ html.ui-dark .persona-count-group {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* ============================================
+   MIGRATION FROM CURRENT.HTML - 2026-02-06
+   ============================================ */
+
+/* Duration badge with delta bar */
+.ld-duration-badge { position: relative; overflow: hidden; }
+.ld-delta-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  pointer-events: none;
+  background: rgba(148, 163, 184, 0.18);
+}
+.ld-delta-bar .ld-delta-axis {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-0.5px);
+  background: rgba(148, 163, 184, 0.75);
+}
+.ld-delta-bar .ld-delta-neg {
+  position: absolute;
+  right: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  background: rgba(59, 130, 246, 0.92);
+}
+.ld-delta-bar .ld-delta-pos {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  background: rgba(239, 68, 68, 0.92);
+}
+.ld-delta-bar.ld-delta-ok .ld-delta-neg,
+.ld-delta-bar.ld-delta-ok .ld-delta-pos {
+  background: rgba(34, 197, 94, 0.86);
+}
+
+/* Ignore label for moments/submoments */
+.ld-ignore-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  user-select: none;
+  cursor: pointer;
+}
+.ld-ignore-label input {
+  width: 14px;
+  height: 14px;
+}
+.ld-ignored { opacity: 0.55; }
+.ld-ignored .ld-ignore-label,
+.ld-ignored .ld-ignore-label * { opacity: 1; }
+.ld-ignored-inherited { opacity: 0.65; }
+.ld-ignored .step-header,
+.ld-ignored .moment-header,
+.ld-ignored .submoment-header {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(148, 163, 184, 0.12),
+    rgba(148, 163, 184, 0.12) 6px,
+    rgba(148, 163, 184, 0.02) 6px,
+    rgba(148, 163, 184, 0.02) 12px
+  );
+}
+
+/* Solo moment (single unnamed moment hides chrome) */
+.moment-group.ld-solo-moment {
+  border-color: transparent !important;
+  background: transparent !important;
+}
+.moment-group.ld-solo-moment > div:first-child {
+  display: none !important;
+}
+.moment-group.ld-solo-moment > .moment-body {
+  padding: 0 !important;
+}
+.moment-group.ld-solo-moment .submoments-controls {
+  display: none !important;
+}
+.moment-group.ld-solo-moment .moment-description-wrap {
+  display: none !important;
+}
+
+/* Collapsed state for submoment body */
+.submoment-body.collapsed {
+  display: none;
+}
