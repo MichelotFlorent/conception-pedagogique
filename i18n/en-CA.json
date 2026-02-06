@@ -984,6 +984,11 @@
     "structure_success": "Structure generated successfully!",
     "structure_error_min_modules": "At least 1 module required",
     "structure_error_max_modules": "Maximum 20 modules allowed",
-    "structure_summary_template": "{modules} module(s), {activities} activity(ies), {moments} moment(s)"
+    "structure_summary_template": "{modules} module(s), {activities} activity(ies), {moments} moment(s)",
+    "label_num_modules": "number of modules",
+    "label_num_moments": "number of moments:",
+    "label_num_submoments": "number of sub-moments:",
+    "label_num_activities": "number of activities:",
+    "structure_hint": "each module contains moments, sub-moments and activities"
   }
 }
