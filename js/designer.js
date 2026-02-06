@@ -495,6 +495,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
       'add-moment': ({btn}) => call('addMomentToActivity', btn),
       'add-submoment': ({btn}) => call('addSubmomentToMoment', btn),
       'delete-submoment': ({btn}) => call('deleteSubmoment', btn),
+      'toggle-submoment': ({btn}) => call('toggleSubmoment', btn),
+      'toggle-submoment-notes': ({btn}) => call('toggleSubmomentNotes', btn),
       'add-step-submoment': ({btn}) => call('addStepToSubmoment', btn),
       'open-export-preview': ({event}) => call('openExportPreview', event),
       'close-export-preview': ({event}) => call('closeExportPreview', event),
@@ -4733,10 +4735,25 @@ initSortableSteps(moment.querySelector('.activity-steps-container'));
             return moment;
         }
 
+        function syncSoloMomentUI(activityGroup) {
+            if (!activityGroup) return;
+            const momentsRoot = activityGroup.querySelector('.activity-moments-container');
+            if (!momentsRoot) return;
+            const moments = momentsRoot.querySelectorAll(':scope > .moment-group');
+            if (moments.length === 1) {
+                const m = moments[0];
+                const title = (m.querySelector('.moment-title')?.value || '').trim();
+                const desc  = (m.querySelector('.moment-description')?.value || '').trim();
+                m.classList.toggle('ld-solo-moment', !title && !desc);
+            } else {
+                moments.forEach(m => m.classList.remove('ld-solo-moment'));
+            }
+        }
+
         function updateMomentIndexes(activityGroup) {
             if (!activityGroup) return;
 
-            
+
             let moduleNum = '';
             const moduleBadge = activityGroup.querySelector('.activity-index');
             if (moduleBadge) moduleNum = String(moduleBadge.textContent || moduleBadge.innerText || '').trim();
@@ -4754,117 +4771,45 @@ initSortableSteps(moment.querySelector('.activity-steps-container'));
             });
         }
 
-        function addMomentToActivity(btnOrEvent) {
-            console.log('[Designer] addMomentToActivity called, arg:', btnOrEvent);
-            try { historyCaptureNow(); } catch (_) {}
-
-            // Robust handler: accepts either a button element or an event / context object
-            var btn = (btnOrEvent && (btnOrEvent.currentTarget || btnOrEvent.target))
-                ? (btnOrEvent.currentTarget || btnOrEvent.target)
-                : btnOrEvent;
-
-            var activityGroup = btn && btn.closest ? btn.closest('.activity-group') : null;
-            if (!activityGroup) {
-                console.error('[Designer] addMomentToActivity: activity-group not found');
-                return;
-            }
-
-            var momentsRoot = activityGroup.querySelector('.activity-moments-container');
-            if (!momentsRoot) {
-                console.error('[Designer] addMomentToActivity: activity-moments-container not found');
-                return;
-            }
-
-            // DIAGNOSTIC: state before append
-            var _beforeCount = momentsRoot.querySelectorAll('.moment-group').length;
-            var _viewLevel = document.body.getAttribute('data-view-level') || '(none)';
-            var _containerRect = momentsRoot.getBoundingClientRect();
-            var _containerStyle = window.getComputedStyle(momentsRoot);
-            console.log('[Designer] addMomentToActivity BEFORE — view-level:', _viewLevel,
-                '| moments in container:', _beforeCount,
-                '| container visible:', _containerStyle.display, _containerStyle.visibility, _containerStyle.opacity,
-                '| container rect:', JSON.stringify({w: _containerRect.width, h: _containerRect.height, top: _containerRect.top}),
-                '| container overflow:', _containerStyle.overflow, _containerStyle.overflowY);
-
-            // Also check parent (activity-body) overflow
-            var _actBody = activityGroup.querySelector('.activity-body');
-            if (_actBody) {
-                var _abStyle = window.getComputedStyle(_actBody);
-                var _abRect = _actBody.getBoundingClientRect();
-                console.log('[Designer] addMomentToActivity — activity-body:',
-                    'display:', _abStyle.display, '| maxHeight:', _abStyle.maxHeight,
-                    '| overflow:', _abStyle.overflow,
-                    '| actual height:', _abRect.height,
-                    '| classes:', _actBody.className);
-            }
-
-            // Fallback: re-acquire momentTemplate from DOM if the cached reference is null
-            var tmpl = (typeof momentTemplate !== 'undefined' && momentTemplate)
-                ? momentTemplate
-                : document.getElementById('moment-template');
-            if (!tmpl) {
-                console.error('[Designer] addMomentToActivity: moment-template not found in DOM');
-                return;
-            }
-
-            var clone = tmpl.content.cloneNode(true);
+        function addMomentToActivity(btn) {
+            const activityGroup = btn.closest('.activity-group');
+            const momentsRoot = activityGroup.querySelector('.activity-moments-container');
+            if (!momentsRoot) return;
+            const clone = momentTemplate.content.cloneNode(true);
             momentsRoot.appendChild(clone);
-            var moment = momentsRoot.lastElementChild;
-            if (!moment) {
-                console.error('[Designer] addMomentToActivity: lastElementChild is null after append');
-                return;
-            }
-
-            // DIAGNOSTIC: state after append
-            var _afterCount = momentsRoot.querySelectorAll('.moment-group').length;
-            var _momentRect = moment.getBoundingClientRect();
-            var _momentStyle = window.getComputedStyle(moment);
-            console.log('[Designer] addMomentToActivity AFTER — moments in container:', _afterCount,
-                '| new moment display:', _momentStyle.display, '| visibility:', _momentStyle.visibility,
-                '| opacity:', _momentStyle.opacity, '| height:', _momentRect.height,
-                '| new moment element:', moment);
-
-            // Force visibility — remove collapsed class AND set display explicitly
-            var momentBody = moment.querySelector('.moment-body');
-            if (momentBody) {
-                momentBody.classList.remove('collapsed');
-                momentBody.classList.remove('hidden');
-                momentBody.style.maxHeight = '';
-                momentBody.style.opacity = '';
-                momentBody.style.display = '';
-            }
-
-            // Force the moment-group itself to be visible
-            moment.style.display = '';
-            moment.style.visibility = 'visible';
-            moment.style.opacity = '1';
-
-            var toggleBtn = moment.querySelector('button[data-action="toggle-moment"]');
-            if (toggleBtn) {
-                toggleBtn.setAttribute('aria-expanded', 'true');
-                var icon = toggleBtn.querySelector('.rotate-icon-moment');
-                if (icon) icon.style.transform = 'rotate(180deg)';
-            }
-
+            const moment = momentsRoot.lastElementChild;
             initSortableSteps(moment.querySelector('.activity-steps-container'));
             try { initSortableSubmoments(moment.querySelector('.submoments-container')); } catch (_) {}
-            try { setupCompactTextareas(moment); } catch (_) {}
-            var mUnitSel = moment.querySelector('.moment-target-unit');
+            const mUnitSel = moment.querySelector('.moment-target-unit');
             if (mUnitSel) {
                 __ldEnsureUnitOption(mUnitSel, 2592000, 'unit_months', 'Mois');
                 mUnitSel.value = String(getDefaultDurationUnitSecs());
-                __ldLockUnitSelect(mUnitSel);
+                // BUGFIX: Do NOT lock moment target unit - users should be able to change it
+                // __ldLockUnitSelect(mUnitSel); // REMOVED
             }
+
+            // CRITICAL FIX: Ensure the new moment is visible
+            // Moments are hidden in "modules" view
+            try {
+                const lvl = document.body && document.body.getAttribute ? document.body.getAttribute('data-view-level') : '';
+                const currentLevel = String(lvl || '').trim();
+
+                // Switch to moments view if we're in modules view
+                if (currentLevel === 'modules') {
+                    if (typeof applyViewLevel === 'function') {
+                        applyViewLevel('moments');
+                    } else if (document.body && document.body.setAttribute) {
+                        document.body.setAttribute('data-view-level', 'moments');
+                    }
+                }
+            } catch (_) {}
+
             updateMomentIndexes(activityGroup);
+            syncSoloMomentUI(activityGroup);
             syncMomentSubmomentsUI(moment);
             applyTranslations();
             try { __ldApplyUnitLabelFormat(); } catch (_) {}
             updateStats();
-
-            // Scroll into view with a short delay to ensure DOM is settled
-            setTimeout(function () {
-                try { moment.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (_) {}
-            }, 60);
         }
 
 
@@ -4881,54 +4826,53 @@ initSortableSteps(moment.querySelector('.activity-steps-container'));
         }
 
         function addSubmomentToMoment(btnOrEvent) {
-            console.log('[Designer] addSubmomentToMoment called, arg:', btnOrEvent);
             try { historyCaptureNow(); } catch (_) {}
-            var btn = (btnOrEvent && (btnOrEvent.currentTarget || btnOrEvent.target)) ? (btnOrEvent.currentTarget || btnOrEvent.target) : btnOrEvent;
-            var momentEl = btn && btn.closest ? btn.closest('.moment-group') : null;
-            if (!momentEl) {
-                console.error('[Designer] addSubmomentToMoment: moment-group not found');
-                return;
-            }
+            const btn = (btnOrEvent && (btnOrEvent.currentTarget || btnOrEvent.target)) ? (btnOrEvent.currentTarget || btnOrEvent.target) : btnOrEvent;
+            const momentEl = btn && btn.closest ? btn.closest('.moment-group') : null;
+            if (!momentEl) return;
 
-            var container = momentEl.querySelector('.submoments-container');
-            if (!container) {
-                console.error('[Designer] addSubmomentToMoment: submoments-container not found');
-                return;
-            }
+            const container = momentEl.querySelector('.submoments-container');
+            if (!container) return;
 
             try { initSortableSubmoments(container); } catch (_) {}
 
-            var tmpl = (typeof submomentTemplate !== 'undefined' && submomentTemplate) ? submomentTemplate : document.getElementById('submoment-template');
-            if (!tmpl) {
-                console.error('[Designer] addSubmomentToMoment: submoment template not found');
-                return;
-            }
+            const tmpl = (typeof submomentTemplate !== 'undefined' && submomentTemplate) ? submomentTemplate : document.getElementById('submoment-template');
+            if (!tmpl) return;
 
-            var clone = tmpl.content.cloneNode(true);
+            const clone = tmpl.content.cloneNode(true);
             container.appendChild(clone);
-            var subEl = container.lastElementChild;
-            if (!subEl) {
-                console.error('[Designer] addSubmomentToMoment: lastElementChild is null after append');
-                return;
-            }
+            const subEl = container.lastElementChild;
 
-            // Ensure the submoment body is visible
-            var subBody = subEl.querySelector('.submoment-body');
-            if (subBody) {
-                subBody.classList.remove('collapsed');
-                subBody.classList.remove('hidden');
-            }
+            // Ensure the new sub-moment remains visible (expand moment + correct view level)
+            try {
+                const momentBody = momentEl.querySelector('.moment-body');
+                if (momentBody) momentBody.classList.remove('collapsed');
+
+                const toggleBtn = momentEl.querySelector('button[data-action="toggle-moment"]');
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('aria-expanded', 'true');
+                    const icon = toggleBtn.querySelector('.rotate-icon');
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                }
+
+                // If the UI is currently in "moments" view, sub-moments are hidden by CSS.
+                // Switch back to "activities" so the newly created sub-moment stays visible.
+                const lvl = document.body && document.body.getAttribute ? document.body.getAttribute('data-view-level') : '';
+                if (String(lvl || '').trim() === 'moments') {
+                    if (typeof applyViewLevel === 'function') applyViewLevel('activities');
+                    else if (document.body && document.body.setAttribute) document.body.setAttribute('data-view-level', 'activities');
+                }
+            } catch (_) {}
 
             try { initSortableSteps(subEl.querySelector('.submoment-steps')); } catch (_) {}
-            try { setupCompactTextareas(subEl); } catch (_) {}
 
             // If this is the first submoment, migrate any existing direct steps into it
             try {
-                var subCount = container.querySelectorAll('.submoment-card').length;
+                const subCount = container.querySelectorAll('.submoment-card').length;
                 if (subCount === 1) {
-                    var directSteps = momentEl.querySelectorAll('.moment-direct-steps .step-card');
-                    var subSteps = subEl.querySelector('.submoment-steps');
-                    if (subSteps && directSteps.length) directSteps.forEach(function (st) { subSteps.appendChild(st); });
+                    const directSteps = momentEl.querySelectorAll('.moment-direct-steps .step-card');
+                    const subSteps = subEl.querySelector('.submoment-steps');
+                    if (subSteps && directSteps.length) directSteps.forEach(st => subSteps.appendChild(st));
                 }
             } catch (_) {}
 
@@ -4936,11 +4880,6 @@ initSortableSteps(moment.querySelector('.activity-steps-container'));
             try { applyTranslations(); } catch (_) {}
             try { __ldApplyUnitLabelFormat(); } catch (_) {}
             try { updateStats(); } catch (_) {}
-
-            // Scroll into view with a short delay
-            setTimeout(function () {
-                try { subEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (_) {}
-            }, 60);
         }
 
         function deleteSubmoment(btnOrEvent) {
@@ -4958,6 +4897,43 @@ initSortableSteps(moment.querySelector('.activity-steps-container'));
 
             syncMomentSubmomentsUI(momentEl);
             try { updateStats(); } catch (_) {}
+        }
+
+        function toggleSubmoment(btn) {
+            const submomentCard = btn.closest('.submoment-card');
+            const body = submomentCard ? submomentCard.querySelector('.submoment-body') : null;
+            const icon = btn.querySelector('.rotate-icon');
+
+            if (!body) return;
+
+            if (body.classList.contains('collapsed')) {
+                body.classList.remove('collapsed');
+                if (icon) icon.style.transform = 'rotate(180deg)';
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                body.classList.add('collapsed');
+                if (icon) icon.style.transform = 'rotate(0deg)';
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        function toggleSubmomentNotes(btn) {
+            const submomentCard = btn.closest('.submoment-card');
+            if (!submomentCard) return;
+            const body = submomentCard.querySelector('.submoment-body');
+            if (body && body.classList.contains('collapsed')) {
+                body.classList.remove('collapsed');
+                const toggleBtn = submomentCard.querySelector('button[data-action="toggle-submoment"]');
+                const icon = toggleBtn ? toggleBtn.querySelector('.rotate-icon') : null;
+                if (icon) icon.style.transform = 'rotate(180deg)';
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+            }
+            const wrap = submomentCard.querySelector('.submoment-notes-wrap');
+            if (!wrap) return;
+
+            const willOpen = wrap.classList.contains('hidden');
+            wrap.classList.toggle('hidden', !willOpen);
+            btn.setAttribute('aria-expanded', String(willOpen));
         }
 
         function addStepToSubmoment(btnOrEvent) {
@@ -5010,9 +4986,12 @@ initSortableSteps(moment.querySelector('.activity-steps-container'));
 // Ensure these functions are always reachable on the global object.
 window.ensureDefaultMoment    = ensureDefaultMoment;
 window.addMomentToActivity    = addMomentToActivity;
+window.syncSoloMomentUI       = syncSoloMomentUI;
 window.syncMomentSubmomentsUI = syncMomentSubmomentsUI;
 window.addSubmomentToMoment   = addSubmomentToMoment;
 window.deleteSubmoment        = deleteSubmoment;
+window.toggleSubmoment        = toggleSubmoment;
+window.toggleSubmomentNotes   = toggleSubmomentNotes;
 window.addStepToSubmoment     = addStepToSubmoment;
 window.updateMomentIndexes    = updateMomentIndexes;
 // deleteMoment/trashMoment are defined just below; export them after their declaration
