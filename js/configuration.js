@@ -477,6 +477,7 @@ function updateVal(id, val) {
     if (dim) {
         dim.value = parseInt(val, 10);
         checkAlerts();
+        updateRadarChart();
     }
 }
 
@@ -613,6 +614,7 @@ function performReset() {
     dimensions.forEach(function (d) { d.value = 50; });
     renderSliders();
     checkAlerts();
+    updateRadarChart();
     hideResetModal();
 }
 
@@ -681,4 +683,109 @@ document.addEventListener('i18n:langchange', function () {
     renderSliders();
     checkAlerts();
     syncLangSelector();
+    updateRadarChart();
+});
+
+// ── Radar Chart ──────────────────────────────────────────────────────────────
+
+var radarChart = null;
+
+function initRadarChart() {
+    var ctx = document.getElementById('dimensionsRadarChart');
+    if (!ctx) return;
+
+    var labels = dimensions.map(function(d) {
+        var leftKey = 'cfg_dim' + d.id + '_left';
+        var rightKey = 'cfg_dim' + d.id + '_right';
+        var left = i18nCore.t(leftKey) || d.labelLeft;
+        var right = i18nCore.t(rightKey) || d.labelRight;
+        return left + ' / ' + right;
+    });
+
+    var data = dimensions.map(function(d) { return d.value; });
+
+    radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: i18nCore.t('cfg_radar_title') || 'Configuration',
+                data: data,
+                fill: true,
+                backgroundColor: 'rgba(145, 35, 56, 0.2)',
+                borderColor: '#912338',
+                borderWidth: 2,
+                pointBackgroundColor: '#912338',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        stepSize: 25,
+                        display: false
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    angleLines: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    pointLabels: {
+                        font: {
+                            size: 10,
+                            weight: '600'
+                        },
+                        color: '#64748b'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateRadarChart() {
+    if (!radarChart) {
+        initRadarChart();
+        return;
+    }
+
+    // Update labels (for language changes)
+    radarChart.data.labels = dimensions.map(function(d) {
+        var leftKey = 'cfg_dim' + d.id + '_left';
+        var rightKey = 'cfg_dim' + d.id + '_right';
+        var left = i18nCore.t(leftKey) || d.labelLeft;
+        var right = i18nCore.t(rightKey) || d.labelRight;
+        return left + ' / ' + right;
+    });
+
+    // Update data
+    radarChart.data.datasets[0].data = dimensions.map(function(d) { return d.value; });
+    radarChart.update();
+}
+
+// Initialize radar chart after DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initRadarChart, 200);
 });
