@@ -1,0 +1,37 @@
+{
+  "name_en": "Psychomotor (Berthiaume & Daele)",
+  "name_fr": "Psychomoteur (Berthiaume & Daele)",
+  "domain": "psychomotor",
+  "levels": [
+    {
+      "level": 1,
+      "name_en": "Perception",
+      "name_fr": "Perception",
+      "definition_en": "Recognizing gestures or steps performed by another person.",
+      "definition_fr": "Reconnaître des gestes ou étapes effectués par une autre personne.",
+      "verbs_en": ["discriminate", "identify", "perceive", "recognize"],
+      "verbs_fr": ["discriminer", "identifier", "percevoir", "reconnaître"]
+    },
+    {
+      "level": 2,
+      "name_en": "Reproduction",
+      "name_fr": "Reproduction",
+      "definition_en": "Performing gestures oneself.",
+      "definition_fr": "Effectuer soi-même des gestes.",
+      "verbs_en": ["apply", "coordinate", "demonstrate", "employ", "execute", "imitate", "mime", "realize", "reproduce", "use"],
+      "verbs_fr": ["appliquer", "coordonner", "démontrer", "employer", "exécuter", "imiter", "mimer", "réaliser", "reproduire", "utiliser"]
+    },
+    {
+      "level": 3,
+      "name_en": "Perfection / Excellence",
+      "name_fr": "Perfection / Excellence",
+      "definition_en": "Developing one's own techniques.",
+      "definition_fr": "Développer ses propres techniques.",
+      "verbs_en": ["anticipate", "adapt", "improve", "change", "compose", "control", "diversify", "improvise", "interpret", "modify", "adjust", "vary"],
+      "verbs_fr": ["anticiper", "adapter", "améliorer", "changer", "composer", "contrôler", "diversifier", "improviser", "interpréter", "modifier", "ajuster", "varier"]
+    }
+  ],
+  "references": [
+    "Berthiaume, D., & Daele, A. (2013). Comment clarifier les apprentissages visés par un enseignement ? In D. Berthiaume & N. Rege Colet (Eds.), La pédagogie de l'enseignement supérieur: repères théoriques et applications pratiques, Vol. 1, 55-71. Berne: Peter Lang."
+  ]
+}

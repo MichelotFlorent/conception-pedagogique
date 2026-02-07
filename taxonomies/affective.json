@@ -1,0 +1,37 @@
+{
+  "name_en": "Affective (Berthiaume & Daele)",
+  "name_fr": "Affectif (Berthiaume & Daele)",
+  "domain": "affective",
+  "levels": [
+    {
+      "level": 1,
+      "name_en": "Reception",
+      "name_fr": "Réception",
+      "definition_en": "Being attentive, sensitized, or aware of an issue; showing openness.",
+      "definition_fr": "Être attentif, sensibilisé ou conscient d'un enjeu ; montrer de l'ouverture.",
+      "verbs_en": ["accept", "analyze", "associate", "define", "differentiate", "listen", "identify", "query", "ask questions", "recognize", "specify"],
+      "verbs_fr": ["accepter", "analyser", "associer", "définir", "différencier", "écouter", "identifier", "interroger", "poser des questions", "reconnaître", "spécifier"]
+    },
+    {
+      "level": 2,
+      "name_en": "Valorization",
+      "name_fr": "Valorisation",
+      "definition_en": "Promoting a value or an attitude; taking a position.",
+      "definition_fr": "Promouvoir une valeur ou une attitude ; prendre position.",
+      "verbs_en": ["acclaim", "approve", "argue", "choose", "raise awareness", "contest", "debate", "demonstrate", "encourage", "provide examples", "influence", "deny", "protest"],
+      "verbs_fr": ["acclamer", "approuver", "argumenter", "choisir", "sensibiliser", "contester", "débattre", "démontrer", "encourager", "fournir des exemples", "influencer", "nier", "protester"]
+    },
+    {
+      "level": 3,
+      "name_en": "Adoption",
+      "name_fr": "Adoption",
+      "definition_en": "Adopting a behavior that reflects an attitude or a value; being personally committed.",
+      "definition_fr": "Adopter un comportement reflétant une attitude ou une valeur ; s'engager personnellement.",
+      "verbs_en": ["adhere", "act", "help", "assist", "change", "lead", "avoid", "modify", "offer", "practice", "prevent", "claim", "revise", "resist", "resolve", "associate oneself", "conform", "follow"],
+      "verbs_fr": ["adhérer", "agir", "aider", "assister", "changer", "diriger", "éviter", "modifier", "offrir", "pratiquer", "prévenir", "revendiquer", "réviser", "résister", "résoudre", "s'associer", "se conformer", "suivre"]
+    }
+  ],
+  "references": [
+    "Berthiaume, D., & Daele, A. (2013). Comment clarifier les apprentissages visés par un enseignement ? In D. Berthiaume & N. Rege Colet (Eds.), La pédagogie de l'enseignement supérieur: repères théoriques et applications pratiques, Vol. 1, 55-71. Berne: Peter Lang."
+  ]
+}

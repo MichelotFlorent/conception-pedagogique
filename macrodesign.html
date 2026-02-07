@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macrodesign - Planification stratégique</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'concordia-burgundy': '#912338',
+            'concordia-gold': '#FFD700',
+            indigo: {
+              50: '#fef2f4',
+              100: '#fde6ea',
+              200: '#f9c0ca',
+              300: '#f5949f',
+              400: '#d4475a',
+              500: '#b52e47',
+              600: '#912338',
+              700: '#6d1a2a',
+              800: '#5a1523',
+              900: '#48101c',
+              950: '#350c14',
+            }
+          },
+          fontFamily: {
+            'display': ['Advent Pro', 'system-ui', 'sans-serif'],
+            'body': ['Antic', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+    </script>
+    <!-- Bunny Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=advent-pro:400,500,600,700|antic:400" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <!-- Header Mount Point -->
+    <div id="app-header-mount"></div>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Page Header -->
+        <header class="mb-8">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #912338, #6d1a2a);">
+                    <span class="material-icons-round text-white text-2xl">account_tree</span>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold" style="color: #912338; font-family: 'Advent Pro', sans-serif;" data-i18n="macro_title">Macrodesign</h1>
+                    <p class="text-slate-500" data-i18n="macro_subtitle">planification stratégique et organisationnelle</p>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="flex flex-wrap gap-3 mt-6">
+                <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm">
+                    <button onclick="macroSaveState()" class="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Sauvegarder">
+                        <span class="material-icons-round text-xl">save</span>
+                        <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_save">sauvegarder</span>
+                    </button>
+                    <button onclick="macroLoadState()" class="text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Charger">
+                        <span class="material-icons-round text-xl">folder_open</span>
+                        <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_load">charger</span>
+                    </button>
+                    <input id="macro-load-input" type="file" accept="application/json" class="hidden" onchange="macroLoadFromFile(event)">
+                    <div class="w-px bg-slate-200 h-6 mx-1"></div>
+                    <button onclick="macroExportMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Exporter">
+                        <span class="material-icons-round text-xl">description</span>
+                        <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_export">exporter</span>
+                    </button>
+                </div>
+
+                <!-- Language selector -->
+                <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm">
+                    <select id="macro-lang-select" onchange="macroSwitchLang(this.value)" class="text-sm text-slate-600 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1">
+                        <option value="fr">Français</option>
+                        <option value="en-CA">English (CA)</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Global Curriculum Control -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="material-icons-round text-concordia-burgundy">school</span>
+                    <span class="font-bold text-slate-700" data-i18n="macro_num_curriculums">nombre de curriculums</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="qty-btn" onclick="macroCurriculumDec()">−</button>
+                    <input type="number" id="num-curriculums" class="qty-input w-16 text-center" value="1" min="1" max="10">
+                    <button type="button" class="qty-btn" onclick="macroCurriculumInc()">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Curriculums Container -->
+        <div id="curriculums-container" class="space-y-6">
+            <!-- Curriculums will be rendered here -->
+        </div>
+
+    </div>
+
+    <!-- Templates -->
+    <template id="curriculum-template">
+        <div class="curriculum-card bg-white rounded-2xl shadow-sm border-2 border-slate-200 overflow-hidden">
+            <!-- Curriculum Header -->
+            <div class="curriculum-header p-4 border-b border-slate-100" style="background: linear-gradient(135deg, rgba(145,35,56,0.05), rgba(145,35,56,0.02));">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3 flex-1">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white curriculum-index" style="background: linear-gradient(135deg, #912338, #6d1a2a);">1</div>
+                        <div class="flex-1">
+                            <input type="text" class="curriculum-title w-full text-lg font-bold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-concordia-burgundy outline-none" placeholder="Titre du curriculum (ex: Baccalauréat en éducation)" data-i18n-placeholder="macro_ph_curriculum">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="text-slate-400 hover:text-concordia-burgundy p-2 transition-colors" onclick="toggleCurriculum(this)" title="Replier/Déplier">
+                            <span class="material-icons-round">expand_less</span>
+                        </button>
+                        <button class="text-slate-400 hover:text-red-500 p-2 transition-colors" onclick="deleteCurriculum(this)" title="Supprimer">
+                            <span class="material-icons-round">delete_outline</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Curriculum Body -->
+            <div class="curriculum-body p-4">
+                <!-- Needs Analysis -->
+                <div class="mb-4">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="macro_needs_analysis">analyse des besoins</label>
+                    <textarea class="curriculum-needs w-full mt-2 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-concordia-burgundy/20 focus:border-concordia-burgundy outline-none resize-y" rows="2" placeholder="Quels sont les écarts de performance à combler ?" data-i18n-placeholder="macro_ph_needs"></textarea>
+                </div>
+
+                <!-- Strategic Alignment -->
+                <div class="mb-4">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="macro_strategic_alignment">alignement stratégique</label>
+                    <textarea class="curriculum-alignment w-full mt-2 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-concordia-burgundy/20 focus:border-concordia-burgundy outline-none resize-y" rows="2" placeholder="Comment ce programme s'aligne-t-il avec la mission de l'organisation ?" data-i18n-placeholder="macro_ph_alignment"></textarea>
+                </div>
+
+                <!-- Terminal Objectives Section -->
+                <div class="mb-4">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="macro_terminal_objectives">objectifs terminaux</label>
+                    <div class="curriculum-objectives mt-2 space-y-2">
+                        <!-- Objectives will be added here -->
+                    </div>
+                    <button type="button" class="mt-2 text-sm text-concordia-burgundy hover:text-concordia-burgundy/80 flex items-center gap-1" onclick="addObjective(this, 'curriculum')">
+                        <span class="material-icons-round text-sm">add</span>
+                        <span data-i18n="btn_add_objective">ajouter un objectif</span>
+                    </button>
+                </div>
+
+                <!-- Courses Control -->
+                <div class="flex items-center justify-between bg-slate-50 rounded-lg p-3 mb-4">
+                    <span class="text-sm font-semibold text-slate-600" data-i18n="macro_num_courses">nombre de cours</span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="qty-btn-inline" onclick="macroCourseDec(this)">−</button>
+                        <input type="number" class="num-courses qty-input-inline" value="2" min="0" max="20">
+                        <button type="button" class="qty-btn-inline" onclick="macroCourseInc(this)">+</button>
+                    </div>
+                </div>
+
+                <!-- Courses Container -->
+                <div class="courses-container space-y-4 ml-4 border-l-2 border-slate-200 pl-4">
+                    <!-- Courses will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="course-template">
+        <div class="course-card bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+            <!-- Course Header -->
+            <div class="course-header p-3 border-b border-slate-200 bg-white">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 flex-1">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-700 text-sm course-index">1.1</div>
+                        <input type="text" class="course-title flex-1 text-sm font-semibold text-slate-700 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-concordia-burgundy outline-none" placeholder="Titre du cours (ex: Introduction à la pédagogie)" data-i18n-placeholder="macro_ph_course">
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button class="text-slate-400 hover:text-concordia-burgundy p-1 transition-colors" onclick="toggleCourse(this)" title="Replier/Déplier">
+                            <span class="material-icons-round text-lg">expand_less</span>
+                        </button>
+                        <button class="text-slate-400 hover:text-red-500 p-1 transition-colors" onclick="deleteCourse(this)" title="Supprimer">
+                            <span class="material-icons-round text-lg">delete_outline</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Body -->
+            <div class="course-body p-3">
+                <!-- Course Description -->
+                <div class="mb-3">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" data-i18n="macro_course_description">description du cours</label>
+                    <textarea class="course-description w-full mt-1 px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-concordia-burgundy/20 outline-none resize-y bg-white" rows="2" placeholder="Objectifs et contenu du cours..." data-i18n-placeholder="macro_ph_course_desc"></textarea>
+                </div>
+
+                <!-- Units Control -->
+                <div class="flex items-center justify-between bg-white rounded-lg p-2 mb-3">
+                    <span class="text-xs font-semibold text-slate-500" data-i18n="macro_num_units">nombre d'unités</span>
+                    <div class="flex items-center gap-1">
+                        <button type="button" class="qty-btn-inline-sm" onclick="macroUnitDec(this)">−</button>
+                        <input type="number" class="num-units qty-input-inline-sm" value="3" min="0" max="20">
+                        <button type="button" class="qty-btn-inline-sm" onclick="macroUnitInc(this)">+</button>
+                    </div>
+                </div>
+
+                <!-- Units Container -->
+                <div class="units-container space-y-2">
+                    <!-- Units will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="unit-template">
+        <div class="unit-card bg-white rounded-lg border border-slate-200 p-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 flex-1">
+                    <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center font-bold text-emerald-700 text-[10px] unit-index">1.1.1</div>
+                    <input type="text" class="unit-title flex-1 text-xs font-medium text-slate-600 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-concordia-burgundy outline-none" placeholder="Titre de l'unité (ex: Chapitre 1 - Fondements)" data-i18n-placeholder="macro_ph_unit">
+                </div>
+                <button class="text-slate-400 hover:text-red-500 p-1 transition-colors" onclick="deleteUnit(this)" title="Supprimer">
+                    <span class="material-icons-round text-sm">close</span>
+                </button>
+            </div>
+            <div class="mt-2">
+                <textarea class="unit-description w-full px-2 py-1 text-[11px] border border-slate-100 rounded focus:ring-1 focus:ring-concordia-burgundy/20 outline-none resize-y bg-slate-50" rows="1" placeholder="Objectifs de l'unité..." data-i18n-placeholder="macro_ph_unit_desc"></textarea>
+            </div>
+        </div>
+    </template>
+
+    <!-- Objective Template -->
+    <template id="objective-template">
+        <div class="objective-item bg-slate-50 rounded-lg p-3 border border-slate-200">
+            <div class="flex items-start gap-2">
+                <div class="flex-1 space-y-2">
+                    <textarea class="objective-text w-full px-2 py-1.5 text-sm border border-slate-200 rounded focus:ring-1 focus:ring-concordia-burgundy/20 outline-none resize-y bg-white" rows="2" placeholder="Décrire l'objectif d'apprentissage..." data-i18n-placeholder="macro_ph_objective"></textarea>
+                    <div class="flex flex-wrap gap-2">
+                        <select class="taxonomy-select text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-concordia-burgundy/20 outline-none" onchange="updateTaxonomyLevels(this)">
+                            <option value="" data-i18n="opt_select_taxonomy">-- taxonomie --</option>
+                            <option value="cognitive" data-i18n="opt_cognitive">cognitif (Bloom)</option>
+                            <option value="affective" data-i18n="opt_affective">affectif</option>
+                            <option value="psychomotor" data-i18n="opt_psychomotor">psychomoteur</option>
+                        </select>
+                        <select class="level-select text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-concordia-burgundy/20 outline-none" onchange="showVerbsForLevel(this)">
+                            <option value="" data-i18n="opt_select_level">-- niveau --</option>
+                        </select>
+                    </div>
+                    <div class="verbs-display hidden text-xs text-slate-500 italic p-2 bg-white rounded border border-dashed border-slate-200">
+                        <span class="font-semibold" data-i18n="label_suggested_verbs">verbes suggérés :</span>
+                        <span class="verbs-list"></span>
+                    </div>
+                </div>
+                <button class="text-slate-400 hover:text-red-500 p-1 transition-colors" onclick="deleteObjective(this)" title="Supprimer">
+                    <span class="material-icons-round text-sm">close</span>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Footer Mount Point -->
+    <div id="app-footer-mount"></div>
+
+    <!-- Scripts -->
+    <script src="js/i18n-core.js"></script>
+    <script src="js/macrodesign.js"></script>
+    <script src="js/components-loader.js" defer></script>
+</body>
+</html>

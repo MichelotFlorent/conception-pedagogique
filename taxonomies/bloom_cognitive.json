@@ -1,0 +1,65 @@
+{
+  "name_en": "Cognitive (Bloom revised)",
+  "name_fr": "Cognitif (Bloom révisé)",
+  "domain": "cognitive",
+  "levels": [
+    {
+      "level": 1,
+      "name_en": "Remember",
+      "name_fr": "Se souvenir",
+      "definition_en": "Extracting significant knowledge from long-term memory.",
+      "definition_fr": "Extraire des connaissances significatives de la mémoire à long terme.",
+      "verbs_en": ["associate", "cite", "describe", "define", "duplicate", "record", "enumerate", "label", "identify", "indicate", "list", "locate", "memorize", "name", "order", "recall", "recognize", "repeat", "reproduce", "summarize", "select"],
+      "verbs_fr": ["associer", "citer", "décrire", "définir", "dupliquer", "enregistrer", "énumérer", "étiqueter", "identifier", "indiquer", "lister", "localiser", "mémoriser", "nommer", "ordonner", "rappeler", "reconnaître", "répéter", "reproduire", "résumer", "sélectionner"]
+    },
+    {
+      "level": 2,
+      "name_en": "Understand",
+      "name_fr": "Comprendre",
+      "definition_en": "Constructing the meaning of received information (oral, written, and graphic).",
+      "definition_fr": "Construire le sens de l'information reçue (orale, écrite et graphique).",
+      "verbs_en": ["classify", "compare", "convert", "demonstrate", "differentiate", "state in one's own words", "illustrate", "explain", "express", "make an analogy", "generalize", "interpret", "paraphrase", "predict", "reformulate", "represent", "summarize"],
+      "verbs_fr": ["classifier", "comparer", "convertir", "démontrer", "différencier", "énoncer dans ses propres mots", "illustrer", "expliquer", "exprimer", "faire une analogie", "généraliser", "interpréter", "paraphraser", "prédire", "reformuler", "représenter", "résumer"]
+    },
+    {
+      "level": 3,
+      "name_en": "Apply",
+      "name_fr": "Appliquer",
+      "definition_en": "Executing or using a procedure in a given situation.",
+      "definition_fr": "Exécuter ou utiliser une procédure dans une situation donnée.",
+      "verbs_en": ["administer", "apply", "assemble", "calculate", "categorize", "collect", "construct", "control", "discover", "demonstrate", "draw", "determine", "employ", "establish", "formulate", "provide", "manipulate", "measure", "put into practice", "modify", "show", "operate", "participate", "prepare", "produce", "resolve", "treat", "find", "use"],
+      "verbs_fr": ["administrer", "appliquer", "assembler", "calculer", "catégoriser", "collecter", "construire", "contrôler", "découvrir", "démontrer", "dessiner", "déterminer", "employer", "établir", "formuler", "fournir", "manipuler", "mesurer", "mettre en pratique", "modifier", "montrer", "opérer", "participer", "préparer", "produire", "résoudre", "traiter", "trouver", "utiliser"]
+    },
+    {
+      "level": 4,
+      "name_en": "Analyze",
+      "name_fr": "Analyser",
+      "definition_en": "Breaking down the constituent parts of a whole and determining the links that unite these parts to each other and to an overall structure or purpose.",
+      "definition_fr": "Décomposer les parties constitutives d'un tout et déterminer les liens qui unissent ces parties entre elles et à une structure ou un but global.",
+      "verbs_en": ["analyze", "target", "compare", "contrast", "criticize", "cut", "deduce", "delimit", "differentiate", "discriminate", "dissect", "distinguish", "examine", "correlate", "highlight", "infer", "limit", "prioritize", "relate", "fragment", "organize", "oppose", "question", "separate", "subdivide"],
+      "verbs_fr": ["analyser", "cibler", "comparer", "contraster", "critiquer", "découper", "déduire", "délimiter", "différencier", "discriminer", "disséquer", "distinguer", "examiner", "corréler", "mettre en évidence", "inférer", "limiter", "prioriser", "relier", "fragmenter", "organiser", "opposer", "questionner", "séparer", "subdiviser"]
+    },
+    {
+      "level": 5,
+      "name_en": "Evaluate",
+      "name_fr": "Évaluer",
+      "definition_en": "Making a judgment based on criteria and standards.",
+      "definition_fr": "Porter un jugement basé sur des critères et standards.",
+      "verbs_en": ["appraise", "argue", "attack", "choose", "conclude", "criticize", "defend", "determine", "estimate", "evaluate", "judge", "justify", "support"],
+      "verbs_fr": ["apprécier", "argumenter", "attaquer", "choisir", "conclure", "critiquer", "défendre", "déterminer", "estimer", "évaluer", "juger", "justifier", "soutenir"]
+    },
+    {
+      "level": 6,
+      "name_en": "Create",
+      "name_fr": "Créer",
+      "definition_en": "Assembling elements to form a new and coherent whole, or making an original production.",
+      "definition_fr": "Assembler des éléments pour former un tout nouveau et cohérent, ou réaliser une production originale.",
+      "verbs_en": ["adapt", "arrange", "anticipate", "assemble", "combine", "comment", "compose", "conceive", "connect", "construct", "create", "develop", "write", "expose", "incorporate", "integrate", "set up", "organize", "plan", "prepare", "produce", "propose", "draft", "structure", "synthesize"],
+      "verbs_fr": ["adapter", "arranger", "anticiper", "assembler", "combiner", "commenter", "composer", "concevoir", "connecter", "construire", "créer", "développer", "écrire", "exposer", "incorporer", "intégrer", "mettre en place", "organiser", "planifier", "préparer", "produire", "proposer", "rédiger", "structurer", "synthétiser"]
+    }
+  ],
+  "references": [
+    "Anderson, L. W., & Krathwohl, D. R. (Eds.) (2001). A taxonomy for learning, teaching, and assessing: A revision of Bloom's taxonomy of educational objectives. Longman.",
+    "Bloom, B. S. (Ed.). (1956). Taxonomy of educational objectives. The classification of educational goals: Handbook I, cognitive domain. Longmans."
+  ]
+}
