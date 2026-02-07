@@ -2371,3 +2371,98 @@ html.ui-dark .persona-count-group {
     justify-content: center;
   }
 }
+
+/* ============================================
+   MACRODESIGN MODE SELECTOR
+   ============================================ */
+.macro-mode-option {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.macro-mode-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.macro-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: 2px solid var(--ld-border);
+  background: var(--ld-bg-card);
+  color: var(--ld-gray-600);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.macro-mode-btn:hover {
+  border-color: var(--ld-primary-light);
+  color: var(--ld-primary);
+  background: rgba(145, 35, 56, 0.04);
+}
+
+.macro-mode-option input[type="radio"]:checked + .macro-mode-btn {
+  border-color: var(--ld-primary);
+  background: linear-gradient(135deg, rgba(145, 35, 56, 0.08), rgba(145, 35, 56, 0.04));
+  color: var(--ld-primary-dark);
+  box-shadow: 0 2px 8px rgba(145, 35, 56, 0.15);
+}
+
+.macro-mode-option input[type="radio"]:focus + .macro-mode-btn {
+  outline: 3px solid rgba(145, 35, 56, 0.3);
+  outline-offset: 2px;
+}
+
+/* Global qty-btn for macrodesign top control */
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #912338;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:hover {
+  background: #6d1a2a;
+}
+
+.qty-btn:active {
+  transform: scale(0.95);
+}
+
+.qty-input {
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  color: #912338;
+  -moz-appearance: textfield;
+  padding: 0.25rem;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: #912338;
+  box-shadow: 0 0 0 3px rgba(145, 35, 56, 0.1);
+}

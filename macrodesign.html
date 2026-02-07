@@ -87,12 +87,41 @@
             </div>
         </header>
 
-        <!-- Global Curriculum Control -->
+        <!-- Mode Selector -->
+        <div class="bg-gradient-to-r from-concordia-burgundy/5 to-transparent rounded-2xl border border-concordia-burgundy/20 p-4 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-icons-round text-concordia-burgundy">settings</span>
+                    <span class="font-bold text-slate-700" data-i18n="macro_mode_label">type de macrodesign</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <label class="macro-mode-option">
+                        <input type="radio" name="macro-mode" value="program" checked onchange="switchMacroMode('program')">
+                        <span class="macro-mode-btn">
+                            <span class="material-icons-round text-sm">library_books</span>
+                            <span data-i18n="macro_mode_program">programme (plusieurs cours)</span>
+                        </span>
+                    </label>
+                    <label class="macro-mode-option">
+                        <input type="radio" name="macro-mode" value="course" onchange="switchMacroMode('course')">
+                        <span class="macro-mode-btn">
+                            <span class="material-icons-round text-sm">menu_book</span>
+                            <span data-i18n="macro_mode_course">cours unique</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <p class="text-xs text-slate-500 mt-2 ml-8" id="macro-mode-hint" data-i18n="macro_mode_hint_program">
+                Structure : Curriculum → Cours → Unités
+            </p>
+        </div>
+
+        <!-- Global Level 1 Control -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <span class="material-icons-round text-concordia-burgundy">school</span>
-                    <span class="font-bold text-slate-700" data-i18n="macro_num_curriculums">nombre de curriculums</span>
+                    <span class="material-icons-round text-concordia-burgundy" id="level1-icon">school</span>
+                    <span class="font-bold text-slate-700" id="level1-label" data-i18n="macro_num_curriculums">nombre de curriculums</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button type="button" class="qty-btn" onclick="macroCurriculumDec()">−</button>

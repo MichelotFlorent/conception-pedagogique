@@ -1,7 +1,103 @@
 /**
  * Macrodesign - Strategic Planning Tool
- * Levels: Curriculum > Course > Unit
+ * Levels: Curriculum > Course > Unit (Program mode)
+ *    or: Thème > Séance > Unit (Course mode)
  */
+
+// ── Current Mode ──────────────────────────────────────────────────────────────
+let currentMacroMode = 'program'; // 'program' or 'course'
+
+// ── Mode Labels ───────────────────────────────────────────────────────────────
+const modeLabels = {
+    program: {
+        level1_label: 'macro_num_curriculums',
+        level1_icon: 'school',
+        level1_placeholder: 'macro_ph_curriculum',
+        level2_label: 'macro_num_courses',
+        level2_placeholder: 'macro_ph_course',
+        hint: 'macro_mode_hint_program'
+    },
+    course: {
+        level1_label: 'macro_num_themes',
+        level1_icon: 'category',
+        level1_placeholder: 'macro_ph_theme',
+        level2_label: 'macro_num_sessions',
+        level2_placeholder: 'macro_ph_session',
+        hint: 'macro_mode_hint_course'
+    }
+};
+
+// ── Switch Mode ───────────────────────────────────────────────────────────────
+function switchMacroMode(mode) {
+    currentMacroMode = mode;
+    const labels = modeLabels[mode];
+
+    // Update Level 1 control
+    const level1Label = document.getElementById('level1-label');
+    const level1Icon = document.getElementById('level1-icon');
+    if (level1Label) {
+        level1Label.setAttribute('data-i18n', labels.level1_label);
+        level1Label.textContent = getTranslation(labels.level1_label);
+    }
+    if (level1Icon) {
+        level1Icon.textContent = labels.level1_icon;
+    }
+
+    // Update hint text
+    const hintEl = document.getElementById('macro-mode-hint');
+    if (hintEl) {
+        hintEl.setAttribute('data-i18n', labels.hint);
+        hintEl.textContent = getTranslation(labels.hint);
+    }
+
+    // Update all curriculum cards
+    document.querySelectorAll('.curriculum-card').forEach(card => {
+        const titleInput = card.querySelector('.curriculum-title');
+        if (titleInput) {
+            titleInput.setAttribute('data-i18n-placeholder', labels.level1_placeholder);
+            titleInput.placeholder = getTranslation(labels.level1_placeholder);
+        }
+    });
+
+    // Update all course cards labels
+    document.querySelectorAll('.curriculum-card').forEach(curriculum => {
+        const coursesLabel = curriculum.querySelector('[data-i18n="macro_num_courses"], [data-i18n="macro_num_sessions"]');
+        if (coursesLabel) {
+            coursesLabel.setAttribute('data-i18n', labels.level2_label);
+            coursesLabel.textContent = getTranslation(labels.level2_label);
+        }
+    });
+
+    // Update all course title placeholders
+    document.querySelectorAll('.course-title').forEach(input => {
+        input.setAttribute('data-i18n-placeholder', labels.level2_placeholder);
+        input.placeholder = getTranslation(labels.level2_placeholder);
+    });
+
+    console.log('[Macrodesign] Mode switched to:', mode);
+}
+
+// Helper function to get translation
+function getTranslation(key) {
+    if (typeof i18nCore !== 'undefined' && i18nCore.translations[i18nCore.currentLang]) {
+        const trans = i18nCore.translations[i18nCore.currentLang].translations || i18nCore.translations[i18nCore.currentLang];
+        return trans[key] || key;
+    }
+    // Fallback French labels
+    const fallbacks = {
+        'macro_num_curriculums': 'nombre de curriculums',
+        'macro_num_themes': 'nombre de thèmes',
+        'macro_num_courses': 'nombre de cours',
+        'macro_num_sessions': 'nombre de séances',
+        'macro_ph_curriculum': 'Titre du curriculum (ex: Baccalauréat en éducation)',
+        'macro_ph_theme': 'Titre du thème (ex: Introduction aux concepts)',
+        'macro_ph_course': 'Titre du cours (ex: Introduction à la pédagogie)',
+        'macro_ph_session': 'Titre de la séance (ex: Séance 1 - Fondements)',
+        'macro_mode_hint_program': 'Structure : Curriculum → Cours → Unités',
+        'macro_mode_hint_course': 'Structure : Thème → Séance → Unités'
+    };
+    return fallbacks[key] || key;
+}
 
 // ── Taxonomies Cache ──────────────────────────────────────────────────────────
 let taxonomies = {
