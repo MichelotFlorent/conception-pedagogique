@@ -5054,48 +5054,117 @@ function initNumericControls() {
     });
 
     // Create default structure on init (2 modules, each with 2 moments, 2 submoments, 1 activity)
+    console.log('[Designer] initNumericControls terminé, lancement initDefaultStructure dans 100ms');
     setTimeout(initDefaultStructure, 100);
+}
+
+/**
+ * Update all activity indexes across the entire structure
+ * Assigns hierarchical numbering: Module.Moment.Submoment.Activity
+ */
+function updateActivityIndexes() {
+    console.log('[Designer] updateActivityIndexes appelé');
+    const root = document.getElementById('activities-root');
+    if (!root) {
+        console.warn('[Designer] activities-root non trouvé');
+        return;
+    }
+
+    const modules = root.querySelectorAll(':scope > .activity-group');
+    console.log('[Designer] Nombre de modules:', modules.length);
+
+    modules.forEach((moduleEl, moduleIdx) => {
+        const moduleNum = moduleIdx + 1;
+
+        // Update module index badge
+        const moduleBadge = moduleEl.querySelector('.activity-index');
+        if (moduleBadge) moduleBadge.textContent = String(moduleNum);
+
+        // Update moments in this module
+        const moments = moduleEl.querySelectorAll('.activity-moments-container > .moment-group');
+        moments.forEach((momentEl, momentIdx) => {
+            const momentNum = momentIdx + 1;
+            const momentBadge = momentEl.querySelector('.moment-index');
+            if (momentBadge) momentBadge.textContent = `${moduleNum}.${momentNum}`;
+
+            // Update submoments in this moment
+            const submoments = momentEl.querySelectorAll('.submoments-container > .submoment-card');
+            submoments.forEach((subEl, subIdx) => {
+                const subNum = subIdx + 1;
+                const subBadge = subEl.querySelector('.submoment-index');
+                if (subBadge) subBadge.textContent = `${moduleNum}.${momentNum}.${subNum}`;
+
+                // Update activities/steps in this submoment
+                const steps = subEl.querySelectorAll('.submoment-steps > .step-card');
+                steps.forEach((stepEl, stepIdx) => {
+                    const stepNum = stepIdx + 1;
+                    const stepBadge = stepEl.querySelector('.step-index');
+                    if (stepBadge) stepBadge.textContent = `${moduleNum}.${momentNum}.${subNum}.${stepNum}`;
+                });
+            });
+        });
+    });
 }
 
 /**
  * Initialize default structure: 2 modules with 2 moments each, 2 submoments each, 1 activity each
  */
 function initDefaultStructure() {
+    console.log('[Designer] initDefaultStructure appelé');
     const root = document.getElementById('activities-root');
-    if (!root) return;
+    if (!root) {
+        console.error('[Designer] activities-root non trouvé!');
+        return;
+    }
 
     // Only init if empty
-    if (root.querySelectorAll('.activity-group').length > 0) return;
+    if (root.querySelectorAll('.activity-group').length > 0) {
+        console.log('[Designer] Structure existante détectée, skip init');
+        return;
+    }
 
     const numModulesInput = document.getElementById('num-modules-global');
     const targetModules = numModulesInput ? parseInt(numModulesInput.value) || 2 : 2;
 
+    console.log('[Designer] Création de', targetModules, 'modules');
     syncModules(targetModules);
+    console.log('[Designer] initDefaultStructure terminé');
 }
 
 /**
  * Sync modules to target count
  */
 function syncModules(targetCount) {
+    console.log('[Designer] syncModules appelé, cible:', targetCount);
     const root = document.getElementById('activities-root');
-    if (!root) return;
+    if (!root) {
+        console.error('[Designer] syncModules: activities-root non trouvé');
+        return;
+    }
 
     targetCount = Math.max(1, Math.min(20, targetCount));
 
     const currentModules = root.querySelectorAll(':scope > .activity-group');
     const currentCount = currentModules.length;
+    console.log('[Designer] syncModules: modules actuels:', currentCount, '→ cible:', targetCount);
 
     if (targetCount > currentCount) {
         // Add modules
         for (let i = currentCount; i < targetCount; i++) {
+            console.log('[Designer] Création module', i + 1);
             const module = createModuleProgrammatically();
             if (module) {
                 // Trigger moments sync with default value
                 const numMomentsInput = module.querySelector('.num-moments-input');
                 if (numMomentsInput) {
                     const defaultMoments = parseInt(numMomentsInput.value) || 2;
+                    console.log('[Designer] Module', i + 1, ': création de', defaultMoments, 'moments');
                     syncMoments(module, defaultMoments);
+                } else {
+                    console.warn('[Designer] Module', i + 1, ': num-moments-input non trouvé');
                 }
+            } else {
+                console.error('[Designer] Échec création module', i + 1);
             }
         }
     } else if (targetCount < currentCount) {
@@ -5107,32 +5176,45 @@ function syncModules(targetCount) {
 
     updateActivityIndexes();
     try { updateStats(); } catch (_) {}
+    console.log('[Designer] syncModules terminé');
 }
 
 /**
  * Sync moments in a module to target count
  */
 function syncMoments(moduleEl, targetCount) {
-    if (!moduleEl) return;
+    console.log('[Designer] syncMoments appelé, cible:', targetCount);
+    if (!moduleEl) {
+        console.warn('[Designer] syncMoments: moduleEl null');
+        return;
+    }
 
     const container = moduleEl.querySelector('.activity-moments-container');
-    if (!container) return;
+    if (!container) {
+        console.warn('[Designer] syncMoments: activity-moments-container non trouvé');
+        return;
+    }
 
     targetCount = Math.max(0, Math.min(20, targetCount));
 
     const currentMoments = container.querySelectorAll(':scope > .moment-group');
     const currentCount = currentMoments.length;
+    console.log('[Designer] syncMoments: moments actuels:', currentCount, '→ cible:', targetCount);
 
     if (targetCount > currentCount) {
         // Add moments
         for (let i = currentCount; i < targetCount; i++) {
+            console.log('[Designer] Création moment', i + 1);
             const moment = createMomentProgrammatically(moduleEl);
             if (moment) {
                 // Trigger submoments sync with default value
                 const numSubInput = moment.querySelector('.num-submoments-input');
                 if (numSubInput) {
                     const defaultSubs = parseInt(numSubInput.value) || 2;
+                    console.log('[Designer] Moment', i + 1, ': création de', defaultSubs, 'sous-moments');
                     syncSubmoments(moment, defaultSubs);
+                } else {
+                    console.warn('[Designer] Moment', i + 1, ': num-submoments-input non trouvé');
                 }
             }
         }
@@ -5152,26 +5234,38 @@ function syncMoments(moduleEl, targetCount) {
  * Sync submoments in a moment to target count
  */
 function syncSubmoments(momentEl, targetCount) {
-    if (!momentEl) return;
+    console.log('[Designer] syncSubmoments appelé, cible:', targetCount);
+    if (!momentEl) {
+        console.warn('[Designer] syncSubmoments: momentEl null');
+        return;
+    }
 
     const container = momentEl.querySelector('.submoments-container');
-    if (!container) return;
+    if (!container) {
+        console.warn('[Designer] syncSubmoments: submoments-container non trouvé');
+        return;
+    }
 
     targetCount = Math.max(0, Math.min(20, targetCount));
 
     const currentSubs = container.querySelectorAll(':scope > .submoment-card');
     const currentCount = currentSubs.length;
+    console.log('[Designer] syncSubmoments: sous-moments actuels:', currentCount, '→ cible:', targetCount);
 
     if (targetCount > currentCount) {
         // Add submoments
         for (let i = currentCount; i < targetCount; i++) {
+            console.log('[Designer] Création sous-moment', i + 1);
             const submoment = createSubmomentProgrammatically(momentEl);
             if (submoment) {
                 // Trigger activities sync with default value
                 const numActInput = submoment.querySelector('.num-activities-input');
                 if (numActInput) {
                     const defaultActs = parseInt(numActInput.value) || 1;
+                    console.log('[Designer] Sous-moment', i + 1, ': création de', defaultActs, 'activité(s)');
                     syncActivities(submoment, defaultActs);
+                } else {
+                    console.warn('[Designer] Sous-moment', i + 1, ': num-activities-input non trouvé');
                 }
             }
         }
@@ -5190,19 +5284,28 @@ function syncSubmoments(momentEl, targetCount) {
  * Sync activities (steps) in a submoment to target count
  */
 function syncActivities(submomentEl, targetCount) {
-    if (!submomentEl) return;
+    console.log('[Designer] syncActivities appelé, cible:', targetCount);
+    if (!submomentEl) {
+        console.warn('[Designer] syncActivities: submomentEl null');
+        return;
+    }
 
     const container = submomentEl.querySelector('.submoment-steps');
-    if (!container) return;
+    if (!container) {
+        console.warn('[Designer] syncActivities: submoment-steps non trouvé');
+        return;
+    }
 
     targetCount = Math.max(0, Math.min(20, targetCount));
 
     const currentSteps = container.querySelectorAll(':scope > .step-card');
     const currentCount = currentSteps.length;
+    console.log('[Designer] syncActivities: activités actuelles:', currentCount, '→ cible:', targetCount);
 
     if (targetCount > currentCount) {
         // Add steps
         for (let i = currentCount; i < targetCount; i++) {
+            console.log('[Designer] Création activité', i + 1);
             createStepProgrammatically(submomentEl);
         }
     } else if (targetCount < currentCount) {
@@ -5219,17 +5322,28 @@ function syncActivities(submomentEl, targetCount) {
  * Create a step (activity) programmatically in a submoment
  */
 function createStepProgrammatically(submomentEl) {
-    if (!submomentEl) return null;
+    console.log('[Designer] createStepProgrammatically appelé');
+    if (!submomentEl) {
+        console.warn('[Designer] createStepProgrammatically: submomentEl null');
+        return null;
+    }
 
     const container = submomentEl.querySelector('.submoment-steps');
-    if (!container) return null;
+    if (!container) {
+        console.warn('[Designer] createStepProgrammatically: submoment-steps non trouvé');
+        return null;
+    }
 
     const template = document.getElementById('step-template');
-    if (!template) return null;
+    if (!template) {
+        console.error('[Designer] Template step-template non trouvé');
+        return null;
+    }
 
     const clone = template.content.cloneNode(true);
     container.appendChild(clone);
     const step = container.lastElementChild;
+    console.log('[Designer] Activité créée:', step ? 'OK' : 'ÉCHEC');
 
     // Initialize step status
     try { applyStepStatus(step, 'in_progress'); } catch (_) {}
@@ -5302,15 +5416,24 @@ function hideProgressBar() {
  * Returns the created module element
  */
 function createModuleProgrammatically() {
+    console.log('[Designer] createModuleProgrammatically appelé');
     const root = document.getElementById('activities-root');
-    if (!root) return null;
+    if (!root) {
+        console.error('[Designer] createModuleProgrammatically: activities-root non trouvé');
+        return null;
+    }
 
-    const template = document.getElementById('module-template');
-    if (!template) return null;
+    const template = document.getElementById('activity-template');
+    if (!template) {
+        console.error('[Designer] Template activity-template non trouvé');
+        return null;
+    }
 
+    console.log('[Designer] Template activity-template trouvé, clonage...');
     const clone = template.content.cloneNode(true);
     root.appendChild(clone);
     const module = root.lastElementChild;
+    console.log('[Designer] Module créé:', module ? 'OK' : 'ÉCHEC');
 
     // Initialize sortable for moments container
     try {
@@ -5328,17 +5451,28 @@ function createModuleProgrammatically() {
  * Returns the created moment element
  */
 function createMomentProgrammatically(moduleEl) {
-    if (!moduleEl) return null;
+    console.log('[Designer] createMomentProgrammatically appelé');
+    if (!moduleEl) {
+        console.warn('[Designer] createMomentProgrammatically: moduleEl null');
+        return null;
+    }
 
     const momentsContainer = moduleEl.querySelector('.activity-moments-container');
-    if (!momentsContainer) return null;
+    if (!momentsContainer) {
+        console.warn('[Designer] createMomentProgrammatically: activity-moments-container non trouvé');
+        return null;
+    }
 
     const template = document.getElementById('moment-template');
-    if (!template) return null;
+    if (!template) {
+        console.error('[Designer] Template moment-template non trouvé');
+        return null;
+    }
 
     const clone = template.content.cloneNode(true);
     momentsContainer.appendChild(clone);
     const moment = momentsContainer.lastElementChild;
+    console.log('[Designer] Moment créé:', moment ? 'OK' : 'ÉCHEC');
 
     // Initialize sortable for steps
     try {
@@ -5364,17 +5498,28 @@ function createMomentProgrammatically(moduleEl) {
  * Returns the created submoment element
  */
 function createSubmomentProgrammatically(momentEl) {
-    if (!momentEl) return null;
+    console.log('[Designer] createSubmomentProgrammatically appelé');
+    if (!momentEl) {
+        console.warn('[Designer] createSubmomentProgrammatically: momentEl null');
+        return null;
+    }
 
     const container = momentEl.querySelector('.submoments-container');
-    if (!container) return null;
+    if (!container) {
+        console.warn('[Designer] createSubmomentProgrammatically: submoments-container non trouvé');
+        return null;
+    }
 
     const template = document.getElementById('submoment-template');
-    if (!template) return null;
+    if (!template) {
+        console.error('[Designer] Template submoment-template non trouvé');
+        return null;
+    }
 
     const clone = template.content.cloneNode(true);
     container.appendChild(clone);
     const submoment = container.lastElementChild;
+    console.log('[Designer] Sous-moment créé:', submoment ? 'OK' : 'ÉCHEC');
 
     // Initialize sortable for steps
     try {
