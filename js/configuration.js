@@ -61,27 +61,27 @@ const translations_fr = {
     cfg_dim0_tick3: "Majoritairement à distance",
     cfg_dim0_tick4: "À distance",
 
-    // Dimension 1: Petit groupe / Grand groupe
-    cfg_dim1_left: "PETIT GROUPE",
-    cfg_dim1_right: "GRAND GROUPE",
-    cfg_dim1_left_desc: "Suivi individuel.",
-    cfg_dim1_right_desc: "Massification.",
-    cfg_dim1_tick0: "Petit groupe",
-    cfg_dim1_tick1: "Groupe restreint",
+    // Dimension 1: Grand groupe / Petit groupe
+    cfg_dim1_left: "GRAND GROUPE",
+    cfg_dim1_right: "PETIT GROUPE",
+    cfg_dim1_left_desc: "Massification.",
+    cfg_dim1_right_desc: "Suivi individuel.",
+    cfg_dim1_tick0: "Grand groupe",
+    cfg_dim1_tick1: "Groupe large",
     cfg_dim1_tick2: "Groupe moyen",
-    cfg_dim1_tick3: "Groupe large",
-    cfg_dim1_tick4: "Grand groupe",
+    cfg_dim1_tick3: "Groupe restreint",
+    cfg_dim1_tick4: "Petit groupe",
 
-    // Dimension 2: Asynchrone / Synchrone
-    cfg_dim2_left: "ASYNCHRONE",
-    cfg_dim2_right: "SYNCHRONE",
-    cfg_dim2_left_desc: "Temps différé.",
-    cfg_dim2_right_desc: "Temps réel.",
-    cfg_dim2_tick0: "Auto-rythmé",
-    cfg_dim2_tick1: "Asynchrone guidé",
+    // Dimension 2: Synchrone / Asynchrone
+    cfg_dim2_left: "SYNCHRONE",
+    cfg_dim2_right: "ASYNCHRONE",
+    cfg_dim2_left_desc: "Temps réel.",
+    cfg_dim2_right_desc: "Temps différé.",
+    cfg_dim2_tick0: "Synchrone",
+    cfg_dim2_tick1: "Synchrone ponctuel",
     cfg_dim2_tick2: "Mixte",
-    cfg_dim2_tick3: "Synchrone ponctuel",
-    cfg_dim2_tick4: "Synchrone",
+    cfg_dim2_tick3: "Asynchrone guidé",
+    cfg_dim2_tick4: "Auto-rythmé",
 
     // Dimension 3: Individuel / Collaboratif
     cfg_dim3_left: "INDIVIDUEL",
@@ -105,16 +105,16 @@ const translations_fr = {
     cfg_dim4_tick3: "Création",
     cfg_dim4_tick4: "Production",
 
-    // Dimension 5: Accompagnement / Sans accompagnement
-    cfg_dim5_left: "ACCOMPAGNEMENT",
-    cfg_dim5_right: "SANS ACCOMPAGNEMENT",
-    cfg_dim5_left_desc: "Guidage fort.",
-    cfg_dim5_right_desc: "Autonomie.",
-    cfg_dim5_tick0: "Accompagnement fort",
-    cfg_dim5_tick1: "Accompagnement régulier",
+    // Dimension 5: Sans accompagnement / Accompagnement
+    cfg_dim5_left: "SANS ACCOMPAGNEMENT",
+    cfg_dim5_right: "ACCOMPAGNEMENT",
+    cfg_dim5_left_desc: "Autonomie.",
+    cfg_dim5_right_desc: "Guidage fort.",
+    cfg_dim5_tick0: "Sans accompagnement",
+    cfg_dim5_tick1: "Autonomie guidée",
     cfg_dim5_tick2: "Accompagnement ponctuel",
-    cfg_dim5_tick3: "Autonomie guidée",
-    cfg_dim5_tick4: "Sans accompagnement",
+    cfg_dim5_tick3: "Accompagnement régulier",
+    cfg_dim5_tick4: "Accompagnement fort",
 
     // Tick label fallbacks
     cfg_tick_balanced: "Équilibré",
@@ -537,18 +537,19 @@ function checkAlerts() {
     var isL = function (idx) { return d[idx] < 50; };
     var isR = function (idx) { return d[idx] > 50; };
 
-    if (isR(2) && isR(5)) alerts.push(i18nCore.t('cfg_alert_0'));
-    if (isR(3) && isL(2)) alerts.push(i18nCore.t('cfg_alert_1'));
-    if (isR(4) && isR(5)) alerts.push(i18nCore.t('cfg_alert_2'));
-    if (isR(2) && isR(4) && isR(3) && isR(5)) alerts.push(i18nCore.t('cfg_alert_3'));
-    if (isR(2) && isR(4) && isR(3) && isL(5)) alerts.push(i18nCore.t('cfg_alert_4'));
-    if (isR(1) && isL(5)) alerts.push(i18nCore.t('cfg_alert_5'));
-    if (isR(0) && isR(2)) alerts.push(i18nCore.t('cfg_alert_6'));
-    if (isR(0) && isR(1) && isR(5)) alerts.push(i18nCore.t('cfg_alert_7'));
-    if (isR(0) && isR(3)) alerts.push(i18nCore.t('cfg_alert_8'));
-    if (isR(1) && isR(3)) alerts.push(i18nCore.t('cfg_alert_9'));
-    if (isR(1) && isR(4)) alerts.push(i18nCore.t('cfg_alert_10'));
-    if (isL(0) && isL(2)) alerts.push(i18nCore.t('cfg_alert_11'));
+    // Note: Dimensions inversées - dim1: Grand groupe(L)/Petit groupe(R), dim2: Synchrone(L)/Asynchrone(R), dim5: Sans accomp.(L)/Accomp.(R)
+    if (isL(2) && isL(5)) alerts.push(i18nCore.t('cfg_alert_0'));  // Synchrone + Sans accompagnement
+    if (isR(3) && isR(2)) alerts.push(i18nCore.t('cfg_alert_1'));  // Collaboratif + Asynchrone
+    if (isR(4) && isL(5)) alerts.push(i18nCore.t('cfg_alert_2'));  // Production + Sans accompagnement
+    if (isL(2) && isR(4) && isR(3) && isL(5)) alerts.push(i18nCore.t('cfg_alert_3'));  // Synchrone + Production + Collaboratif + Sans accompagnement
+    if (isL(2) && isR(4) && isR(3) && isR(5)) alerts.push(i18nCore.t('cfg_alert_4'));  // Synchrone + Production + Collaboratif (avec accompagnement)
+    if (isL(1) && isR(5)) alerts.push(i18nCore.t('cfg_alert_5'));  // Grand groupe + Accompagnement fort
+    if (isR(0) && isL(2)) alerts.push(i18nCore.t('cfg_alert_6'));  // Distance + Synchrone
+    if (isR(0) && isL(1) && isL(5)) alerts.push(i18nCore.t('cfg_alert_7'));  // Distance + Grand groupe + Sans accompagnement
+    if (isR(0) && isR(3)) alerts.push(i18nCore.t('cfg_alert_8'));  // Distance + Collaboratif
+    if (isL(1) && isR(3)) alerts.push(i18nCore.t('cfg_alert_9'));  // Grand groupe + Collaboratif
+    if (isL(1) && isR(4)) alerts.push(i18nCore.t('cfg_alert_10')); // Grand groupe + Production
+    if (isL(0) && isR(2)) alerts.push(i18nCore.t('cfg_alert_11')); // Présence + Asynchrone
 
     if (alerts.length > 0) {
         var header = i18nCore.t('cfg_alert_header');
