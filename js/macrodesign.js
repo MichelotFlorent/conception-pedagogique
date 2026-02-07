@@ -32,7 +32,9 @@ function switchMacroMode(mode) {
     currentMacroMode = mode;
     const labels = modeLabels[mode];
 
-    // Update Level 1 control
+    console.log('[Macrodesign] Switching mode to:', mode);
+
+    // Update Level 1 control (main page)
     const level1Label = document.getElementById('level1-label');
     const level1Icon = document.getElementById('level1-icon');
     if (level1Label) {
@@ -50,38 +52,71 @@ function switchMacroMode(mode) {
         hintEl.textContent = getTranslation(labels.hint);
     }
 
-    // Update all curriculum cards
+    // Update all existing curriculum cards (level 1)
     document.querySelectorAll('.curriculum-card').forEach(card => {
-        const titleInput = card.querySelector('.curriculum-title');
-        if (titleInput) {
-            titleInput.setAttribute('data-i18n-placeholder', labels.level1_placeholder);
-            titleInput.placeholder = getTranslation(labels.level1_placeholder);
-        }
+        applyModeToLevel1Card(card);
     });
 
-    // Update all course cards labels
-    document.querySelectorAll('.curriculum-card').forEach(curriculum => {
-        const coursesLabel = curriculum.querySelector('[data-i18n="macro_num_courses"], [data-i18n="macro_num_sessions"]');
-        if (coursesLabel) {
-            coursesLabel.setAttribute('data-i18n', labels.level2_label);
-            coursesLabel.textContent = getTranslation(labels.level2_label);
-        }
-    });
-
-    // Update all course title placeholders
-    document.querySelectorAll('.course-title').forEach(input => {
-        input.setAttribute('data-i18n-placeholder', labels.level2_placeholder);
-        input.placeholder = getTranslation(labels.level2_placeholder);
+    // Update all existing course cards (level 2)
+    document.querySelectorAll('.course-card').forEach(card => {
+        applyModeToLevel2Card(card);
     });
 
     console.log('[Macrodesign] Mode switched to:', mode);
+}
+
+// Apply current mode labels to a Level 1 card (Curriculum/Thème)
+function applyModeToLevel1Card(card) {
+    const labels = modeLabels[currentMacroMode];
+
+    // Update title placeholder
+    const titleInput = card.querySelector('.curriculum-title');
+    if (titleInput) {
+        titleInput.setAttribute('data-i18n-placeholder', labels.level1_placeholder);
+        titleInput.placeholder = getTranslation(labels.level1_placeholder);
+    }
+
+    // Update the "nombre de cours/séances" label inside this card
+    const level2ControlLabel = card.querySelector('.curriculum-body .bg-slate-50 span[data-i18n]');
+    if (level2ControlLabel) {
+        level2ControlLabel.setAttribute('data-i18n', labels.level2_label);
+        level2ControlLabel.textContent = getTranslation(labels.level2_label);
+    }
+}
+
+// Apply current mode labels to a Level 2 card (Cours/Séance)
+function applyModeToLevel2Card(card) {
+    const labels = modeLabels[currentMacroMode];
+
+    // Update title placeholder
+    const titleInput = card.querySelector('.course-title');
+    if (titleInput) {
+        titleInput.setAttribute('data-i18n-placeholder', labels.level2_placeholder);
+        titleInput.placeholder = getTranslation(labels.level2_placeholder);
+    }
+
+    // Update description label if needed (for course mode, change "description du cours" to "description de la séance")
+    const descLabel = card.querySelector('.course-body label[data-i18n]');
+    if (descLabel) {
+        const descKey = currentMacroMode === 'course' ? 'macro_session_description' : 'macro_course_description';
+        descLabel.setAttribute('data-i18n', descKey);
+        descLabel.textContent = getTranslation(descKey);
+    }
+
+    // Update description placeholder
+    const descTextarea = card.querySelector('.course-description');
+    if (descTextarea) {
+        const descPhKey = currentMacroMode === 'course' ? 'macro_ph_session_desc' : 'macro_ph_course_desc';
+        descTextarea.setAttribute('data-i18n-placeholder', descPhKey);
+        descTextarea.placeholder = getTranslation(descPhKey);
+    }
 }
 
 // Helper function to get translation
 function getTranslation(key) {
     if (typeof i18nCore !== 'undefined' && i18nCore.translations[i18nCore.currentLang]) {
         const trans = i18nCore.translations[i18nCore.currentLang].translations || i18nCore.translations[i18nCore.currentLang];
-        return trans[key] || key;
+        if (trans[key]) return trans[key];
     }
     // Fallback French labels
     const fallbacks = {
@@ -94,7 +129,11 @@ function getTranslation(key) {
         'macro_ph_course': 'Titre du cours (ex: Introduction à la pédagogie)',
         'macro_ph_session': 'Titre de la séance (ex: Séance 1 - Fondements)',
         'macro_mode_hint_program': 'Structure : Curriculum → Cours → Unités',
-        'macro_mode_hint_course': 'Structure : Thème → Séance → Unités'
+        'macro_mode_hint_course': 'Structure : Thème → Séance → Unités',
+        'macro_course_description': 'description du cours',
+        'macro_session_description': 'description de la séance',
+        'macro_ph_course_desc': 'Objectifs et contenu du cours...',
+        'macro_ph_session_desc': 'Objectifs et contenu de la séance...'
     };
     return fallbacks[key] || key;
 }
@@ -172,7 +211,14 @@ function createCurriculum() {
 
     const clone = template.content.cloneNode(true);
     container.appendChild(clone);
-    return container.lastElementChild;
+    const newCard = container.lastElementChild;
+
+    // Apply current mode labels to the new card
+    if (newCard) {
+        applyModeToLevel1Card(newCard);
+    }
+
+    return newCard;
 }
 
 function deleteCurriculum(btn) {
@@ -258,7 +304,14 @@ function createCourse(curriculumEl) {
 
     const clone = template.content.cloneNode(true);
     container.appendChild(clone);
-    return container.lastElementChild;
+    const newCard = container.lastElementChild;
+
+    // Apply current mode labels to the new card
+    if (newCard) {
+        applyModeToLevel2Card(newCard);
+    }
+
+    return newCard;
 }
 
 function deleteCourse(btn) {

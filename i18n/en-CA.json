@@ -77,6 +77,8 @@
     "macro_ph_theme": "Theme title (e.g., Introduction to concepts)",
     "macro_num_sessions": "number of sessions",
     "macro_ph_session": "Session title (e.g., Session 1 - Foundations)",
+    "macro_session_description": "session description",
+    "macro_ph_session_desc": "Session objectives and content...",
 
     "micro_title": "Microdesign",
     "micro_subtitle": "pedagogical and operational planning",
