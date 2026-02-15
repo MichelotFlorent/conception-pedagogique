@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="eval_page_title">Plan d'évaluation (Kirkpatrick)</title>
+
+    <!-- Performance: Preconnect to font domains -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Tailwind CDN + Concordia theme -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'concordia-burgundy': '#912338',
+            'concordia-gold': '#FFD700',
+            indigo: {
+              50: '#fef2f4',
+              100: '#fde6ea',
+              200: '#f9c0ca',
+              300: '#f5949f',
+              400: '#d4475a',
+              500: '#b52e47',
+              600: '#912338',
+              700: '#6d1a2a',
+              800: '#5a1523',
+              900: '#48101c',
+              950: '#350c14',
+            }
+          }
+        }
+      }
+    }
+    </script>
+
+    <!-- Material Icons Round -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="p-4 md:p-8">
+    <!-- Header Mount Point -->
+    <div id="app-header-mount"></div>
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8">
+            <!-- Title Section -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight" data-i18n="eval_heading">
+                    Plan d'évaluation
+                </h1>
+                <p class="text-slate-500 mt-1" data-i18n="eval_subtitle">
+                    Modèle de Kirkpatrick à 4 niveaux – Planifiez qui, quoi, quand, où et comment évaluer
+                </p>
+            </div>
+
+            <!-- Pro-Tip -->
+            <div class="p-4 rounded-lg mb-6" style="background: linear-gradient(135deg, rgba(145, 35, 56, 0.05), rgba(255, 215, 0, 0.05)); border: 2px solid rgba(145, 35, 56, 0.2);">
+                <div class="flex items-start gap-3">
+                    <span class="material-icons-round text-amber-500 text-xl">lightbulb</span>
+                    <p class="text-sm text-slate-600" data-i18n="eval_pro_tip">
+                        <strong>Pro-Tip :</strong> Niveau 1 vérifie s'ils ont aimé ; Niveau 2 vérifie s'ils ont compris ; Niveau 3 vérifie s'ils appliquent ; Niveau 4 vérifie si ça a fait une différence.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Toolbars -->
+            <div class="flex flex-wrap gap-4" data-html2canvas-ignore="true">
+                <!-- I/O Group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="eval_label_io">Import & Export</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="loadEvaluation()" class="text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Charger une sauvegarde (JSON)">
+                            <span class="material-icons-round text-xl">folder_open</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_load">charger</span>
+                        </button>
+                        <button onclick="saveEvaluation()" class="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Sauvegarder (JSON)">
+                            <span class="material-icons-round text-xl">save</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_save">sauvegarder</span>
+                        </button>
+                        <button onclick="exportEvaluationMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Exporter en Markdown">
+                            <span class="material-icons-round text-xl">description</span>
+                            <span class="text-sm font-semibold hidden md:inline">MD</span>
+                        </button>
+                        <input id="loadFileInput" type="file" accept=".json" class="hidden" onchange="loadEvalFromFile(event)">
+                        <div class="w-px bg-slate-200 h-6 mx-1"></div>
+                        <button onclick="resetEvaluation()" class="text-slate-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Réinitialiser">
+                            <span class="material-icons-round text-xl">restart_alt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Language selector -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="eval_label_language">Langue</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <select id="langSelect" onchange="switchLang(this.value)" class="text-sm text-slate-600 bg-transparent border-none focus:outline-none cursor-pointer px-2 py-1">
+                            <option value="fr">Français</option>
+                            <option value="en-CA">English (CA)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Form Content - 4 Kirkpatrick Levels -->
+        <div id="evaluationForm" class="space-y-8">
+
+            <!-- Level 1: Reaction -->
+            <details class="card" open style="border-left: 4px solid #3b82f6;">
+                <summary class="cursor-pointer flex items-center justify-between">
+                    <h2 class="flex items-center gap-2">
+                        <span class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">1</span>
+                        <span data-i18n="eval_level_1">Niveau 1 : Réaction</span>
+                    </h2>
+                    <span class="material-icons-round text-slate-400 rotate-icon open">expand_more</span>
+                </summary>
+                <p class="card-desc mt-3" data-i18n="eval_level_1_desc">Mesurer comment les participants ont ressenti la formation et sa pertinence perçue.</p>
+
+                <div class="space-y-4 mt-4">
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_who_administer">Qui administrera l'évaluation ?</label>
+                        <input type="text" id="l1Who" data-i18n-placeholder="eval_ph_who" placeholder="Ex. : Formateur, système automatisé, coordinateur">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_what_measure_l1">Que sera mesuré spécifiquement ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1Instructor">
+                                <span data-i18n="eval_opt_instructor">Efficacité et style de présentation du formateur</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1Relevance">
+                                <span data-i18n="eval_opt_relevance">Pertinence du contenu pour le travail/contexte</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1Materials">
+                                <span data-i18n="eval_opt_materials">Qualité des supports et médias pédagogiques</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1Technology">
+                                <span data-i18n="eval_opt_technology">Facilité d'utilisation de la technologie (e-learning)</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1Logistics">
+                                <span data-i18n="eval_opt_logistics">Environnement et logistique (locaux, rythme, timing)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_when_l1">Quand sera-t-elle administrée ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="radio" name="l1When" value="immediate">
+                                <span data-i18n="eval_opt_immediate">Immédiatement après la session</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="radio" name="l1When" value="per_module">
+                                <span data-i18n="eval_opt_per_module">Après chaque module</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="radio" name="l1When" value="end_only">
+                                <span data-i18n="eval_opt_end_only">À la fin de la formation uniquement</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_how_l1">Comment les données seront-elles collectées ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1Likert">
+                                <span data-i18n="eval_opt_likert">Questionnaire à échelle de Likert</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1NPS">
+                                <span data-i18n="eval_opt_nps">Net Promoter Score (NPS) – Probabilité de recommander</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1OpenEnded">
+                                <span data-i18n="eval_opt_open_ended">Questions ouvertes de rétroaction</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l1InClass">
+                                <span data-i18n="eval_opt_in_class">Vérification en classe (hochements, sondages, doigts levés)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_why_l1">Pourquoi ce niveau est-il important pour ce projet ?</label>
+                        <textarea id="l1Why" rows="2" data-i18n-placeholder="eval_ph_why" placeholder="Justification brève..."></textarea>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Level 2: Learning -->
+            <details class="card" style="border-left: 4px solid #10b981;">
+                <summary class="cursor-pointer flex items-center justify-between">
+                    <h2 class="flex items-center gap-2">
+                        <span class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-lg">2</span>
+                        <span data-i18n="eval_level_2">Niveau 2 : Apprentissage</span>
+                    </h2>
+                    <span class="material-icons-round text-slate-400 rotate-icon">expand_more</span>
+                </summary>
+                <p class="card-desc mt-3" data-i18n="eval_level_2_desc">Mesurer dans quelle mesure les participants ont changé d'attitude, amélioré leurs connaissances ou développé leurs compétences.</p>
+
+                <div class="space-y-4 mt-4">
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_who_assess">Qui évaluera l'apprentissage ?</label>
+                        <input type="text" id="l2Who" data-i18n-placeholder="eval_ph_who_assess" placeholder="Ex. : Expert de contenu, pairs, quiz automatisé">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_what_type_l2">Quel type d'apprentissage sera mesuré ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Knowledge">
+                                <span data-i18n="eval_opt_knowledge">Connaissances (faits, concepts, règles)</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Skills">
+                                <span data-i18n="eval_opt_skills">Compétences (actions psychomotrices, procédures)</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Attitudes">
+                                <span data-i18n="eval_opt_attitudes">Attitudes (valeurs, croyances, engagement professionnel)</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Confidence">
+                                <span data-i18n="eval_opt_confidence">Confiance (capacité perçue à performer)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_when_l2">Quand l'évaluation aura-t-elle lieu ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2PrePost">
+                                <span data-i18n="eval_opt_pre_post">Comparaison pré-test / post-test</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Embedded">
+                                <span data-i18n="eval_opt_embedded">Vérifications de connaissances intégrées pendant le cours</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Final">
+                                <span data-i18n="eval_opt_final">Examen final / Démonstration de compétences à la fin</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_how_l2">Comment l'évaluation sera-t-elle structurée ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2MCQ">
+                                <span data-i18n="eval_opt_mcq">Tests à choix multiples ou réponses courtes</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Simulation">
+                                <span data-i18n="eval_opt_simulation">Simulation de performance ou jeu de rôle</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Observation">
+                                <span data-i18n="eval_opt_observation">Observation directe avec grille d'évaluation</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l2Portfolio">
+                                <span data-i18n="eval_opt_portfolio">Portfolio de travaux produits pendant le cours</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Level 3: Behavior -->
+            <details class="card" style="border-left: 4px solid #f59e0b;">
+                <summary class="cursor-pointer flex items-center justify-between">
+                    <h2 class="flex items-center gap-2">
+                        <span class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-lg">3</span>
+                        <span data-i18n="eval_level_3">Niveau 3 : Comportement</span>
+                    </h2>
+                    <span class="material-icons-round text-slate-400 rotate-icon">expand_more</span>
+                </summary>
+                <p class="card-desc mt-3" data-i18n="eval_level_3_desc">Mesurer dans quelle mesure les participants appliquent ce qu'ils ont appris dans leur contexte de travail/vie réelle.</p>
+
+                <div class="space-y-4 mt-4">
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_who_observe">Qui observera le comportement ?</label>
+                        <input type="text" id="l3Who" data-i18n-placeholder="eval_ph_who_observe" placeholder="Ex. : Superviseur direct, pairs, clients, tiers neutre">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_desired_behaviors">Quels sont les comportements désirés spécifiques à observer ?</label>
+                        <textarea id="l3Behaviors" rows="4" data-i18n-placeholder="eval_ph_behaviors" placeholder="Listez les actions observables que les apprenants devraient démontrer..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_when_l3">Quand le suivi aura-t-il lieu ?</label>
+                        <p class="text-sm text-slate-500 mb-2" data-i18n="eval_when_l3_hint">Recommandé : 6 semaines à 6 mois après la formation</p>
+                        <input type="text" id="l3When" data-i18n-placeholder="eval_ph_when_l3" placeholder="Ex. : 8 semaines après la formation">
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_how_l3">Comment le transfert sera-t-il vérifié ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l3Checklist">
+                                <span data-i18n="eval_opt_checklist">Liste de vérification d'observation sur le terrain</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l3SelfReport">
+                                <span data-i18n="eval_opt_self_report">Enquête d'auto-évaluation sur la fréquence d'utilisation</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l3SupervisorInterview">
+                                <span data-i18n="eval_opt_supervisor">Entretien ou évaluation par le superviseur</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l3Retrospective">
+                                <span data-i18n="eval_opt_retrospective">Enquête rétrospective (comparaison avant/après)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_barriers">Quels obstacles potentiels pourraient interférer avec le changement de comportement ?</label>
+                        <textarea id="l3Barriers" rows="2" data-i18n-placeholder="eval_ph_barriers" placeholder="Ex. : Manque de ressources, découragement de la direction, pression du temps"></textarea>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Level 4: Results -->
+            <details class="card" style="border-left: 4px solid #912338;">
+                <summary class="cursor-pointer flex items-center justify-between">
+                    <h2 class="flex items-center gap-2">
+                        <span class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background: linear-gradient(135deg, #912338, #6d1a2a);">4</span>
+                        <span data-i18n="eval_level_4">Niveau 4 : Résultats</span>
+                    </h2>
+                    <span class="material-icons-round text-slate-400 rotate-icon">expand_more</span>
+                </summary>
+                <p class="card-desc mt-3" data-i18n="eval_level_4_desc">Déterminer l'impact de la formation sur la mission et les résultats de l'organisation.</p>
+
+                <!-- Level 4 Toggle -->
+                <div class="p-4 rounded-lg mt-4 mb-4" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b;">
+                    <label class="switch-label">
+                        <span class="switch">
+                            <input type="checkbox" id="l4Required" onchange="toggleLevel4()">
+                            <span class="slider"></span>
+                        </span>
+                        <span data-i18n="eval_lbl_l4_required">Une étude d'impact de Niveau 4 est-elle requise pour ce projet ?</span>
+                    </label>
+                    <p class="text-xs text-amber-700 mt-2" data-i18n="eval_l4_note">Note : Les évaluations de Niveau 4 sont coûteuses et complexes. Activez uniquement si l'organisation l'exige.</p>
+                </div>
+
+                <div id="level4Content" class="hidden space-y-4">
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_kpis">Quels indicateurs clés de performance (KPI) seront suivis ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l4Monetary">
+                                <span data-i18n="eval_opt_monetary">Résultats monétaires (revenus accrus, coûts réduits)</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l4Efficiency">
+                                <span data-i18n="eval_opt_efficiency">Efficacité (temps de cycle réduit, moins d'erreurs)</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l4Retention">
+                                <span data-i18n="eval_opt_retention">Rétention (turnover réduit, satisfaction au travail accrue)</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l4Quality">
+                                <span data-i18n="eval_opt_quality">Qualité (moins d'accidents, meilleurs scores de satisfaction client)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Link to Gap Analysis -->
+                    <div class="p-4 rounded-lg" style="background: rgba(145, 35, 56, 0.05); border: 1px solid rgba(145, 35, 56, 0.2);">
+                        <label class="flex items-center gap-2 text-sm font-semibold" style="color: #912338;">
+                            <span class="material-icons-round">link</span>
+                            <span data-i18n="eval_lbl_gap_link">Alignement avec l'analyse de l'écart (Phase 1)</span>
+                        </label>
+                        <p class="text-xs text-slate-500 mt-1 mb-2" data-i18n="eval_gap_link_hint">Si vous avez défini un écart de performance dans la Phase d'Analyse, référencez-le ici pour assurer l'alignement.</p>
+                        <textarea id="l4GapLink" rows="2" data-i18n-placeholder="eval_ph_gap_link" placeholder="Ex. : L'analyse a identifié un taux d'erreur de 20%. Le succès = réduction à moins de 5%."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_baseline">Quelle est la donnée de référence (AVANT la formation) ?</label>
+                        <textarea id="l4Baseline" rows="2" data-i18n-placeholder="eval_ph_baseline" placeholder="Ex. : Taux d'erreur actuel de 20%, temps de traitement moyen de 45 min"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_isolate">Comment isolerez-vous les effets de la formation des autres facteurs ?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l4ControlGroup">
+                                <span data-i18n="eval_opt_control">Groupes de contrôle</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l4TrendAnalysis">
+                                <span data-i18n="eval_opt_trend">Analyse des tendances</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="l4StakeholderEstimation">
+                                <span data-i18n="eval_opt_stakeholder">Estimation des parties prenantes</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="eval_lbl_when_l4">Quand le résultat final sera-t-il mesuré ?</label>
+                        <p class="text-sm text-slate-500 mb-2" data-i18n="eval_when_l4_hint">Recommandé : 6 mois à 2 ans</p>
+                        <input type="text" id="l4When" data-i18n-placeholder="eval_ph_when_l4" placeholder="Ex. : 12 mois après la fin du déploiement">
+                    </div>
+                </div>
+            </details>
+
+            <!-- Evaluation Timeline Summary -->
+            <div class="card bg-slate-50">
+                <h2><span class="material-icons-round">timeline</span> <span data-i18n="eval_section_timeline">Calendrier d'évaluation</span></h2>
+                <p class="card-desc" data-i18n="eval_timeline_desc">Résumé visuel des moments d'évaluation planifiés.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200">
+                                <th class="text-left py-2 px-3 font-semibold text-slate-700" data-i18n="eval_th_level">Niveau</th>
+                                <th class="text-left py-2 px-3 font-semibold text-slate-700" data-i18n="eval_th_timing">Moment</th>
+                                <th class="text-left py-2 px-3 font-semibold text-slate-700" data-i18n="eval_th_method">Méthode</th>
+                                <th class="text-left py-2 px-3 font-semibold text-slate-700" data-i18n="eval_th_responsible">Responsable</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timelineTableBody">
+                            <tr class="border-b border-slate-100">
+                                <td class="py-2 px-3"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white text-xs font-bold">1</span></td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline1When">-</td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline1Method">-</td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline1Who">-</td>
+                            </tr>
+                            <tr class="border-b border-slate-100">
+                                <td class="py-2 px-3"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500 text-white text-xs font-bold">2</span></td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline2When">-</td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline2Method">-</td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline2Who">-</td>
+                            </tr>
+                            <tr class="border-b border-slate-100">
+                                <td class="py-2 px-3"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold">3</span></td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline3When">-</td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline3Method">-</td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline3Who">-</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-xs font-bold" style="background: linear-gradient(135deg, #912338, #6d1a2a);">4</span></td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline4When">-</td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline4Method">-</td>
+                                <td class="py-2 px-3 text-slate-500" id="timeline4Who">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 text-center">
+                    <button onclick="updateTimeline()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-2 border border-slate-200">
+                        <span class="material-icons-round">refresh</span>
+                        <span data-i18n="eval_btn_refresh">Actualiser le tableau</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer Mount Point -->
+    <div id="app-footer-mount"></div>
+
+    <script src="js/i18n-core.js"></script>
+    <script src="js/evaluation.js"></script>
+    <script src="js/components-loader.js" defer></script>
+</body>
+</html>

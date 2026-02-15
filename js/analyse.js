@@ -1,12 +1,117 @@
 /**
  * Analyse des besoins - JavaScript
  * Based on Carliner (2015) - Training Design Basics
+ * Enhanced with Performance Gap Analysis module
  */
 
 (function () {
     'use strict';
 
     var mainTaskCount = 0;
+    var gapChart = null;
+
+    // ========================================
+    // Gap Visualizer Chart
+    // ========================================
+    window.initGapChart = function () {
+        var ctx = document.getElementById('gapChart');
+        if (!ctx) return;
+
+        gapChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [getTranslation('analysis_chart_actual') || 'Actuel', getTranslation('analysis_chart_optimal') || 'Optimal', getTranslation('analysis_chart_gap') || 'Écart'],
+                datasets: [{
+                    label: '',
+                    data: [0, 0, 0],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',    // Red for actual
+                        'rgba(34, 197, 94, 0.8)',    // Green for optimal
+                        'rgba(145, 35, 56, 0.8)'     // Burgundy for gap
+                    ],
+                    borderColor: [
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(34, 197, 94, 1)',
+                        'rgba(145, 35, 56, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                var unit = document.getElementById('gapUnit')?.value || '';
+                                return context.raw + ' ' + unit;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    };
+
+    window.updateGapChart = function () {
+        if (!gapChart) return;
+
+        var actual = parseFloat(document.getElementById('gapActualValue')?.value) || 0;
+        var optimal = parseFloat(document.getElementById('gapOptimalValue')?.value) || 0;
+        var gap = Math.max(0, optimal - actual);
+
+        gapChart.data.datasets[0].data = [actual, optimal, gap];
+        gapChart.update();
+
+        // Auto-generate gap statement
+        var unit = document.getElementById('gapUnit')?.value || '';
+        if (actual > 0 || optimal > 0) {
+            var statement = (getTranslation('analysis_gap_auto') || 'Actuel : {actual} ; Désiré : {optimal} ; Écart : {gap}')
+                .replace('{actual}', actual + ' ' + unit)
+                .replace('{optimal}', optimal + ' ' + unit)
+                .replace('{gap}', gap + ' ' + unit);
+
+            var gapStatementField = document.getElementById('gapStatement');
+            if (gapStatementField && !gapStatementField.value) {
+                gapStatementField.placeholder = statement;
+            }
+        }
+    };
+
+    // ========================================
+    // Survival Test Handler
+    // ========================================
+    window.handleSurvivalTestChange = function (value) {
+        var alert = document.getElementById('nonInstructionalAlert');
+        if (!alert) return;
+
+        if (value === 'yes') {
+            alert.classList.remove('hidden');
+            alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            alert.classList.add('hidden');
+        }
+    };
+
+    // Helper function for translations
+    function getTranslation(key) {
+        if (typeof i18nCore !== 'undefined' && i18nCore.t) {
+            return i18nCore.t(key);
+        }
+        return null;
+    }
 
     // ========================================
     // Context fields
@@ -137,6 +242,32 @@
                 keyFindings: val('keyFindings'),
                 isTrainingSolution: checkedRadio('isTrainingSolution'),
                 recommendations: val('recommendations')
+            },
+            // Performance Gap Analysis sections
+            gapAnalysis: {
+                optimalPerformance: val('optimalPerformance'),
+                actualPerformance: val('actualPerformance'),
+                gapActualValue: val('gapActualValue'),
+                gapOptimalValue: val('gapOptimalValue'),
+                gapUnit: val('gapUnit'),
+                gapStatement: val('gapStatement'),
+                gapFrequency: val('gapFrequency')
+            },
+            rootCauseFilter: {
+                survivalTest: checkedRadio('survivalTest'),
+                envToolsEquipment: val('envToolsEquipment'),
+                envProcedures: val('envProcedures'),
+                envFeedback: val('envFeedback'),
+                motConsequences: val('motConsequences'),
+                motValueAlignment: val('motValueAlignment'),
+                ksPrerequisite: val('ksPrerequisite'),
+                ksComplexity: val('ksComplexity')
+            },
+            impactAnalysis: {
+                costInaction: val('costInaction'),
+                smartGoal: val('smartGoal'),
+                dropDeadDeadline: val('dropDeadDeadline'),
+                maxBudget: val('maxBudget')
             }
         };
     }
@@ -238,6 +369,42 @@
             setVal('keyFindings', data.synthesis.keyFindings);
             setRadio('isTrainingSolution', data.synthesis.isTrainingSolution);
             setVal('recommendations', data.synthesis.recommendations);
+        }
+
+        // Gap Analysis
+        if (data.gapAnalysis) {
+            setVal('optimalPerformance', data.gapAnalysis.optimalPerformance);
+            setVal('actualPerformance', data.gapAnalysis.actualPerformance);
+            setVal('gapActualValue', data.gapAnalysis.gapActualValue);
+            setVal('gapOptimalValue', data.gapAnalysis.gapOptimalValue);
+            setVal('gapUnit', data.gapAnalysis.gapUnit);
+            setVal('gapStatement', data.gapAnalysis.gapStatement);
+            setVal('gapFrequency', data.gapAnalysis.gapFrequency);
+            // Update chart after loading values
+            setTimeout(function () { updateGapChart(); }, 100);
+        }
+
+        // Root Cause Filter
+        if (data.rootCauseFilter) {
+            setRadio('survivalTest', data.rootCauseFilter.survivalTest);
+            if (data.rootCauseFilter.survivalTest) {
+                handleSurvivalTestChange(data.rootCauseFilter.survivalTest);
+            }
+            setVal('envToolsEquipment', data.rootCauseFilter.envToolsEquipment);
+            setVal('envProcedures', data.rootCauseFilter.envProcedures);
+            setVal('envFeedback', data.rootCauseFilter.envFeedback);
+            setVal('motConsequences', data.rootCauseFilter.motConsequences);
+            setVal('motValueAlignment', data.rootCauseFilter.motValueAlignment);
+            setVal('ksPrerequisite', data.rootCauseFilter.ksPrerequisite);
+            setVal('ksComplexity', data.rootCauseFilter.ksComplexity);
+        }
+
+        // Impact Analysis
+        if (data.impactAnalysis) {
+            setVal('costInaction', data.impactAnalysis.costInaction);
+            setVal('smartGoal', data.impactAnalysis.smartGoal);
+            setVal('dropDeadDeadline', data.impactAnalysis.dropDeadDeadline);
+            setVal('maxBudget', data.impactAnalysis.maxBudget);
         }
     }
 
@@ -440,6 +607,89 @@
             lines.push('');
         }
 
+        // Gap Analysis
+        lines.push('## 9. Analyse de l\'écart de performance');
+        lines.push('');
+        if (data.gapAnalysis) {
+            if (data.gapAnalysis.optimalPerformance) {
+                lines.push('**Performance optimale :**');
+                lines.push(data.gapAnalysis.optimalPerformance);
+                lines.push('');
+            }
+            if (data.gapAnalysis.actualPerformance) {
+                lines.push('**Performance réelle :**');
+                lines.push(data.gapAnalysis.actualPerformance);
+                lines.push('');
+            }
+            if (data.gapAnalysis.gapStatement) {
+                lines.push('**Énoncé de l\'écart :** ' + data.gapAnalysis.gapStatement);
+                lines.push('');
+            }
+            if (data.gapAnalysis.gapFrequency) {
+                lines.push('**Fréquence et étendue :**');
+                lines.push(data.gapAnalysis.gapFrequency);
+                lines.push('');
+            }
+        }
+
+        // Root Cause Filter
+        lines.push('## 10. Filtre des causes profondes');
+        lines.push('');
+        if (data.rootCauseFilter) {
+            var survivalResult = { yes: 'OUI - Environnemental/Motivationnel', no: 'NON - Déficit de compétences' };
+            if (data.rootCauseFilter.survivalTest) {
+                lines.push('**Test de survie :** ' + (survivalResult[data.rootCauseFilter.survivalTest] || ''));
+                lines.push('');
+            }
+
+            lines.push('### A. Facteurs environnementaux');
+            if (data.rootCauseFilter.envToolsEquipment) lines.push('- **Outils :** ' + data.rootCauseFilter.envToolsEquipment);
+            if (data.rootCauseFilter.envProcedures) lines.push('- **Procédures :** ' + data.rootCauseFilter.envProcedures);
+            if (data.rootCauseFilter.envFeedback) lines.push('- **Rétroaction :** ' + data.rootCauseFilter.envFeedback);
+            lines.push('');
+
+            lines.push('### B. Facteurs motivationnels');
+            if (data.rootCauseFilter.motConsequences) lines.push('- **Conséquences :** ' + data.rootCauseFilter.motConsequences);
+            if (data.rootCauseFilter.motValueAlignment) lines.push('- **Valeurs :** ' + data.rootCauseFilter.motValueAlignment);
+            lines.push('');
+
+            lines.push('### C. Connaissances et compétences');
+            if (data.rootCauseFilter.ksPrerequisite) lines.push('- **Prérequis :** ' + data.rootCauseFilter.ksPrerequisite);
+            if (data.rootCauseFilter.ksComplexity) lines.push('- **Complexité :** ' + data.rootCauseFilter.ksComplexity);
+            lines.push('');
+        }
+
+        // Impact Analysis
+        lines.push('## 11. Analyse d\'impact et de valeur');
+        lines.push('');
+        if (data.impactAnalysis) {
+            if (data.impactAnalysis.costInaction) {
+                lines.push('**Coût de l\'inaction :**');
+                lines.push(data.impactAnalysis.costInaction);
+                lines.push('');
+            }
+            if (data.impactAnalysis.smartGoal) {
+                lines.push('**Objectif SMART :**');
+                lines.push(data.impactAnalysis.smartGoal);
+                lines.push('');
+            }
+            if (data.impactAnalysis.dropDeadDeadline) lines.push('**Date limite :** ' + data.impactAnalysis.dropDeadDeadline);
+            if (data.impactAnalysis.maxBudget) lines.push('**Budget max :** ' + data.impactAnalysis.maxBudget);
+            lines.push('');
+        }
+
+        // Determine solution type for summary
+        var solutionType = 'À déterminer';
+        if (data.rootCauseFilter && data.rootCauseFilter.survivalTest === 'yes') {
+            solutionType = 'NON PÉDAGOGIQUE (environnemental/motivationnel)';
+        } else if (data.rootCauseFilter && data.rootCauseFilter.survivalTest === 'no') {
+            solutionType = 'PÉDAGOGIQUE (déficit de compétences)';
+        }
+        lines.push('---');
+        lines.push('');
+        lines.push('**Type de solution recommandé :** ' + solutionType);
+        lines.push('');
+
         var md = lines.join('\n');
         var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
         var url = URL.createObjectURL(blob);
@@ -480,6 +730,16 @@
         // Reset context fields
         document.getElementById('contextSelect').value = 'general';
         updateContextFields('general');
+
+        // Reset Gap Chart
+        if (gapChart) {
+            gapChart.data.datasets[0].data = [0, 0, 0];
+            gapChart.update();
+        }
+
+        // Hide Non-Instructional Alert
+        var alert = document.getElementById('nonInstructionalAlert');
+        if (alert) alert.classList.add('hidden');
     };
 
     // ========================================
@@ -512,6 +772,11 @@
         // Add 3 initial task fields
         for (var i = 0; i < 3; i++) {
             addMainTask();
+        }
+
+        // Initialize Gap Visualizer Chart
+        if (typeof Chart !== 'undefined') {
+            initGapChart();
         }
     });
 })();
