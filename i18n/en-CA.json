@@ -1287,6 +1287,20 @@
     "media_preview_placeholder": "Fill in the form to see a preview of media choices.",
     "media_btn_refresh_preview": "Refresh preview",
 
+    "media_label_dna_score": "DNA Score",
+    "media_dna_modal_title": "What is the DNA Score?",
+    "media_dna_modal_text": "The <strong>DNA Score</strong> (Device Neutral Accessibility) measures how accessible your training is across different devices and platforms. A high score indicates learners can access content regardless of their equipment.",
+    "media_dna_criteria_title": "Criteria evaluated:",
+    "media_dna_criteria_1": "• Device diversity supported (max 10 pts)",
+    "media_dna_criteria_2": "• Platform agnosticism (max 30 pts)",
+    "media_dna_criteria_3": "• No installation required (max 20 pts)",
+    "media_dna_criteria_4": "• Keyboard navigation (max 20 pts)",
+    "media_dna_criteria_5": "• Offline support (max 10 pts)",
+    "media_dna_criteria_6": "• Accessibility features (max 10 pts)",
+    "media_dna_legend_good": "80+: Excellent",
+    "media_dna_legend_ok": "50-79: Acceptable",
+    "media_dna_legend_low": "<50: Needs improvement",
+
     "eval_page_title": "Evaluation Plan (Kirkpatrick)",
     "eval_heading": "Evaluation Plan",
     "eval_subtitle": "Kirkpatrick's 4-Level Model – Plan who, what, when, where, and how to evaluate",
@@ -1380,6 +1394,55 @@
     "eval_th_timing": "Timing",
     "eval_th_method": "Method",
     "eval_th_responsible": "Responsible",
-    "eval_btn_refresh": "Refresh table"
+    "eval_btn_refresh": "Refresh table",
+
+    "analysis_lbl_gap_visualizer": "Gap Visualization (optional)",
+    "analysis_gap_visualizer_hint": "— Graphical tool to illustrate the performance gap",
+    "analysis_gap_visualizer_desc": "This optional tool generates a comparative chart between current and desired performance. It helps visualize the magnitude of the gap to be closed.",
+    "analysis_lbl_survival_test": "The Capability Test",
+    "analysis_survival_question": "\"Under ideal conditions and maximum motivation, would the people concerned be capable of performing the task correctly?\"",
+    "analysis_survival_yes": "YES – They would be capable",
+    "analysis_survival_yes_hint": "The cause is likely environmental or motivational. Training alone will not solve the problem.",
+    "analysis_survival_no": "NO – They would not be capable",
+    "analysis_survival_no_hint": "This is a knowledge or skill deficiency. An instructional intervention is appropriate.",
+
+    "media_dna_info_title": "What is the DNA Score?",
+    "media_dna_info_text": "DNA (Device Neutral Accessibility) measures how accessible your training is across multiple devices and platforms. A higher score means better cross-platform compatibility.",
+
+    "eval_lbl_what_measure_l1": "What specifically will be measured?",
+
+    "teacher_chk_inclusion": "Students with special needs (inclusive education)",
+    "teacher_chk_priority_zone": "Disadvantaged area / Vulnerable community",
+    "teacher_opt_transfer": "Transfer / Geographic mobility",
+    "teacher_chk_allophone": "Allophone students (different mother tongue)",
+    "teacher_chk_creole": "Regional linguistic variety (creole, dialect)",
+
+    "cfg_dim3_left": "INDIVIDUALIZED",
+    "cfg_dim3_right": "COLLABORATIVE/SOCIOCENTRIC",
+    "cfg_dim3_tick0": "Individualized",
+    "cfg_dim3_tick1": "Individualized + exchanges",
+    "cfg_dim3_tick4": "Collaborative/Sociocentric",
+
+    "cfg_dim6_left": "NON-MEDIATIZED",
+    "cfg_dim6_right": "MEDIATIZED",
+    "cfg_dim6_left_desc": "Text only, oral.",
+    "cfg_dim6_right_desc": "Images, videos, multimedia.",
+    "cfg_dim6_tick0": "Non-mediatized",
+    "cfg_dim6_tick1": "Few media",
+    "cfg_dim6_tick2": "Moderate media",
+    "cfg_dim6_tick3": "Rich media",
+    "cfg_dim6_tick4": "Highly mediatized",
+
+    "cfg_dim7_left": "TEACHER-CENTERED",
+    "cfg_dim7_right": "LEARNER-CENTERED",
+    "cfg_dim7_left_desc": "Focused on instructor.",
+    "cfg_dim7_right_desc": "Focused on learner.",
+    "cfg_dim7_tick0": "Teacher-centered",
+    "cfg_dim7_tick1": "Teacher-guided",
+    "cfg_dim7_tick2": "Balanced",
+    "cfg_dim7_tick3": "Learner-guided",
+    "cfg_dim7_tick4": "Learner-centered",
+
+    "cfg_about_text": "This tool helps you visualize and balance the 8 structural dimensions of your training program."
   }
 }

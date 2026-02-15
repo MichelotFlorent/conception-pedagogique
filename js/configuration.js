@@ -36,7 +36,7 @@ const translations_fr = {
 
     // About modal
     cfg_about_heading: "À propos",
-    cfg_about_text: "Cet outil permet de visualiser et d\u2019équilibrer les 6 dimensions structurelles de votre dispositif de formation.",
+    cfg_about_text: "Cet outil permet de visualiser et d\u2019équilibrer les 8 dimensions structurelles de votre dispositif de formation.",
     cfg_about_reference: "Inspiré de : Docq et al. 2023. Enseigner à distance: 5 balises pour vous lancer. Presses universitaires de Louvain.",
     cfg_about_privacy: "Traitement local : toutes les données restent sur votre navigateur, rien n\u2019est envoyé en ligne.",
     cfg_about_credits: "Développé par Florent Michelot, inspiré des travaux de F. Jourde & J. Dubois (2026) \u2022 CC BY-SA",
@@ -83,16 +83,16 @@ const translations_fr = {
     cfg_dim2_tick3: "Asynchrone guidé",
     cfg_dim2_tick4: "Auto-rythmé",
 
-    // Dimension 3: Individuel / Collaboratif
-    cfg_dim3_left: "INDIVIDUEL",
-    cfg_dim3_right: "COLLABORATIF",
+    // Dimension 3: Individualisé / Collaboratif-Sociocentré
+    cfg_dim3_left: "INDIVIDUALISÉ",
+    cfg_dim3_right: "COLLABORATIF/SOCIOCENTRÉ",
     cfg_dim3_left_desc: "Travaux personnels.",
     cfg_dim3_right_desc: "Co-construction.",
-    cfg_dim3_tick0: "Individuel",
-    cfg_dim3_tick1: "Individuel + échanges",
+    cfg_dim3_tick0: "Individualisé",
+    cfg_dim3_tick1: "Individualisé + échanges",
     cfg_dim3_tick2: "Alterné",
     cfg_dim3_tick3: "Travail en équipe",
-    cfg_dim3_tick4: "Collaboratif",
+    cfg_dim3_tick4: "Collaboratif/Sociocentré",
 
     // Dimension 4: Appropriation / Production
     cfg_dim4_left: "APPROPRIATION",
@@ -115,6 +115,28 @@ const translations_fr = {
     cfg_dim5_tick2: "Accompagnement ponctuel",
     cfg_dim5_tick3: "Accompagnement régulier",
     cfg_dim5_tick4: "Accompagnement fort",
+
+    // Dimension 6: Non médiatisé / Médiatisé
+    cfg_dim6_left: "NON MÉDIATISÉ",
+    cfg_dim6_right: "MÉDIATISÉ",
+    cfg_dim6_left_desc: "Texte seul, oral.",
+    cfg_dim6_right_desc: "Images, vidéos, multimédia.",
+    cfg_dim6_tick0: "Non médiatisé",
+    cfg_dim6_tick1: "Peu de médias",
+    cfg_dim6_tick2: "Médias modérés",
+    cfg_dim6_tick3: "Médias riches",
+    cfg_dim6_tick4: "Hautement médiatisé",
+
+    // Dimension 7: Magistrocentré / Pédocentré
+    cfg_dim7_left: "MAGISTROCENTRÉ",
+    cfg_dim7_right: "PÉDOCENTRÉ",
+    cfg_dim7_left_desc: "Centré sur l'enseignant.",
+    cfg_dim7_right_desc: "Centré sur l'apprenant.",
+    cfg_dim7_tick0: "Magistrocentré",
+    cfg_dim7_tick1: "Guidé par l'enseignant",
+    cfg_dim7_tick2: "Équilibré",
+    cfg_dim7_tick3: "Guidé par l'apprenant",
+    cfg_dim7_tick4: "Pédocentré",
 
     // Tick label fallbacks
     cfg_tick_balanced: "Équilibré",
@@ -158,7 +180,9 @@ const dimensions = [
     { id: 2, value: 50 },
     { id: 3, value: 50 },
     { id: 4, value: 50 },
-    { id: 5, value: 50 }
+    { id: 5, value: 50 },
+    { id: 6, value: 50 },
+    { id: 7, value: 50 }
 ];
 
 // Dimension translation helpers
@@ -790,3 +814,48 @@ function updateRadarChart() {
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(initRadarChart, 200);
 });
+
+// ── Chart Export Functions ───────────────────────────────────────────────────
+
+function exportChartPNG() {
+    var canvas = document.getElementById('dimensionsRadarChart');
+    if (!canvas || !radarChart) return;
+
+    var link = document.createElement('a');
+    link.download = 'portrait-pedagogique_' + new Date().toISOString().slice(0, 10) + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+function exportChartSVG() {
+    if (!radarChart) return;
+
+    var canvas = document.getElementById('dimensionsRadarChart');
+    var width = canvas.width;
+    var height = canvas.height;
+
+    // Create SVG element
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    // Embed canvas as image in SVG
+    var img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+    img.setAttribute('width', width);
+    img.setAttribute('height', height);
+    img.setAttribute('href', canvas.toDataURL('image/png'));
+    svg.appendChild(img);
+
+    // Convert to blob and download
+    var svgData = new XMLSerializer().serializeToString(svg);
+    var blob = new Blob([svgData], { type: 'image/svg+xml' });
+    var url = URL.createObjectURL(blob);
+
+    var link = document.createElement('a');
+    link.download = 'portrait-pedagogique_' + new Date().toISOString().slice(0, 10) + '.svg';
+    link.href = url;
+    link.click();
+
+    URL.revokeObjectURL(url);
+}

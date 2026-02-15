@@ -7,6 +7,23 @@
     'use strict';
 
     // ========================================
+    // DNA Score Info Modal
+    // ========================================
+    window.showDNAInfo = function () {
+        var modal = document.getElementById('dnaInfoModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    };
+
+    window.hideDNAInfo = function () {
+        var modal = document.getElementById('dnaInfoModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    };
+
+    // ========================================
     // DNA Score Calculator
     // ========================================
     window.updateDNAScore = function () {

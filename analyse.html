@@ -384,10 +384,15 @@
                     <textarea id="actualPerformance" rows="4" data-i18n-placeholder="analysis_ph_actual" placeholder="Décrivez ce qui se passe actuellement. Que font les exécutants (ou ne font-ils pas) qui cause le problème ?"></textarea>
                 </div>
 
-                <!-- Gap Visualizer -->
-                <div class="form-group">
-                    <label data-i18n="analysis_lbl_gap_visualizer">Visualisation de l'écart</label>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <!-- Gap Visualizer (Optional) -->
+                <details class="form-group">
+                    <summary class="cursor-pointer flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                        <span class="material-icons-round text-sm">bar_chart</span>
+                        <span data-i18n="analysis_lbl_gap_visualizer">Visualisation de l'écart (optionnel)</span>
+                        <span class="text-xs text-slate-400 font-normal ml-2" data-i18n="analysis_gap_visualizer_hint">— Outil graphique pour illustrer l'écart de performance</span>
+                    </summary>
+                    <p class="text-xs text-slate-500 mb-3 ml-6" data-i18n="analysis_gap_visualizer_desc">Cet outil facultatif génère un graphique comparatif entre la performance actuelle et la performance souhaitée. Il permet de visualiser l'ampleur de l'écart à combler.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 ml-6">
                         <div>
                             <label class="text-xs text-slate-500" data-i18n="analysis_lbl_actual_value">Valeur actuelle</label>
                             <input type="number" id="gapActualValue" class="w-full" placeholder="10" oninput="updateGapChart()">
@@ -404,7 +409,7 @@
                     <div style="max-width: 400px; margin: 0 auto;">
                         <canvas id="gapChart" height="200"></canvas>
                     </div>
-                </div>
+                </details>
 
                 <div class="form-group">
                     <label data-i18n="analysis_lbl_gap_statement">Énoncé de l'écart</label>
@@ -423,24 +428,24 @@
                 <h2><span class="material-icons-round">filter_alt</span> <span data-i18n="analysis_section_filter">10. Filtre des causes profondes</span></h2>
                 <p class="card-desc" data-i18n="analysis_filter_desc">Déterminez si la conception pédagogique est la solution appropriée.</p>
 
-                <!-- Survival Test -->
+                <!-- Motivation-Competence Test -->
                 <div class="form-group p-4 rounded-lg" style="background: linear-gradient(135deg, rgba(145, 35, 56, 0.05), rgba(255, 215, 0, 0.05)); border: 2px solid rgba(145, 35, 56, 0.2);">
-                    <label class="text-lg font-bold" style="color: #912338;" data-i18n="analysis_lbl_survival_test">Le test de survie</label>
-                    <p class="text-sm text-slate-600 mb-4" data-i18n="analysis_survival_question">« Les exécutants pourraient-ils accomplir la tâche correctement si leur vie (ou une prime importante) en dépendait ? »</p>
+                    <label class="text-lg font-bold" style="color: #912338;" data-i18n="analysis_lbl_survival_test">Le test de capacité</label>
+                    <p class="text-sm text-slate-600 mb-4" data-i18n="analysis_survival_question">« Si les conditions étaient idéales et la motivation maximale, les personnes concernées seraient-elles capables d'accomplir la tâche correctement ? »</p>
 
                     <div class="checkbox-group">
                         <label class="checkbox-item p-3 rounded-lg bg-white border border-slate-200 hover:border-emerald-400 transition-colors cursor-pointer">
                             <input type="radio" name="survivalTest" value="yes" onchange="handleSurvivalTestChange(this.value)">
                             <div>
-                                <span class="font-semibold text-emerald-700" data-i18n="analysis_survival_yes">OUI – Ils pourraient le faire</span>
-                                <p class="text-xs text-slate-500 mt-1" data-i18n="analysis_survival_yes_hint">Problème environnemental ou motivationnel. Une formation n'est probablement pas la solution.</p>
+                                <span class="font-semibold text-emerald-700" data-i18n="analysis_survival_yes">OUI – Elles en seraient capables</span>
+                                <p class="text-xs text-slate-500 mt-1" data-i18n="analysis_survival_yes_hint">La cause est probablement environnementale ou motivationnelle. Une formation seule ne résoudra pas le problème.</p>
                             </div>
                         </label>
                         <label class="checkbox-item p-3 rounded-lg bg-white border border-slate-200 hover:border-rose-400 transition-colors cursor-pointer">
                             <input type="radio" name="survivalTest" value="no" onchange="handleSurvivalTestChange(this.value)">
                             <div>
-                                <span class="font-semibold text-rose-700" data-i18n="analysis_survival_no">NON – Ils ne pourraient pas</span>
-                                <p class="text-xs text-slate-500 mt-1" data-i18n="analysis_survival_no_hint">Déficit de connaissances ou de compétences. Procédez à la conception pédagogique.</p>
+                                <span class="font-semibold text-rose-700" data-i18n="analysis_survival_no">NON – Elles n'en seraient pas capables</span>
+                                <p class="text-xs text-slate-500 mt-1" data-i18n="analysis_survival_no_hint">Il s'agit d'un déficit de connaissances ou de compétences. Une intervention pédagogique est appropriée.</p>
                             </div>
                         </label>
                     </div>
