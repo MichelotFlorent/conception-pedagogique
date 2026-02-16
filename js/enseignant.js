@@ -93,7 +93,7 @@ var translations_fr = {
     teacher_chk_turnover_students: "Fort turnover des \u00e9l\u00e8ves",
     teacher_lbl_geographic_context: "Contexte g\u00e9ographique",
     teacher_chk_rural: "Zone rurale / Isolement g\u00e9ographique",
-    teacher_chk_priority_zone: "Zone d\u2019\u00e9ducation prioritaire (REP/REP+)",
+    teacher_chk_social_context: "Contexte économique et social",
     teacher_chk_remote_access: "Acc\u00e8s difficile (montagne, \u00eele, etc.)",
     teacher_chk_overseas: "Territoire ultramarin",
     teacher_lbl_linguistic_context: "Contexte linguistique",

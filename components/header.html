@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <!-- Navigation Links -->
+        <!-- Navigation Links (order matches homepage tiles) -->
         <div class="flex flex-wrap items-center gap-2">
             <a href="index.html" class="nav-link" data-i18n="nav_home">
                 <span class="material-icons-round text-sm">home</span>
@@ -37,6 +37,10 @@
                 <span class="material-icons-round text-sm">people</span>
                 personas
             </a>
+            <a href="configuration.html" class="nav-link" data-i18n="nav_portrait">
+                <span class="material-icons-round text-sm">tune</span>
+                portrait
+            </a>
             <a href="macrodesign.html" class="nav-link" data-i18n="nav_macrodesign">
                 <span class="material-icons-round text-sm">account_tree</span>
                 macrodesign
@@ -45,13 +49,17 @@
                 <span class="material-icons-round text-sm">view_timeline</span>
                 microdesign
             </a>
+            <a href="macrodesign-beta.html" class="nav-link nav-link-beta" data-i18n="nav_macrodesign_beta">
+                <span class="material-icons-round text-sm">science</span>
+                macro β
+            </a>
+            <a href="microdesign-beta.html" class="nav-link nav-link-beta" data-i18n="nav_microdesign_beta">
+                <span class="material-icons-round text-sm">science</span>
+                micro β
+            </a>
             <a href="evaluation.html" class="nav-link" data-i18n="nav_evaluation">
                 <span class="material-icons-round text-sm">assessment</span>
                 évaluation
-            </a>
-            <a href="configuration.html" class="nav-link" data-i18n="nav_portrait">
-                <span class="material-icons-round text-sm">tune</span>
-                portrait
             </a>
         </div>
     </div>
@@ -88,5 +96,23 @@
 
 .nav-link .material-icons-round {
     font-size: 1rem;
+}
+
+.nav-link-beta {
+    color: #b45309;
+    border: 1px dashed #fbbf24;
+    background: #fffbeb;
+}
+
+.nav-link-beta:hover {
+    color: #92400e;
+    background: #fef3c7;
+    border-color: #f59e0b;
+}
+
+.nav-link-beta.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #d97706, #b45309);
+    border-color: transparent;
 }
 </style>
