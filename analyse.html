@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="analysis_page_title">Analyse des besoins</title>
+    <title data-i18n="analysis_page_title">Analyse de la situation</title>
 
     <!-- Performance: Preconnect to font domains -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -12,6 +12,9 @@
 
     <!-- Chart.js for Gap Visualizer -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- docx.js for Word export -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 
     <!-- Tailwind CDN + Concordia theme -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -54,11 +57,20 @@
         <header class="mb-8">
             <!-- Title Section -->
             <div class="mb-6">
-                <h1 class="text-3xl font-bold text-slate-900 tracking-tight" data-i18n="analysis_heading">
-                    Analyse des besoins de formation
+                <h1 class="text-3xl font-bold tracking-tight flex items-center gap-3" style="color: #912338;">
+                    <span class="material-icons-round text-4xl">analytics</span>
+                    <span data-i18n="analysis_heading">Analyse de la situation</span>
                 </h1>
-                <p class="text-slate-500 mt-1" data-i18n="analysis_subtitle">
-                    Formulaire basé sur Carliner (2015) – Training Design Basics
+                <p class="text-slate-500 mt-2" data-i18n="analysis_subtitle">
+                    Documentez le contexte de formation, identifiez les contraintes et opportunités pour cadrer votre projet pédagogique.
+                </p>
+            </div>
+
+            <!-- Info Box -->
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
+                <span class="material-icons-round text-blue-500 text-xl mt-0.5">info</span>
+                <p class="text-sm text-blue-800" data-i18n="analysis_info_box">
+                    Certaines sections sont davantage pertinentes hors contexte éducatif (auquel cas, simplement sauter ces sections).
                 </p>
             </div>
 
@@ -93,6 +105,10 @@
                             <span class="material-icons-round text-xl">description</span>
                             <span class="text-sm font-semibold hidden md:inline">MD</span>
                         </button>
+                        <button onclick="exportAnalysisWord()" class="text-slate-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="analysis_tip_word" title="Exporter en Word (.docx)">
+                            <span class="material-icons-round text-xl">article</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="analysis_btn_word">Word</span>
+                        </button>
                         <input id="loadFileInput" type="file" accept=".json" class="hidden" onchange="loadAnalysisFromFile(event)">
                         <div class="w-px bg-slate-200 h-6 mx-1"></div>
                         <button onclick="resetAnalysis()" class="text-slate-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="analysis_tip_reset" title="Réinitialiser">
@@ -101,14 +117,10 @@
                     </div>
                 </div>
 
-                <!-- Help group -->
+                <!-- Info group (only Infos button, no Aide) -->
                 <div class="flex flex-col gap-1">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="analysis_label_help">Aide</span>
                     <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
-                        <button onclick="openHelpModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Guide méthodologique">
-                            <span class="material-icons-round text-xl">help</span>
-                            <span class="text-sm font-semibold hidden md:inline" data-i18n="analysis_btn_help">aide</span>
-                        </button>
                         <button onclick="openInfoModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="À propos">
                             <span class="material-icons-round text-xl">info</span>
                             <span class="text-sm font-semibold hidden md:inline" data-i18n="analysis_btn_info">infos</span>
@@ -116,7 +128,7 @@
                     </div>
                 </div>
 
-                <!-- Language selector -->
+                <!-- Language selector (without load pack button) -->
                 <div class="flex flex-col gap-1">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="analysis_label_language">Langue</span>
                     <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
@@ -124,16 +136,12 @@
                             <option value="fr">Français</option>
                             <option value="en-CA">English (CA)</option>
                         </select>
-                        <button onclick="document.getElementById('langFileInput').click()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-2 py-2 rounded-lg transition-colors" title="Charger un pack de langue">
-                            <span class="material-icons-round text-xl">translate</span>
-                        </button>
-                        <input id="langFileInput" type="file" accept=".json" class="hidden" onchange="loadLangPack(event)">
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Form Content - 8 Sections + Synthesis -->
+        <!-- Form Content -->
         <div id="analysisForm" class="space-y-8">
 
             <!-- Section 1: Request Clarification -->
@@ -141,18 +149,18 @@
                 <h2><span class="material-icons-round">assignment</span> <span data-i18n="analysis_section_1">1. Clarification de la demande</span></h2>
 
                 <div class="form-group">
-                    <label data-i18n="analysis_lbl_request_original">Demande originale (textuelle)</label>
-                    <textarea id="requestOriginal" rows="3" data-i18n-placeholder="analysis_ph_request" placeholder="Copiez ici la demande exacte du commanditaire…"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label data-i18n="analysis_lbl_sponsor">Commanditaire</label>
+                    <label data-i18n="analysis_lbl_sponsor">Commanditaire/Instance à l'origine de la demande</label>
                     <input type="text" id="sponsorName" data-i18n-placeholder="analysis_ph_sponsor" placeholder="Nom et fonction">
                 </div>
 
                 <div class="form-group">
+                    <label data-i18n="analysis_lbl_request_original">Demande formulée</label>
+                    <textarea id="requestOriginal" rows="3" data-i18n-placeholder="analysis_ph_request" placeholder="Copiez ici la demande exacte du commanditaire ou de l'instance"></textarea>
+                </div>
+
+                <div class="form-group">
                     <label data-i18n="analysis_lbl_request_reformulated">Demande reformulée</label>
-                    <textarea id="requestReformulated" rows="4" data-i18n-placeholder="analysis_ph_reformulated" placeholder="Reformulez la demande avec les éléments clés…"></textarea>
+                    <textarea id="requestReformulated" rows="4" data-i18n-placeholder="analysis_ph_reformulated" placeholder="Reformulez la demande avec les éléments clés"></textarea>
                 </div>
             </div>
 
@@ -161,69 +169,104 @@
                 <h2><span class="material-icons-round">business_center</span> <span data-i18n="analysis_section_2">2. Besoin organisationnel</span></h2>
 
                 <div class="form-group">
-                    <label data-i18n="analysis_lbl_business_type">Type de besoin</label>
-                    <div class="checkbox-group">
+                    <label data-i18n="analysis_lbl_business_type">Type de besoin <span class="text-slate-400 font-normal">(maximum 2 sélections)</span></label>
+                    <div class="checkbox-group" id="businessNeedTypeGroup">
                         <label class="checkbox-item">
-                            <input type="radio" name="businessNeedType" value="revenue">
+                            <input type="checkbox" name="businessNeedType" value="revenue" onchange="limitBusinessNeedCheckboxes(this)">
                             <span data-i18n="analysis_opt_revenue">Générer des revenus</span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="radio" name="businessNeedType" value="expenses">
+                            <input type="checkbox" name="businessNeedType" value="expenses" onchange="limitBusinessNeedCheckboxes(this)">
                             <span data-i18n="analysis_opt_expenses">Contenir les dépenses</span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="radio" name="businessNeedType" value="compliance">
-                            <span data-i18n="analysis_opt_compliance">Se conformer aux règlements</span>
+                            <input type="checkbox" name="businessNeedType" value="compliance" onchange="limitBusinessNeedCheckboxes(this)">
+                            <span data-i18n="analysis_opt_compliance">Se conformer à une norme (décision d'un ordre professionnel, nouvelle réglementation, politique ministérielle, etc.)</span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="radio" name="businessNeedType" value="quality">
+                            <input type="checkbox" name="businessNeedType" value="quality" onchange="limitBusinessNeedCheckboxes(this)">
                             <span data-i18n="analysis_opt_quality">Améliorer la qualité</span>
                         </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="businessNeedType" value="other" onchange="limitBusinessNeedCheckboxes(this); toggleOtherNeedField(this)">
+                            <span data-i18n="analysis_opt_other">Autre</span>
+                        </label>
+                    </div>
+                    <div id="otherNeedField" class="hidden mt-2">
+                        <input type="text" id="businessNeedOther" data-i18n-placeholder="analysis_ph_other_need" placeholder="Précisez le type de besoin" class="w-full">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label data-i18n="analysis_lbl_business_statement">Énoncé du besoin (mesurable)</label>
-                    <textarea id="businessStatement" rows="3" data-i18n-placeholder="analysis_ph_business" placeholder="Ex. : après la formation, 90 % des participants atteindront leurs objectifs…"></textarea>
+                    <label data-i18n="analysis_lbl_business_statement">Énoncé des besoins (mesurables)</label>
+                    <textarea id="businessStatement" rows="3" data-i18n-placeholder="analysis_ph_business" placeholder="Ex. : après la formation, 90 % des participants atteindront leurs objectifs"></textarea>
                 </div>
             </div>
 
-            <!-- Section 3: Desired Performance -->
-            <div class="card">
-                <h2><span class="material-icons-round">star</span> <span data-i18n="analysis_section_3">3. Performance désirée</span></h2>
+            <!-- Section 3: Performance Gap Analysis (moved from section 9) -->
+            <div class="card" style="border-left: 4px solid #912338;">
+                <h2><span class="material-icons-round">trending_up</span> <span data-i18n="analysis_section_gap">3. Analyse de l'écart de performance</span></h2>
+                <p class="card-desc" data-i18n="analysis_gap_desc">Quantifiez l'écart entre la performance actuelle et la performance optimale.</p>
 
                 <div class="form-group">
-                    <label data-i18n="analysis_lbl_desired_scenario">Scénario de performance désirée</label>
-                    <textarea id="desiredScenario" rows="6" data-i18n-placeholder="analysis_ph_desired" placeholder="Décrivez une « photo » de la performance désirée…"></textarea>
+                    <label data-i18n="analysis_lbl_optimal_performance">Performance optimale (la norme)</label>
+                    <textarea id="optimalPerformance" rows="4" data-i18n-placeholder="analysis_ph_optimal" placeholder="Décrivez le standard de performance élevé attendu. Que devrait-il se passer lorsque la tâche est parfaitement réalisée ?"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label data-i18n="analysis_lbl_performance_indicators">Indicateurs de performance</label>
-                    <textarea id="performanceIndicators" rows="3" data-i18n-placeholder="analysis_ph_indicators" placeholder="1. Indicateur 1&#10;2. Indicateur 2&#10;3. Indicateur 3"></textarea>
+                    <label data-i18n="analysis_lbl_actual_performance">Performance réelle (la réalité)</label>
+                    <textarea id="actualPerformance" rows="4" data-i18n-placeholder="analysis_ph_actual" placeholder="Décrivez ce qui se passe actuellement. Que font les exécutants (ou ne font-ils pas) qui cause le problème ?"></textarea>
+                </div>
+
+                <!-- Gap Visualizer (Optional) -->
+                <details class="form-group">
+                    <summary class="cursor-pointer flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                        <span class="material-icons-round text-sm">bar_chart</span>
+                        <span data-i18n="analysis_lbl_gap_visualizer">Visualisation de l'écart (optionnel)</span>
+                        <span class="text-xs text-slate-400 font-normal ml-2" data-i18n="analysis_gap_visualizer_hint"> Outil graphique pour illustrer l'écart de performance</span>
+                    </summary>
+                    <p class="text-xs text-slate-500 mb-3 ml-6" data-i18n="analysis_gap_visualizer_desc">Cet outil facultatif génère un graphique comparatif entre la performance actuelle et la performance souhaitée. Il permet de visualiser l'ampleur de l'écart à combler.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 ml-6">
+                        <div>
+                            <label class="text-xs text-slate-500" data-i18n="analysis_lbl_actual_value">Valeur actuelle</label>
+                            <input type="number" id="gapActualValue" class="w-full" placeholder="10" oninput="updateGapChart()">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500" data-i18n="analysis_lbl_optimal_value">Valeur optimale</label>
+                            <input type="number" id="gapOptimalValue" class="w-full" placeholder="50" oninput="updateGapChart()">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500" data-i18n="analysis_lbl_gap_unit">Unité de mesure</label>
+                            <input type="text" id="gapUnit" class="w-full" data-i18n-placeholder="analysis_ph_unit" placeholder="unités/heure" oninput="updateGapChart()">
+                        </div>
+                    </div>
+                    <div style="max-width: 500px; margin: 0 auto;">
+                        <canvas id="gapChart" height="120"></canvas>
+                    </div>
+                    <div class="flex justify-center gap-6 mt-3 text-xs text-slate-600">
+                        <span class="flex items-center gap-2"><span class="inline-block w-4 h-4 rounded" style="background: rgba(239, 68, 68, 0.8);"></span> <span data-i18n="analysis_legend_actual">Valeur actuelle</span></span>
+                        <span class="flex items-center gap-2"><span class="inline-block w-4 h-4 rounded" style="background: rgba(34, 197, 94, 0.5);"></span> <span data-i18n="analysis_legend_optimal">Valeur optimale</span></span>
+                    </div>
+                </details>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_gap_statement">Énoncé de l'écart</label>
+                    <textarea id="gapStatement" rows="3" data-i18n-placeholder="analysis_ph_gap_statement" placeholder="Ex. : Actuel : 10 unités/h ; Désiré : 50 unités/h ; Écart : 40 unités"></textarea>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="analysis_gap_statement_hint">Cet Énoncé sera réutilisé dans la phase d'évaluation.</p>
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="analysis_lbl_frequency">Fréquence et étendue</label>
+                    <textarea id="gapFrequency" rows="2" data-i18n-placeholder="analysis_ph_frequency" placeholder="À quelle fréquence cette erreur se produit-elle ? Qui est affecté ?"></textarea>
                 </div>
             </div>
 
-            <!-- Section 4: Current Performance -->
+            <!-- Section 4: Task Analysis -->
             <div class="card">
-                <h2><span class="material-icons-round">assessment</span> <span data-i18n="analysis_section_4">4. Performance actuelle</span></h2>
+                <h2><span class="material-icons-round">list</span> <span data-i18n="analysis_section_5">4. Analyse des tâches</span></h2>
 
                 <div class="form-group">
-                    <label data-i18n="analysis_lbl_current_scenario">Scénario de performance actuelle</label>
-                    <textarea id="currentScenario" rows="6" data-i18n-placeholder="analysis_ph_current" placeholder="Décrivez comment les apprenants performent actuellement…"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label data-i18n="analysis_lbl_performance_gap">Écart de performance</label>
-                    <textarea id="performanceGap" rows="4" data-i18n-placeholder="analysis_ph_gap" placeholder="Décrivez les différences clés entre performance actuelle et désirée…"></textarea>
-                </div>
-            </div>
-
-            <!-- Section 5: Task Analysis -->
-            <div class="card">
-                <h2><span class="material-icons-round">list</span> <span data-i18n="analysis_section_5">5. Analyse des tâches</span></h2>
-
-                <div class="form-group">
-                    <label data-i18n="analysis_lbl_main_tasks">Tâches principales (5 à 9 maximum)</label>
+                    <label data-i18n="analysis_lbl_main_tasks">Tâches principales (5  9 maximum)</label>
                     <div id="mainTasksList" class="space-y-3">
                         <!-- Tasks added dynamically -->
                     </div>
@@ -235,24 +278,24 @@
 
                 <div class="form-group">
                     <label data-i18n="analysis_lbl_entry_tasks">Tâches préalables (prérequis)</label>
-                    <textarea id="entryTasks" rows="3" data-i18n-placeholder="analysis_ph_entry" placeholder="Listez les compétences que les apprenants doivent déjà posséder…"></textarea>
+                    <textarea id="entryTasks" rows="3" data-i18n-placeholder="analysis_ph_entry" placeholder="Listez les compétences que les apprenant·es doivent déjà posséder"></textarea>
                 </div>
             </div>
 
-            <!-- Section 6: Learner Profile -->
+            <!-- Section 5: Learner Profile -->
             <div class="card">
-                <h2><span class="material-icons-round">people</span> <span data-i18n="analysis_section_6">6. Profil des apprenants</span></h2>
+                <h2><span class="material-icons-round">people</span> <span data-i18n="analysis_section_6">5. Profil des apprenant·es</span></h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
-                        <label data-i18n="analysis_lbl_learner_count">Nombre approximatif d'apprenants</label>
+                        <label data-i18n="analysis_lbl_learner_count">Nombre approximatif d'apprenant·es</label>
                         <input type="number" id="learnerCount" placeholder="25">
                     </div>
 
                     <div class="form-group">
                         <label data-i18n="analysis_lbl_experience">Niveau d'expérience</label>
                         <select id="experienceLevel">
-                            <option value="" data-i18n="analysis_opt_select">Sélectionner…</option>
+                            <option value="" data-i18n="analysis_opt_select">Sélectionner</option>
                             <option value="beginner" data-i18n="analysis_opt_beginner">Débutant</option>
                             <option value="intermediate" data-i18n="analysis_opt_intermediate">Intermédiaire</option>
                             <option value="advanced" data-i18n="analysis_opt_advanced">Avancé</option>
@@ -262,8 +305,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label data-i18n="analysis_lbl_learner_profile">Profil détaillé des apprenants</label>
-                    <textarea id="learnerProfile" rows="5" data-i18n-placeholder="analysis_ph_profile" placeholder="Décrivez démographie, connaissances antérieures, attitudes, motivations…"></textarea>
+                    <label data-i18n="analysis_lbl_learner_profile">Profil détaillé des apprenant·es</label>
+                    <textarea id="learnerProfile" rows="5" data-i18n-placeholder="analysis_ph_profile" placeholder="Décrivez démographie, connaissances antérieures, attitudes, motivations"></textarea>
                 </div>
 
                 <!-- Context-specific fields -->
@@ -274,13 +317,13 @@
                     </div>
                     <div class="form-group">
                         <label data-i18n="analysis_lbl_parent_involvement">Implication des parents</label>
-                        <textarea id="parentInvolvement" rows="2" data-i18n-placeholder="analysis_ph_parent" placeholder="Décrivez le rôle attendu des parents…"></textarea>
+                        <textarea id="parentInvolvement" rows="2" data-i18n-placeholder="analysis_ph_parent" placeholder="Décrivez le rôle attendu des parents"></textarea>
                     </div>
                 </div>
 
                 <div id="postsecFields" class="context-fields hidden space-y-4 mt-4 pl-4 border-l-4 border-indigo-200">
                     <div class="form-group">
-                        <label data-i18n="analysis_lbl_program">Programme d'études</label>
+                        <label data-i18n="analysis_lbl_program">Programme d'Études</label>
                         <input type="text" id="academicProgram" data-i18n-placeholder="analysis_ph_program" placeholder="Ex. : baccalauréat en génie">
                     </div>
                     <div class="form-group">
@@ -296,34 +339,34 @@
                     </div>
                     <div class="form-group">
                         <label data-i18n="analysis_lbl_manager_support">Soutien de la direction</label>
-                        <textarea id="managerSupport" rows="2" data-i18n-placeholder="analysis_ph_manager" placeholder="Décrivez le degré de soutien de la direction…"></textarea>
+                        <textarea id="managerSupport" rows="2" data-i18n-placeholder="analysis_ph_manager" placeholder="Décrivez le degré de soutien de la direction"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Section 7: Influencing Factors -->
+            <!-- Section 6: Influencing Factors -->
             <div class="card">
-                <h2><span class="material-icons-round">psychology</span> <span data-i18n="analysis_section_7">7. Facteurs d'influence</span></h2>
+                <h2><span class="material-icons-round">psychology</span> <span data-i18n="analysis_section_7">6. Facteurs d'influence</span></h2>
 
                 <div class="form-group">
                     <label data-i18n="analysis_lbl_barriers">Obstacles à l'apprentissage</label>
-                    <textarea id="learningBarriers" rows="4" data-i18n-placeholder="analysis_ph_barriers" placeholder="Charge de travail, manque de temps, équipement inadéquat…"></textarea>
+                    <textarea id="learningBarriers" rows="4" data-i18n-placeholder="analysis_ph_barriers" placeholder="Charge de travail, manque de temps, équipement inadéquat"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label data-i18n="analysis_lbl_support">Facteurs de soutien</label>
-                    <textarea id="supportFactors" rows="4" data-i18n-placeholder="analysis_ph_support" placeholder="Culture d'apprentissage, coaching, ressources…"></textarea>
+                    <textarea id="supportFactors" rows="4" data-i18n-placeholder="analysis_ph_support" placeholder="Culture d'apprentissage, coaching, ressources"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label data-i18n="analysis_lbl_environment">Environnement d'apprentissage</label>
-                    <textarea id="learningEnvironment" rows="3" data-i18n-placeholder="analysis_ph_environment" placeholder="Lieu, équipement disponible, connectivité…"></textarea>
+                    <textarea id="learningEnvironment" rows="3" data-i18n-placeholder="analysis_ph_environment" placeholder="Lieu, équipement disponible, connectivité"></textarea>
                 </div>
             </div>
 
-            <!-- Section 8: Project Constraints -->
+            <!-- Section 7: Project Constraints -->
             <div class="card">
-                <h2><span class="material-icons-round">schedule</span> <span data-i18n="analysis_section_8">8. Contraintes du projet</span></h2>
+                <h2><span class="material-icons-round">schedule</span> <span data-i18n="analysis_section_8">7. Contraintes du projet</span></h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
@@ -361,77 +404,19 @@
 
                 <div class="form-group">
                     <label data-i18n="analysis_lbl_constraints_other">Autres contraintes</label>
-                    <textarea id="otherConstraints" rows="3" data-i18n-placeholder="analysis_ph_constraints" placeholder="Technologie, approbations requises, ressources…"></textarea>
+                    <textarea id="otherConstraints" rows="3" data-i18n-placeholder="analysis_ph_constraints" placeholder="Technologie, approbations requises, ressources"></textarea>
                 </div>
             </div>
 
-            <!-- ============================================
-                 PERFORMANCE GAP ANALYSIS MODULE
-                 ============================================ -->
-
-            <!-- Section 9: Performance Gap Definition -->
+            <!-- Section 8: Root Cause Filter -->
             <div class="card" style="border-left: 4px solid #912338;">
-                <h2><span class="material-icons-round">trending_up</span> <span data-i18n="analysis_section_gap">9. Analyse de l'écart de performance</span></h2>
-                <p class="card-desc" data-i18n="analysis_gap_desc">Quantifiez l'écart entre la performance actuelle et la performance optimale.</p>
-
-                <div class="form-group">
-                    <label data-i18n="analysis_lbl_optimal_performance">Performance optimale (la norme)</label>
-                    <textarea id="optimalPerformance" rows="4" data-i18n-placeholder="analysis_ph_optimal" placeholder="Décrivez le standard de performance élevé attendu. Que devrait-il se passer lorsque la tâche est parfaitement réalisée ?"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label data-i18n="analysis_lbl_actual_performance">Performance réelle (la réalité)</label>
-                    <textarea id="actualPerformance" rows="4" data-i18n-placeholder="analysis_ph_actual" placeholder="Décrivez ce qui se passe actuellement. Que font les exécutants (ou ne font-ils pas) qui cause le problème ?"></textarea>
-                </div>
-
-                <!-- Gap Visualizer (Optional) -->
-                <details class="form-group">
-                    <summary class="cursor-pointer flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
-                        <span class="material-icons-round text-sm">bar_chart</span>
-                        <span data-i18n="analysis_lbl_gap_visualizer">Visualisation de l'écart (optionnel)</span>
-                        <span class="text-xs text-slate-400 font-normal ml-2" data-i18n="analysis_gap_visualizer_hint">— Outil graphique pour illustrer l'écart de performance</span>
-                    </summary>
-                    <p class="text-xs text-slate-500 mb-3 ml-6" data-i18n="analysis_gap_visualizer_desc">Cet outil facultatif génère un graphique comparatif entre la performance actuelle et la performance souhaitée. Il permet de visualiser l'ampleur de l'écart à combler.</p>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 ml-6">
-                        <div>
-                            <label class="text-xs text-slate-500" data-i18n="analysis_lbl_actual_value">Valeur actuelle</label>
-                            <input type="number" id="gapActualValue" class="w-full" placeholder="10" oninput="updateGapChart()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500" data-i18n="analysis_lbl_optimal_value">Valeur optimale</label>
-                            <input type="number" id="gapOptimalValue" class="w-full" placeholder="50" oninput="updateGapChart()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500" data-i18n="analysis_lbl_gap_unit">Unité de mesure</label>
-                            <input type="text" id="gapUnit" class="w-full" data-i18n-placeholder="analysis_ph_unit" placeholder="unités/heure" oninput="updateGapChart()">
-                        </div>
-                    </div>
-                    <div style="max-width: 400px; margin: 0 auto;">
-                        <canvas id="gapChart" height="200"></canvas>
-                    </div>
-                </details>
-
-                <div class="form-group">
-                    <label data-i18n="analysis_lbl_gap_statement">Énoncé de l'écart</label>
-                    <textarea id="gapStatement" rows="3" data-i18n-placeholder="analysis_ph_gap_statement" placeholder="Ex. : Actuel : 10 unités/h ; Désiré : 50 unités/h ; Écart : 40 unités"></textarea>
-                    <p class="text-xs text-slate-400 mt-1" data-i18n="analysis_gap_statement_hint">Cet énoncé sera réutilisé dans la phase d'Évaluation.</p>
-                </div>
-
-                <div class="form-group">
-                    <label data-i18n="analysis_lbl_frequency">Fréquence et étendue</label>
-                    <textarea id="gapFrequency" rows="2" data-i18n-placeholder="analysis_ph_frequency" placeholder="À quelle fréquence cette erreur se produit-elle ? Qui est affecté ?"></textarea>
-                </div>
-            </div>
-
-            <!-- Section 10: Root Cause Filter (The Instructional Filter) -->
-            <div class="card" style="border-left: 4px solid #912338;">
-                <h2><span class="material-icons-round">filter_alt</span> <span data-i18n="analysis_section_filter">10. Filtre des causes profondes</span></h2>
+                <h2><span class="material-icons-round">filter_alt</span> <span data-i18n="analysis_section_filter">8. Étude approfondie des causes</span></h2>
                 <p class="card-desc" data-i18n="analysis_filter_desc">Déterminez si la conception pédagogique est la solution appropriée.</p>
 
                 <!-- Motivation-Competence Test -->
                 <div class="form-group p-4 rounded-lg" style="background: linear-gradient(135deg, rgba(145, 35, 56, 0.05), rgba(255, 215, 0, 0.05)); border: 2px solid rgba(145, 35, 56, 0.2);">
                     <label class="text-lg font-bold" style="color: #912338;" data-i18n="analysis_lbl_survival_test">Le test de capacité</label>
-                    <p class="text-sm text-slate-600 mb-4" data-i18n="analysis_survival_question">« Si les conditions étaient idéales et la motivation maximale, les personnes concernées seraient-elles capables d'accomplir la tâche correctement ? »</p>
+                    <p class="text-sm text-slate-600 mb-4" data-i18n="analysis_survival_question"> Si les conditions étaient idéales et la motivation maximale, les personnes concernées seraient-elles capables d'accomplir la tâche correctement ? </p>
 
                     <div class="checkbox-group">
                         <label class="checkbox-item p-3 rounded-lg bg-white border border-slate-200 hover:border-emerald-400 transition-colors cursor-pointer">
@@ -475,8 +460,8 @@
                             <textarea id="envToolsEquipment" rows="2" data-i18n-placeholder="analysis_ph_tools" placeholder="Ont-ils le matériel, logiciel ou espace de travail nécessaire ?"></textarea>
                         </div>
                         <div class="form-group">
-                            <label data-i18n="analysis_lbl_procedures">Processus et procédures</label>
-                            <textarea id="envProcedures" rows="2" data-i18n-placeholder="analysis_ph_procedures" placeholder="Les instructions écrites sont-elles claires, à jour et sans étapes contradictoires ?"></textarea>
+                            <label data-i18n="analysis_lbl_procédures">Processus et procédurées</label>
+                            <textarea id="envProcedures" rows="2" data-i18n-placeholder="analysis_ph_procédures" placeholder="Les instructions écrites sont-elles claires, à jour et sans étapes contradictoires ?"></textarea>
                         </div>
                         <div class="form-group">
                             <label data-i18n="analysis_lbl_feedback_systems">Systèmes de rétroaction</label>
@@ -495,7 +480,7 @@
                     <div class="space-y-3 pl-4 border-l-2 border-orange-200">
                         <div class="form-group">
                             <label data-i18n="analysis_lbl_consequences">Conséquences</label>
-                            <textarea id="motConsequences" rows="2" data-i18n-placeholder="analysis_ph_consequences" placeholder="La bonne performance est-elle « punie » (ex. : plus de travail) ou la non-performance « récompensée » ?"></textarea>
+                            <textarea id="motConsequences" rows="2" data-i18n-placeholder="analysis_ph_consequences" placeholder="La bonne performance est-elle  « punie »  (ex. : plus de travail) ou la non-performance  récompensée  ?"></textarea>
                         </div>
                         <div class="form-group">
                             <label data-i18n="analysis_lbl_value_alignment">Alignement des valeurs</label>
@@ -518,15 +503,15 @@
                         </div>
                         <div class="form-group">
                             <label data-i18n="analysis_lbl_complexity">Complexité et fréquence</label>
-                            <textarea id="ksComplexity" rows="2" data-i18n-placeholder="analysis_ph_complexity" placeholder="La tâche est-elle si rarement exécutée qu'une aide à la tâche (checklist) serait plus efficace qu'un cours formel ?"></textarea>
+                            <textarea id="ksComplexity" rows="2" data-i18n-placeholder="analysis_ph_complexity" placeholder="La tâche est-elle si rarement exécutée qu'une aide  la tâche (checklist) serait plus efficace qu'un cours formel ?"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Section 11: Impact and Value Analysis -->
+            <!-- Section 9: Impact and Value Analysis -->
             <div class="card" style="border-left: 4px solid #912338;">
-                <h2><span class="material-icons-round">insights</span> <span data-i18n="analysis_section_impact">11. Analyse d'impact et de valeur</span></h2>
+                <h2><span class="material-icons-round">insights</span> <span data-i18n="analysis_section_impact">9. Analyse d'impact et de valeur</span></h2>
                 <p class="card-desc" data-i18n="analysis_impact_desc">Construisez le dossier d'affaires pour l'intervention.</p>
 
                 <div class="form-group">
@@ -537,7 +522,7 @@
                 <div class="form-group">
                     <label data-i18n="analysis_lbl_smart_goal">Objectif SMART stratégique</label>
                     <textarea id="smartGoal" rows="3" data-i18n-placeholder="analysis_ph_smart" placeholder="Transformez cet écart en un objectif Spécifique, Mesurable, Atteignable, Réaliste et Temporellement défini."></textarea>
-                    <p class="text-xs text-slate-400 mt-1" data-i18n="analysis_smart_hint">Cet objectif sera réutilisé dans la phase d'Évaluation (Niveau 4 - Résultats).</p>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="analysis_smart_hint">Cet objectif sera réutilisé dans la phase d'évaluation (Niveau 4 - Résultats).</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -581,7 +566,7 @@
 
                 <div class="form-group">
                     <label data-i18n="analysis_lbl_recommendations">Recommandations</label>
-                    <textarea id="recommendations" rows="6" data-i18n-placeholder="analysis_ph_recommendations" placeholder="Format recommandé, durée estimée, approche pédagogique…"></textarea>
+                    <textarea id="recommendations" rows="6" data-i18n-placeholder="analysis_ph_recommendations" placeholder="Format recommand, durée estimée, approche pédagogique"></textarea>
                 </div>
             </div>
         </div>
@@ -590,41 +575,46 @@
     <!-- Footer Mount Point -->
     <div id="app-footer-mount"></div>
 
-    <!-- Help Modal -->
-    <div id="helpModal" class="modal">
-        <div class="modal-content" style="max-width: 640px;">
-            <span class="close-btn" onclick="closeHelpModal()">&times;</span>
-            <h2 style="border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 15px;" data-i18n="analysis_help_title">Guide méthodologique</h2>
-            <div style="font-size: 0.95rem; line-height: 1.6; color: #404040;" data-i18n="analysis_help_body">
-<p><strong>1. Qu'est-ce qu'une analyse des besoins ?</strong><br>
-L'analyse des besoins est la première étape de toute conception pédagogique. Elle permet de déterminer si une formation est la réponse appropriée à un problème de performance et, le cas échéant, de définir son contenu et son format.</p>
-
-<p><strong>2. Les 8 sections</strong><br>
-<ul>
-    <li><strong>Clarification :</strong> comprendre et reformuler la demande initiale.</li>
-    <li><strong>Besoin organisationnel :</strong> rattacher la demande à un objectif mesurable.</li>
-    <li><strong>Performance désirée :</strong> décrire ce que les apprenants devraient faire.</li>
-    <li><strong>Performance actuelle :</strong> documenter l'état actuel et l'écart.</li>
-    <li><strong>Analyse des tâches :</strong> décomposer le travail en tâches concrètes.</li>
-    <li><strong>Profil des apprenants :</strong> connaître le public cible.</li>
-    <li><strong>Facteurs d'influence :</strong> identifier obstacles et leviers.</li>
-    <li><strong>Contraintes :</strong> cadrer le projet (budget, délais, format).</li>
-</ul></p>
-
-<p><strong>3. Référence</strong><br>
-Carliner, S. (2015). <em>Training Design Basics</em> (2nd ed.). ATD Press.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Info Modal -->
+    <!-- Info Modal (enhanced) -->
     <div id="infoModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 640px;">
             <span class="close-btn" onclick="closeInfoModal()">&times;</span>
-            <h2 data-i18n="analysis_about_title">À propos</h2>
-            <p data-i18n="analysis_about_text">Cet outil permet de réaliser une analyse structurée des besoins de formation, adaptée à différents contextes éducatifs et professionnels.</p>
-            <p data-i18n="analysis_about_prototype">Ce document est un prototype non officiel, partagé à des fins d'expérimentation.</p>
-            <p data-i18n="analysis_about_privacy"><strong>Traitement local :</strong> toutes les données restent sur votre navigateur, rien n'est envoyé en ligne.</p>
+            <h2 style="border-bottom: 2px solid #912338; padding-bottom: 10px; margin-bottom: 15px; color: #912338;" data-i18n="analysis_about_title">À propos de cet outil</h2>
+            <div style="font-size: 0.95rem; line-height: 1.7; color: #404040;">
+                <p data-i18n="analysis_about_text"><strong>Analyse de la situation</strong> est un outil qui permet de réaliser une analyse structurée des besoins de formation, adaptée à différents contextes éducatifs et professionnels.</p>
+
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: #912338; font-size: 1rem;" data-i18n="analysis_info_sections_title">Les sections de l'analyse</h3>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem;" data-i18n="analysis_info_sections_list">
+                    <li><strong>Clarification :</strong> comprendre et reformuler la demande initiale.</li>
+                    <li><strong>Besoin organisationnel :</strong> rattacher la demande  un objectif mesurable.</li>
+                    <li><strong>Analyse de l'écart :</strong> quantifier l'écart entre performance actuelle et désirée.</li>
+                    <li><strong>Analyse des tâches :</strong> décomposer le travail en tâches concrètes.</li>
+                    <li><strong>Profil des apprenant·es :</strong> connaître le public cible.</li>
+                    <li><strong>Facteurs d'influence :</strong> identifier obstacles et leviers.</li>
+                    <li><strong>Contraintes :</strong> cadrer le projet (budget, délais, format).</li>
+                    <li><strong>Étude des causes :</strong> déterminer si la formation est la solution.</li>
+                    <li><strong>Analyse d'impact :</strong> construire le dossier d'affaires.</li>
+                </ul>
+
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: #912338; font-size: 1rem;" data-i18n="analysis_info_features_title">Fonctionnalits</h3>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1rem;" data-i18n="analysis_info_features_list">
+                    <li><strong>Sauvegarder/Charger :</strong> exportez et importez vos données en JSON.</li>
+                    <li><strong>Export Markdown :</strong> générez un document texte structuré.</li>
+                    <li><strong>Export Word :</strong> créez un document .docx.</li>
+                    <li><strong>Visualisation de l'écart :</strong> graphique pour illustrer l'écart de performance.</li>
+                </ul>
+
+                <p data-i18n="analysis_about_prototype" style="font-style: italic; color: #666;">Ce document est un prototype non officiel, partagé à des fins d'expérimentation.</p>
+
+                <p style="margin-top: 1rem; padding: 0.75rem; background: #e8f5e9; border-radius: 8px; font-size: 0.85rem;">
+                    <span class="material-icons-round" style="vertical-align: middle; color: #2e7d32; font-size: 1rem;">verified_user</span>
+                    <span data-i18n="analysis_about_privacy"><strong>Traitement local :</strong> toutes les données restent sur votre navigateur, rien n'est envoyé en ligne.</span>
+                </p>
+
+                <p style="margin-top: 1rem; font-size: 0.85rem; color: #666;">
+                    <strong data-i18n="analysis_info_reference_title">Référence :</strong> <span data-i18n="analysis_info_reference">Carliner, S. (2015). <em>Training Design Basics</em> (2nd ed.). ATD Press.</span>
+                </p>
+            </div>
             <div class="modal-footer" data-i18n="analysis_about_credits">
                 Développé par Florent Michelot, inspiré des travaux de F. Jourde & J. Dubois (2026) &bull; CC BY-SA
             </div>
