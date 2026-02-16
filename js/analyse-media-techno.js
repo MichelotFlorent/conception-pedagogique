@@ -7,6 +7,124 @@
     'use strict';
 
     // ========================================
+    // Language switching
+    // ========================================
+    window.switchLang = function (code) {
+        if (code && typeof i18nCore !== 'undefined' && i18nCore.translations && i18nCore.translations[code]) {
+            i18nCore.setLang(code);
+        }
+    };
+
+    // ========================================
+    // Device Sub-Options Toggle
+    // ========================================
+    window.toggleDeviceSubOptions = function (deviceType) {
+        var mappings = {
+            phone: { checkbox: 'devicePhone', container: 'phoneSubOptions' },
+            tablet: { checkbox: 'deviceTablet', container: 'tabletSubOptions' },
+            computer: { checkboxes: ['deviceLaptop', 'deviceDesktop'], container: 'computerSubOptions' },
+            other: { checkbox: 'deviceOther', container: 'otherDeviceField' }
+        };
+
+        var mapping = mappings[deviceType];
+        if (!mapping) return;
+
+        var container = document.getElementById(mapping.container);
+        if (!container) return;
+
+        var isChecked = false;
+        if (mapping.checkboxes) {
+            isChecked = mapping.checkboxes.some(function (id) {
+                var el = document.getElementById(id);
+                return el && el.checked;
+            });
+        } else {
+            var checkbox = document.getElementById(mapping.checkbox);
+            isChecked = checkbox && checkbox.checked;
+        }
+
+        if (isChecked) {
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
+    };
+
+    // ========================================
+    // Digital Literacy Slider
+    // ========================================
+    window.updateLiteracyLabel = function () {
+        var slider = document.getElementById('digitalLiteracySlider');
+        var display = document.getElementById('literacyLevelDisplay');
+        if (!slider || !display) return;
+
+        var value = parseInt(slider.value);
+        var labels = {
+            0: 'Aucune compétence technologique requise',
+            1: 'Un tutoriel de base est recommandé',
+            2: 'Un tutoriel avancé est indispensable',
+            3: 'Une formation approfondie est requise'
+        };
+
+        var i18nKeys = {
+            0: 'media_literacy_level_0',
+            1: 'media_literacy_level_1',
+            2: 'media_literacy_level_2',
+            3: 'media_literacy_level_3'
+        };
+
+        // Try to get translation
+        if (typeof i18nCore !== 'undefined' && i18nCore.t) {
+            var translated = i18nCore.t(i18nKeys[value]);
+            display.textContent = translated || labels[value];
+        } else {
+            display.textContent = labels[value];
+        }
+    };
+
+    // ========================================
+    // Audio Duration Field Toggle
+    // ========================================
+    window.toggleAudioDurationField = function () {
+        var longRadio = document.querySelector('input[name="audioDuration"][value="long"]');
+        var field = document.getElementById('audioDurationField');
+        if (!field) return;
+
+        if (longRadio && longRadio.checked) {
+            field.classList.remove('hidden');
+        } else {
+            field.classList.add('hidden');
+        }
+    };
+
+    // ========================================
+    // Audio/Video Storage Options Toggle
+    // ========================================
+    window.toggleStorageOptions = function () {
+        var yesRadio = document.querySelector('input[name="hasAudioVideo"][value="yes"]');
+        var field = document.getElementById('storageOptionsField');
+        if (!field) return;
+
+        if (yesRadio && yesRadio.checked) {
+            field.classList.remove('hidden');
+        } else {
+            field.classList.add('hidden');
+        }
+    };
+
+    window.toggleStorageOtherField = function () {
+        var checkbox = document.getElementById('storageOther');
+        var field = document.getElementById('storageOtherField');
+        if (!field) return;
+
+        if (checkbox && checkbox.checked) {
+            field.classList.remove('hidden');
+        } else {
+            field.classList.add('hidden');
+        }
+    };
+
+    // ========================================
     // DNA Score Info Modal
     // ========================================
     window.showDNAInfo = function () {
@@ -30,7 +148,7 @@
         var score = 0;
 
         // Device diversity (more devices = more agnostic) - max 10 points
-        var devices = ['deviceSmartphone', 'deviceTablet', 'deviceLaptop'];
+        var devices = ['devicePhone', 'deviceTablet', 'deviceLaptop', 'deviceDesktop'];
         var deviceCount = 0;
         devices.forEach(function (id) {
             if (document.getElementById(id)?.checked) deviceCount++;
@@ -128,9 +246,10 @@
         html += '<div style="margin-bottom: 12px; padding: 8px; background: #f1f5f9; border-radius: 8px;">';
         html += '<p style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px;">APPAREILS</p>';
         var devices = [];
-        if (document.getElementById('deviceSmartphone')?.checked) devices.push('Smartphone');
+        if (document.getElementById('devicePhone')?.checked) devices.push('Téléphone');
         if (document.getElementById('deviceTablet')?.checked) devices.push('Tablette');
-        if (document.getElementById('deviceLaptop')?.checked) devices.push('Ordinateur');
+        if (document.getElementById('deviceLaptop')?.checked) devices.push('Portable');
+        if (document.getElementById('deviceDesktop')?.checked) devices.push('Bureau');
         if (document.getElementById('deviceVR')?.checked) devices.push('VR');
         html += '<p style="font-size: 12px; color: #334155;">' + (devices.length ? devices.join(', ') : 'Non spécifié') + '</p>';
         html += '</div>';
@@ -197,17 +316,30 @@
         };
 
         return {
-            version: '1.0',
+            version: '1.1',
             tool: 'analyse-media-techno',
             createdAt: new Date().toISOString(),
             dnaScore: updateDNAScore(),
             section1: {
-                deviceSmartphone: checked('deviceSmartphone'),
+                devicePhone: checked('devicePhone'),
+                devicePhoneIOS: checked('devicePhoneIOS'),
+                devicePhoneAndroid: checked('devicePhoneAndroid'),
+                devicePhoneOther: checked('devicePhoneOther'),
                 deviceTablet: checked('deviceTablet'),
+                deviceTabletIPad: checked('deviceTabletIPad'),
+                deviceTabletAndroid: checked('deviceTabletAndroid'),
+                deviceTabletOther: checked('deviceTabletOther'),
                 deviceLaptop: checked('deviceLaptop'),
+                deviceDesktop: checked('deviceDesktop'),
+                deviceComputerMac: checked('deviceComputerMac'),
+                deviceComputerWindows: checked('deviceComputerWindows'),
+                deviceComputerLinux: checked('deviceComputerLinux'),
+                deviceComputerOther: checked('deviceComputerOther'),
                 deviceVR: checked('deviceVR'),
+                deviceOther: checked('deviceOther'),
+                deviceOtherText: val('deviceOtherText'),
                 platformAgnostic: checkedRadio('platformAgnostic'),
-                digitalLiteracy: checkedRadio('digitalLiteracy'),
+                digitalLiteracyLevel: val('digitalLiteracySlider'),
                 adminRights: checkedRadio('adminRights')
             },
             section2: {
@@ -220,6 +352,7 @@
             section3: {
                 modalityChoice: checkedRadio('modalityChoice'),
                 audioDuration: checkedRadio('audioDuration'),
+                audioDurationMinutes: val('audioDurationMinutes'),
                 signalArrows: checked('signalArrows'),
                 signalCircles: checked('signalCircles'),
                 signalBolding: checked('signalBolding'),
@@ -238,6 +371,13 @@
             },
             section5: {
                 naturalLanguage: val('naturalLanguage'),
+                hasAudioVideo: checkedRadio('hasAudioVideo'),
+                storageYouTube: checked('storageYouTube'),
+                storageSoundCloud: checked('storageSoundCloud'),
+                storageSpotify: checked('storageSpotify'),
+                storagePodcast: checked('storagePodcast'),
+                storageOther: checked('storageOther'),
+                storageOtherText: val('storageOtherText'),
                 skillVideoEditing: checked('skillVideoEditing'),
                 skillCoding: checked('skillCoding'),
                 skillGraphicDesign: checked('skillGraphicDesign'),
@@ -273,13 +413,37 @@
         };
 
         if (data.section1) {
-            setChecked('deviceSmartphone', data.section1.deviceSmartphone);
+            // Main device checkboxes
+            setChecked('devicePhone', data.section1.devicePhone);
+            setChecked('devicePhoneIOS', data.section1.devicePhoneIOS);
+            setChecked('devicePhoneAndroid', data.section1.devicePhoneAndroid);
+            setChecked('devicePhoneOther', data.section1.devicePhoneOther);
             setChecked('deviceTablet', data.section1.deviceTablet);
+            setChecked('deviceTabletIPad', data.section1.deviceTabletIPad);
+            setChecked('deviceTabletAndroid', data.section1.deviceTabletAndroid);
+            setChecked('deviceTabletOther', data.section1.deviceTabletOther);
             setChecked('deviceLaptop', data.section1.deviceLaptop);
+            setChecked('deviceDesktop', data.section1.deviceDesktop);
+            setChecked('deviceComputerMac', data.section1.deviceComputerMac);
+            setChecked('deviceComputerWindows', data.section1.deviceComputerWindows);
+            setChecked('deviceComputerLinux', data.section1.deviceComputerLinux);
+            setChecked('deviceComputerOther', data.section1.deviceComputerOther);
             setChecked('deviceVR', data.section1.deviceVR);
+            setChecked('deviceOther', data.section1.deviceOther);
+            setVal('deviceOtherText', data.section1.deviceOtherText);
             setRadio('platformAgnostic', data.section1.platformAgnostic);
-            setRadio('digitalLiteracy', data.section1.digitalLiteracy);
+            // Digital literacy slider
+            var slider = document.getElementById('digitalLiteracySlider');
+            if (slider && data.section1.digitalLiteracyLevel !== undefined) {
+                slider.value = data.section1.digitalLiteracyLevel;
+                updateLiteracyLabel();
+            }
             setRadio('adminRights', data.section1.adminRights);
+            // Toggle sub-options visibility
+            toggleDeviceSubOptions('phone');
+            toggleDeviceSubOptions('tablet');
+            toggleDeviceSubOptions('computer');
+            toggleDeviceSubOptions('other');
         }
 
         if (data.section2) {
@@ -297,6 +461,8 @@
             setRadio('modalityChoice', data.section3.modalityChoice);
             if (data.section3.modalityChoice === 'both') checkRedundancy();
             setRadio('audioDuration', data.section3.audioDuration);
+            setVal('audioDurationMinutes', data.section3.audioDurationMinutes);
+            if (data.section3.audioDuration === 'long') toggleAudioDurationField();
             setChecked('signalArrows', data.section3.signalArrows);
             setChecked('signalCircles', data.section3.signalCircles);
             setChecked('signalBolding', data.section3.signalBolding);
@@ -317,6 +483,15 @@
 
         if (data.section5) {
             setVal('naturalLanguage', data.section5.naturalLanguage);
+            setRadio('hasAudioVideo', data.section5.hasAudioVideo);
+            if (data.section5.hasAudioVideo === 'yes') toggleStorageOptions();
+            setChecked('storageYouTube', data.section5.storageYouTube);
+            setChecked('storageSoundCloud', data.section5.storageSoundCloud);
+            setChecked('storageSpotify', data.section5.storageSpotify);
+            setChecked('storagePodcast', data.section5.storagePodcast);
+            setChecked('storageOther', data.section5.storageOther);
+            setVal('storageOtherText', data.section5.storageOtherText);
+            if (data.section5.storageOther) toggleStorageOtherField();
             setChecked('skillVideoEditing', data.section5.skillVideoEditing);
             setChecked('skillCoding', data.section5.skillCoding);
             setChecked('skillGraphicDesign', data.section5.skillGraphicDesign);
@@ -386,16 +561,25 @@
         lines.push('');
 
         // Section 1
-        lines.push('## 1. Écosystème numérique des apprenants');
+        lines.push('## 1. Écosystème numérique des apprenant·es');
         lines.push('');
         var devices = [];
-        if (data.section1.deviceSmartphone) devices.push('Smartphone');
+        if (data.section1.devicePhone) devices.push('Téléphone');
         if (data.section1.deviceTablet) devices.push('Tablette');
-        if (data.section1.deviceLaptop) devices.push('Ordinateur');
+        if (data.section1.deviceLaptop) devices.push('Ordinateur portable');
+        if (data.section1.deviceDesktop) devices.push('Ordinateur de bureau');
         if (data.section1.deviceVR) devices.push('VR');
+        if (data.section1.deviceOther && data.section1.deviceOtherText) devices.push(data.section1.deviceOtherText);
         lines.push('**Appareils :** ' + (devices.length ? devices.join(', ') : 'Non spécifié'));
-        lines.push('**Agnosticisme de plateforme :** ' + (data.section1.platformAgnostic || 'Non spécifié'));
-        lines.push('**Littératie numérique :** ' + (data.section1.digitalLiteracy || 'Non spécifié'));
+
+        // Platform agnostic
+        var platformLabels = { yes: 'Oui', partial: 'Partiellement', no: 'Non' };
+        lines.push('**Agnosticisme de plateforme :** ' + (platformLabels[data.section1.platformAgnostic] || 'Non spécifié'));
+
+        // Digital literacy level
+        var literacyLabels = ['Aucune compétence requise', 'Tutoriel de base recommandé', 'Tutoriel avancé indispensable', 'Formation approfondie requise'];
+        var literacyLevel = parseInt(data.section1.digitalLiteracyLevel) || 0;
+        lines.push('**Littératie numérique :** ' + literacyLabels[literacyLevel]);
         lines.push('**Droits admin :** ' + (data.section1.adminRights || 'Non spécifié'));
         lines.push('');
 
@@ -480,6 +664,215 @@
         a.download = 'analyse_media_' + new Date().toISOString().slice(0, 10) + '.md';
         a.click();
         URL.revokeObjectURL(url);
+    };
+
+    // ========================================
+    // Export Word (.docx)
+    // ========================================
+    window.exportMediaWord = function () {
+        if (!window.docx || !window.docx.Document) {
+            alert("La bibliothèque d'export Word n'est pas disponible.");
+            return;
+        }
+
+        var data = collectFormData();
+        var Document = window.docx.Document;
+        var Packer = window.docx.Packer;
+        var Paragraph = window.docx.Paragraph;
+        var TextRun = window.docx.TextRun;
+        var HeadingLevel = window.docx.HeadingLevel;
+
+        var safe = function (s) { return (s || '').toString().trim(); };
+        var children = [];
+
+        // Styles: Helvetica for headings (burgundy), Garamond for body
+        var burgundy = '912338';
+
+        // Title (H1: 16pt Helvetica, burgundy)
+        children.push(new Paragraph({
+            children: [new TextRun({
+                text: 'Analyse médiatique et technologique',
+                font: 'Helvetica',
+                size: 32, // 16pt = 32 half-points
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { after: 200 }
+        }));
+
+        // Date and DNA Score
+        children.push(new Paragraph({
+            children: [
+                new TextRun({ text: 'Date : ', font: 'Garamond', size: 24, bold: true }),
+                new TextRun({ text: new Date().toLocaleDateString('fr-CA'), font: 'Garamond', size: 24 })
+            ]
+        }));
+        children.push(new Paragraph({
+            children: [
+                new TextRun({ text: 'Score DNA : ', font: 'Garamond', size: 24, bold: true }),
+                new TextRun({ text: data.dnaScore + '/100', font: 'Garamond', size: 24 })
+            ],
+            spacing: { after: 400 }
+        }));
+
+        // Section 1 (H2: 14pt Helvetica, burgundy)
+        children.push(new Paragraph({
+            children: [new TextRun({
+                text: '1. Écosystème numérique des apprenant·es',
+                font: 'Helvetica',
+                size: 28,
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { before: 400, after: 200 }
+        }));
+
+        var devices = [];
+        if (data.section1.devicePhone) devices.push('Téléphone');
+        if (data.section1.deviceTablet) devices.push('Tablette');
+        if (data.section1.deviceLaptop) devices.push('Ordinateur portable');
+        if (data.section1.deviceDesktop) devices.push('Ordinateur de bureau');
+        if (data.section1.deviceVR) devices.push('VR');
+
+        children.push(new Paragraph({
+            children: [
+                new TextRun({ text: 'Appareils : ', font: 'Garamond', size: 24, bold: true }),
+                new TextRun({ text: devices.length ? devices.join(', ') : 'Non spécifié', font: 'Garamond', size: 24 })
+            ]
+        }));
+
+        // Section 2
+        children.push(new Paragraph({
+            children: [new TextRun({
+                text: '2. Infrastructure et connectivité',
+                font: 'Helvetica',
+                size: 28,
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { before: 400, after: 200 }
+        }));
+
+        children.push(new Paragraph({
+            children: [
+                new TextRun({ text: 'Bande passante : ', font: 'Garamond', size: 24, bold: true }),
+                new TextRun({ text: data.section2.bandwidth || 'Non spécifié', font: 'Garamond', size: 24 })
+            ]
+        }));
+
+        // Section 3
+        children.push(new Paragraph({
+            children: [new TextRun({
+                text: '3. Principes de conception multimédia',
+                font: 'Helvetica',
+                size: 28,
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { before: 400, after: 200 }
+        }));
+
+        children.push(new Paragraph({
+            children: [
+                new TextRun({ text: 'Choix de modalité : ', font: 'Garamond', size: 24, bold: true }),
+                new TextRun({ text: data.section3.modalityChoice || 'Non spécifié', font: 'Garamond', size: 24 })
+            ]
+        }));
+
+        // Section 4
+        children.push(new Paragraph({
+            children: [new TextRun({
+                text: '4. Accessibilité et conception universelle',
+                font: 'Helvetica',
+                size: 28,
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { before: 400, after: 200 }
+        }));
+
+        var access = [];
+        if (data.section4.accessTextSize) access.push('Texte ajustable');
+        if (data.section4.accessTranscripts) access.push('Transcriptions');
+        if (data.section4.accessCaptions) access.push('Sous-titres');
+
+        children.push(new Paragraph({
+            children: [
+                new TextRun({ text: 'Fonctionnalités : ', font: 'Garamond', size: 24, bold: true }),
+                new TextRun({ text: access.length ? access.join(', ') : 'À configurer', font: 'Garamond', size: 24 })
+            ]
+        }));
+
+        // Section 5
+        children.push(new Paragraph({
+            children: [new TextRun({
+                text: '5. Média vs Défis de médiatisation',
+                font: 'Helvetica',
+                size: 28,
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { before: 400, after: 200 }
+        }));
+
+        if (safe(data.section5.naturalLanguage)) {
+            children.push(new Paragraph({
+                children: [new TextRun({ text: 'Langage naturel de la tâche :', font: 'Garamond', size: 24, bold: true })]
+            }));
+            children.push(new Paragraph({
+                children: [new TextRun({ text: safe(data.section5.naturalLanguage), font: 'Garamond', size: 24 })]
+            }));
+        }
+
+        // Media Production List (H3: 12pt)
+        children.push(new Paragraph({
+            children: [new TextRun({
+                text: 'Liste de production médias',
+                font: 'Helvetica',
+                size: 24,
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { before: 300, after: 200 }
+        }));
+
+        var mediaItems = [
+            ['Vidéos', data.section5.mediaCountVideos || 0],
+            ['Clips audio', data.section5.mediaCountAudio || 0],
+            ['Graphiques', data.section5.mediaCountGraphics || 0],
+            ['Animations', data.section5.mediaCountAnimations || 0],
+            ['Interactifs', data.section5.mediaCountInteractives || 0],
+            ['Documents', data.section5.mediaCountDocuments || 0]
+        ];
+
+        mediaItems.forEach(function (item) {
+            children.push(new Paragraph({
+                children: [
+                    new TextRun({ text: item[0] + ' : ', font: 'Garamond', size: 24, bold: true }),
+                    new TextRun({ text: item[1].toString(), font: 'Garamond', size: 24 })
+                ]
+            }));
+        });
+
+        // Create document
+        var doc = new Document({
+            sections: [{
+                properties: {},
+                children: children
+            }]
+        });
+
+        // Generate and download
+        Packer.toBlob(doc).then(function (blob) {
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'analyse_media_' + new Date().toISOString().slice(0, 10) + '.docx';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(function () { URL.revokeObjectURL(url); }, 500);
+        });
     };
 
     // ========================================

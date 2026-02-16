@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+    <!-- docx.js for Word export -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+
     <!-- Tailwind CDN + Concordia theme -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -50,10 +53,15 @@
     <div class="max-w-6xl mx-auto">
         <header class="mb-8">
             <!-- Title Section -->
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold text-slate-900 tracking-tight" data-i18n="media_heading">
-                    Analyse médiatique et technologique
-                </h1>
+            <div class="mb-6 text-center">
+                <div class="flex items-center justify-center gap-4 mb-2">
+                    <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #912338, #6d1a2a);">
+                        <span class="material-icons-round text-white text-2xl">devices</span>
+                    </div>
+                    <h1 class="text-3xl font-bold tracking-tight" style="color: #912338;" data-i18n="media_heading">
+                        Analyse médiatique et technologique
+                    </h1>
+                </div>
                 <p class="text-slate-500 mt-1" data-i18n="media_subtitle">
                     Évaluer l'environnement technique et sélectionner les médias appropriés
                 </p>
@@ -76,6 +84,10 @@
                         <button onclick="exportMediaMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="Exporter en Markdown">
                             <span class="material-icons-round text-xl">description</span>
                             <span class="text-sm font-semibold hidden md:inline">MD</span>
+                        </button>
+                        <button onclick="exportMediaWord()" class="text-slate-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="media_tip_word" title="Exporter en Word (.docx)">
+                            <span class="material-icons-round text-xl">article</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="media_btn_word">Word</span>
                         </button>
                         <input id="loadFileInput" type="file" accept=".json" class="hidden" onchange="loadMediaFromFile(event)">
                         <div class="w-px bg-slate-200 h-6 mx-1"></div>
@@ -118,28 +130,96 @@
 
             <!-- Section 1: Digital Ecosystem -->
             <div class="card">
-                <h2><span class="material-icons-round">devices</span> <span data-i18n="media_section_1">1. Écosystème numérique des apprenants</span></h2>
+                <h2><span class="material-icons-round">devices</span> <span data-i18n="media_section_1">1. Écosystème numérique des apprenant·es</span></h2>
                 <p class="card-desc" data-i18n="media_section_1_desc">Comprendre le matériel et les logiciels disponibles pour l'utilisateur final.</p>
 
                 <div class="form-group">
                     <label data-i18n="media_lbl_device_usage">Appareils utilisés</label>
                     <div class="checkbox-group">
+                        <!-- Téléphone -->
                         <label class="checkbox-item">
-                            <input type="checkbox" id="deviceSmartphone" onchange="updateDNAScore()">
-                            <span data-i18n="media_opt_smartphone">Smartphone</span>
+                            <input type="checkbox" id="devicePhone" onchange="updateDNAScore(); toggleDeviceSubOptions('phone')">
+                            <span data-i18n="media_opt_phone">Téléphone (p. ex. iPhone, Fairphone, etc.)</span>
                         </label>
+                        <div id="phoneSubOptions" class="hidden ml-8 mt-2 space-y-1 pl-4 border-l-2 border-indigo-200">
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="devicePhoneIOS">
+                                <span>iPhone</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="devicePhoneAndroid">
+                                <span data-i18n="media_opt_phone_android">Téléphone Android</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="devicePhoneOther">
+                                <span data-i18n="media_opt_other">Autre</span>
+                            </label>
+                        </div>
+
+                        <!-- Tablette -->
                         <label class="checkbox-item">
-                            <input type="checkbox" id="deviceTablet" onchange="updateDNAScore()">
+                            <input type="checkbox" id="deviceTablet" onchange="updateDNAScore(); toggleDeviceSubOptions('tablet')">
                             <span data-i18n="media_opt_tablet">Tablette</span>
                         </label>
+                        <div id="tabletSubOptions" class="hidden ml-8 mt-2 space-y-1 pl-4 border-l-2 border-indigo-200">
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="deviceTabletIPad">
+                                <span>iPad</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="deviceTabletAndroid">
+                                <span data-i18n="media_opt_tablet_android">Tablette Android</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="deviceTabletOther">
+                                <span data-i18n="media_opt_other">Autre</span>
+                            </label>
+                        </div>
+
+                        <!-- Ordinateur portable -->
                         <label class="checkbox-item">
-                            <input type="checkbox" id="deviceLaptop" onchange="updateDNAScore()">
-                            <span data-i18n="media_opt_laptop">Ordinateur portable / de bureau</span>
+                            <input type="checkbox" id="deviceLaptop" onchange="updateDNAScore(); toggleDeviceSubOptions('computer')">
+                            <span data-i18n="media_opt_laptop">Ordinateur portable</span>
                         </label>
+
+                        <!-- Ordinateur de bureau -->
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="deviceDesktop" onchange="updateDNAScore(); toggleDeviceSubOptions('computer')">
+                            <span data-i18n="media_opt_desktop">Ordinateur de bureau</span>
+                        </label>
+                        <div id="computerSubOptions" class="hidden ml-8 mt-2 space-y-1 pl-4 border-l-2 border-indigo-200">
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="deviceComputerMac">
+                                <span>Mac</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="deviceComputerWindows">
+                                <span>PC Windows</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="deviceComputerLinux">
+                                <span>PC Linux</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="deviceComputerOther">
+                                <span data-i18n="media_opt_other">Autre</span>
+                            </label>
+                        </div>
+
+                        <!-- VR -->
                         <label class="checkbox-item">
                             <input type="checkbox" id="deviceVR" onchange="updateDNAScore()">
                             <span data-i18n="media_opt_vr">Casque de réalité virtuelle</span>
                         </label>
+
+                        <!-- Autre appareil -->
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="deviceOther" onchange="toggleDeviceSubOptions('other')">
+                            <span data-i18n="media_opt_device_other">Autre</span>
+                        </label>
+                        <div id="otherDeviceField" class="hidden ml-8 mt-2">
+                            <input type="text" id="deviceOtherText" class="w-full" data-i18n-placeholder="media_ph_device_other" placeholder="Précisez l'appareil">
+                        </div>
                     </div>
                 </div>
 
@@ -150,21 +230,21 @@
                         <label class="checkbox-item p-3 rounded-lg bg-white border border-slate-200 hover:border-emerald-400 transition-colors cursor-pointer">
                             <input type="radio" name="platformAgnostic" value="yes" onchange="updateDNAScore()">
                             <div>
-                                <span class="font-semibold text-emerald-700" data-i18n="media_opt_yes_agnostic">Oui – Outils basés sur le navigateur</span>
+                                <span class="font-semibold text-emerald-700" data-i18n="media_opt_yes_agnostic">Oui (logiciels multiplateformes, application Web, etc.)</span>
                                 <p class="text-xs text-slate-500 mt-1" data-i18n="media_opt_yes_hint">+30 points DNA</p>
                             </div>
                         </label>
                         <label class="checkbox-item p-3 rounded-lg bg-white border border-slate-200 hover:border-amber-400 transition-colors cursor-pointer">
                             <input type="radio" name="platformAgnostic" value="partial" onchange="updateDNAScore()">
                             <div>
-                                <span class="font-semibold text-amber-700" data-i18n="media_opt_partial_agnostic">Partiellement – Quelques restrictions</span>
+                                <span class="font-semibold text-amber-700" data-i18n="media_opt_partial_agnostic">Partiellement (certains outils sont limités à certains appareils)</span>
                                 <p class="text-xs text-slate-500 mt-1" data-i18n="media_opt_partial_hint">+15 points DNA</p>
                             </div>
                         </label>
                         <label class="checkbox-item p-3 rounded-lg bg-white border border-slate-200 hover:border-rose-400 transition-colors cursor-pointer">
                             <input type="radio" name="platformAgnostic" value="no" onchange="updateDNAScore()">
                             <div>
-                                <span class="font-semibold text-rose-700" data-i18n="media_opt_no_agnostic">Non – Applications spécifiques requises</span>
+                                <span class="font-semibold text-rose-700" data-i18n="media_opt_no_agnostic">Non (exige des applications spécifiques)</span>
                                 <p class="text-xs text-slate-500 mt-1" data-i18n="media_opt_no_hint">0 points DNA</p>
                             </div>
                         </label>
@@ -172,27 +252,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label data-i18n="media_lbl_digital_literacy">Littératie numérique</label>
-                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_literacy_question">Les apprenants ont-ils les compétences numériques nécessaires pour utiliser la technologie choisie ?</p>
-                    <div class="checkbox-group">
-                        <label class="checkbox-item">
-                            <input type="radio" name="digitalLiteracy" value="yes">
-                            <span data-i18n="media_opt_literacy_yes">Oui – Aucun tutoriel technique requis</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="radio" name="digitalLiteracy" value="tutorial">
-                            <span data-i18n="media_opt_literacy_tutorial">Tutoriel de base recommandé</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="radio" name="digitalLiteracy" value="extensive">
-                            <span data-i18n="media_opt_literacy_extensive">Formation technique approfondie requise</span>
-                        </label>
+                    <label data-i18n="media_lbl_digital_literacy">Littératie/compétence numérique</label>
+                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_literacy_question">Quel niveau de compétence numérique est requis pour utiliser la technologie choisie ?</p>
+                    <div class="mt-4">
+                        <input type="range" id="digitalLiteracySlider" min="0" max="3" value="0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" onchange="updateLiteracyLabel()">
+                        <div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
+                            <span data-i18n="media_literacy_0">Aucune compétence requise</span>
+                            <span data-i18n="media_literacy_1">Tutoriel de base</span>
+                            <span data-i18n="media_literacy_2">Tutoriel avancé</span>
+                            <span data-i18n="media_literacy_3">Formation approfondie</span>
+                        </div>
+                        <p id="literacyLevelDisplay" class="text-center mt-3 text-sm font-semibold text-indigo-600" data-i18n="media_literacy_level_0">Aucune compétence technologique requise</p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label data-i18n="media_lbl_admin_rights">Droits d'administrateur</label>
-                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_admin_question">Les apprenants auront-ils besoin de droits d'administrateur pour installer des logiciels ?</p>
+                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_admin_question">Les apprenant·e·s auront-ils besoin de droits d'administrateur pour installer des logiciels ?</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item">
                             <input type="radio" name="adminRights" value="browser" onchange="updateDNAScore()">
@@ -275,7 +351,7 @@
             <!-- Section 3: Multimedia Design Principles -->
             <div class="card">
                 <h2><span class="material-icons-round">psychology</span> <span data-i18n="media_section_3">3. Principes de conception multimédia</span></h2>
-                <p class="card-desc" data-i18n="media_section_3_desc">Appliquer la science de l'instruction à la sélection des médias (charge cognitive).</p>
+                <p class="card-desc" data-i18n="media_section_3_desc">Étudier la charge cognitive à la sélection des médias.</p>
 
                 <div class="form-group">
                     <label data-i18n="media_lbl_modality">Choix de modalité</label>
@@ -312,23 +388,28 @@
                     <p class="text-sm text-slate-500 mb-2" data-i18n="media_audio_question">Les segments de narration sont-ils brefs (idéalement < 15 secondes) pour éviter la dégradation en mémoire de travail ?</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item">
-                            <input type="radio" name="audioDuration" value="brief">
+                            <input type="radio" name="audioDuration" value="brief" onchange="toggleAudioDurationField()">
                             <span data-i18n="media_opt_brief">Oui – Segments courts (< 15 sec)</span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="radio" name="audioDuration" value="moderate">
+                            <input type="radio" name="audioDuration" value="moderate" onchange="toggleAudioDurationField()">
                             <span data-i18n="media_opt_moderate">Modéré – 15-45 secondes avec pauses</span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="radio" name="audioDuration" value="long">
+                            <input type="radio" name="audioDuration" value="long" onchange="toggleAudioDurationField()">
                             <span data-i18n="media_opt_long">Long – À segmenter pour améliorer la rétention</span>
                         </label>
+                    </div>
+                    <div id="audioDurationField" class="hidden mt-3 ml-6 flex items-center gap-2">
+                        <label class="text-sm text-slate-600" data-i18n="media_lbl_segment_duration">Durée prévue par segment :</label>
+                        <input type="number" id="audioDurationMinutes" class="w-20" min="1" placeholder="5">
+                        <span class="text-sm text-slate-500" data-i18n="media_minutes">minutes</span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label data-i18n="media_lbl_signaling">Signalisation et indices</label>
-                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_signaling_question">Comment dirigerez-vous l'attention des apprenants vers les parties importantes des médias ?</p>
+                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_signaling_question">Comment dirigerez-vous l'attention des apprenant·e·s vers les parties importantes des médias ?</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item">
                             <input type="checkbox" id="signalArrows">
@@ -372,11 +453,11 @@
             <!-- Section 4: Accessibility and UDL -->
             <div class="card">
                 <h2><span class="material-icons-round">accessibility_new</span> <span data-i18n="media_section_4">4. Accessibilité et conception universelle (CUA)</span></h2>
-                <p class="card-desc" data-i18n="media_section_4_desc">Assurer l'inclusivité pour tous les apprenants.</p>
+                <p class="card-desc" data-i18n="media_section_4_desc">Assurer l'inclusivité pour tous les apprenant·e·s.</p>
 
                 <div class="form-group">
                     <label data-i18n="media_lbl_customizable">Affichage personnalisable</label>
-                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_customizable_question">L'apprenant peut-il ajuster les paramètres d'affichage ?</p>
+                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_customizable_question">L'apprenant·e peut-il ajuster les paramètres d'affichage ?</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item">
                             <input type="checkbox" id="accessTextSize">
@@ -413,7 +494,7 @@
 
                 <div class="form-group">
                     <label data-i18n="media_lbl_language_support">Support linguistique</label>
-                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_language_question">Si les apprenants ne sont pas locuteurs natifs, fournissez-vous audio ET sous-titres ?</p>
+                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_language_question">Si les apprenant·e·s ne sont pas locuteurs natifs, fournissez-vous audio ET sous-titres ?</p>
                     <div class="checkbox-group">
                         <label class="checkbox-item">
                             <input type="radio" name="languageSupport" value="native">
@@ -452,12 +533,56 @@
 
             <!-- Section 5: Media Power vs Difficulty -->
             <div class="card">
-                <h2><span class="material-icons-round">balance</span> <span data-i18n="media_section_5">5. Puissance médiatique vs difficulté</span></h2>
+                <h2><span class="material-icons-round">balance</span> <span data-i18n="media_section_5">5. Média vs Défis de médiatisation</span></h2>
                 <p class="card-desc" data-i18n="media_section_5_desc">Équilibrer l'impact pédagogique avec la réalité de production.</p>
 
                 <div class="form-group">
                     <label data-i18n="media_lbl_natural_language">Langage naturel de la tâche</label>
                     <textarea id="naturalLanguage" rows="3" data-i18n-placeholder="media_ph_natural" placeholder="Quel média est ESSENTIEL pour cet objectif ? Ex. : Peut-on enseigner « la résolution de conflits » sans vidéo ou audio d'interactions humaines ?"></textarea>
+                </div>
+
+                <!-- Audio/Video Media -->
+                <div class="form-group">
+                    <label data-i18n="media_lbl_audio_video">Média audio ou vidéo</label>
+                    <p class="text-sm text-slate-500 mb-2" data-i18n="media_audio_video_question">Votre formation inclut-elle des contenus audio ou vidéo ?</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="radio" name="hasAudioVideo" value="yes" onchange="toggleStorageOptions()">
+                            <span data-i18n="media_opt_av_yes">Oui</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="radio" name="hasAudioVideo" value="no" onchange="toggleStorageOptions()">
+                            <span data-i18n="media_opt_av_no">Non</span>
+                        </label>
+                    </div>
+                    <div id="storageOptionsField" class="hidden mt-3 ml-6 p-3 bg-slate-50 rounded-lg">
+                        <label class="text-sm font-semibold text-slate-700 mb-2 block" data-i18n="media_lbl_storage">Espace de stockage prévu</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="storageYouTube">
+                                <span>YouTube</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="storageSoundCloud">
+                                <span>SoundCloud</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="storageSpotify">
+                                <span>Spotify</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="storagePodcast">
+                                <span data-i18n="media_opt_podcast">Podcast autohébergé</span>
+                            </label>
+                            <label class="checkbox-item text-sm">
+                                <input type="checkbox" id="storageOther" onchange="toggleStorageOtherField()">
+                                <span data-i18n="media_opt_other">Autre</span>
+                            </label>
+                        </div>
+                        <div id="storageOtherField" class="hidden mt-2">
+                            <input type="text" id="storageOtherText" class="w-full" data-i18n-placeholder="media_ph_storage_other" placeholder="Précisez la plateforme">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -557,7 +682,7 @@
 
             <div class="space-y-4">
                 <p class="text-sm text-slate-600 leading-relaxed" data-i18n="media_dna_modal_text">
-                    Le <strong>Score DNA</strong> (Device Neutral Accessibility) mesure à quel point votre dispositif de formation est accessible depuis différents appareils et plateformes. Un score élevé indique que les apprenants peuvent accéder au contenu peu importe leur équipement.
+                    Le <strong>Score DNA</strong> (Device Neutral Accessibility) mesure à quel point votre dispositif de formation est accessible depuis différents appareils et plateformes. Un score élevé indique que les apprenant·e·s peuvent accéder au contenu peu importe leur équipement.
                 </p>
                 <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
                     <h4 class="text-sm font-bold text-emerald-800 mb-2" data-i18n="media_dna_criteria_title">Critères évalués :</h4>
