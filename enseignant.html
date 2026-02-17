@@ -42,9 +42,8 @@
     <!-- Material Icons Round -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
-    <!-- Import de html2pdf.js pour l'export PDF.
-         Performance: Added 'defer' to prevent blocking DOM parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+    <!-- docx.js for Word export -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -54,15 +53,59 @@
 
     <div class="max-w-5xl mx-auto">
         <header class="mb-8">
-            <!-- Title -->
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold text-slate-900 tracking-tight" data-i18n="teacher_heading">Canevas de Persona pour le personnel d'éducation</h1>
-                <p class="text-slate-500 mt-1" data-i18n="teacher_subtitle">Prototype pour aider à concevoir des formations adaptées à la réalité terrain.</p>
+            <!-- Title Section -->
+            <div class="mb-6 text-center">
+                <h1 class="text-3xl font-bold tracking-tight flex items-center justify-center gap-3" style="color: #912338;">
+                    <span class="material-icons-round text-4xl">person</span>
+                    <span data-i18n="teacher_heading">Profil de l'enseignant·e</span>
+                </h1>
+                <p class="text-slate-500 mt-2" data-i18n="teacher_subtitle">
+                    Documentez le contexte de formation, identifiez les contraintes et opportunités pour cadrer votre projet pédagogique.
+                </p>
             </div>
 
             <!-- Toolbars -->
-            <div class="flex flex-wrap gap-4" data-html2canvas-ignore="true">
-                <!-- Options group -->
+            <div class="flex flex-wrap gap-4 justify-center" data-html2canvas-ignore="true">
+                <!-- I/O Group -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_io">Import & Export</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="document.getElementById('fileInput').click()" class="text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="teacher_tip_load" title="Charger une sauvegarde (JSON)">
+                            <span class="material-icons-round text-xl">folder_open</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_load">charger</span>
+                        </button>
+                        <button onclick="saveData()" class="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="teacher_tip_save" title="Sauvegarder (JSON)">
+                            <span class="material-icons-round text-xl">save</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="btn_save">sauvegarder</span>
+                        </button>
+                        <button onclick="exportMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="teacher_tip_md" title="Exporter en Markdown">
+                            <span class="material-icons-round text-xl">description</span>
+                            <span class="text-sm font-semibold hidden md:inline">MD</span>
+                        </button>
+                        <button onclick="exportWord()" class="text-slate-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="teacher_tip_word" title="Exporter en Word (.docx)">
+                            <span class="material-icons-round text-xl">article</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_word">Word</span>
+                        </button>
+                        <input id="fileInput" type="file" accept=".json" class="hidden" onchange="loadData(this)">
+                        <div class="w-px bg-slate-200 h-6 mx-1"></div>
+                        <button onclick="resetForm()" class="text-slate-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-title="teacher_tip_reset" title="Réinitialiser">
+                            <span class="material-icons-round text-xl">restart_alt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info group (only Infos button) -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_help">Aide</span>
+                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
+                        <button onclick="openInfoModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" title="À propos">
+                            <span class="material-icons-round text-xl">info</span>
+                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_info">infos</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Options group (centered) -->
                 <div class="flex flex-col gap-1">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_options">Options</span>
                     <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-3 shadow-sm h-[52px]">
@@ -85,57 +128,6 @@
                     </div>
                 </div>
 
-                <!-- I/O group -->
-                <div class="flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_io">Import & Export</span>
-                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
-                        <button onclick="document.getElementById('fileInput').click()" class="text-slate-600 hover:text-sky-600 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_load" title="Charger une sauvegarde (JSON)">
-                            <span class="material-icons-round text-xl">folder_open</span>
-                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_load">charger</span>
-                        </button>
-                        <button onclick="saveData()" class="text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_save" title="Sauvegarder (JSON)">
-                            <span class="material-icons-round text-xl">save</span>
-                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_save">sauvegarder</span>
-                        </button>
-                        <button onclick="exportPDF()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_pdf" title="Exporter en PDF">
-                            <span class="material-icons-round text-xl">picture_as_pdf</span>
-                            <span class="text-sm font-semibold hidden md:inline">PDF</span>
-                        </button>
-                        <button onclick="exportMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_md" title="Exporter Profil (Markdown)">
-                            <span class="material-icons-round text-xl">description</span>
-                            <span class="text-sm font-semibold hidden md:inline">MD</span>
-                        </button>
-                        <button onclick="exportFullMarkdown()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_full_md" title="Exporter Canevas Complet (Markdown)">
-                            <span class="material-icons-round text-xl">list_alt</span>
-                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_full_md">complet</span>
-                        </button>
-                        <input id="fileInput" type="file" accept=".json" class="hidden" onchange="loadData(this)">
-                        <div class="w-px bg-slate-200 h-6 mx-1"></div>
-                        <button onclick="resetForm()" class="text-slate-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_reset" title="Réinitialiser le canevas">
-                            <span class="material-icons-round text-xl">restart_alt</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Aide group -->
-                <div class="flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1" data-i18n="teacher_grp_help">Aide</span>
-                    <div class="flex items-center bg-white border border-slate-200 rounded-xl p-1.5 gap-1 shadow-sm h-[52px]">
-                        <button onclick="openSuggestionsModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_suggest" title="Proposer une amélioration (export local)">
-                            <span class="material-icons-round text-xl">feedback</span>
-                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_suggest">Feedback</span>
-                        </button>
-                        <button onclick="openHelpModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_guide" title="Guide d'utilisation">
-                            <span class="material-icons-round text-xl">help</span>
-                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_help">aide</span>
-                        </button>
-                        <button onclick="openInfoModal()" class="text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2" data-i18n-tooltip="teacher_tip_about" title="À propos">
-                            <span class="material-icons-round text-xl">info</span>
-                            <span class="text-sm font-semibold hidden md:inline" data-i18n="teacher_btn_info">infos</span>
-                        </button>
-                    </div>
-                </div>
-
             </div>
         </header>
 
@@ -144,7 +136,7 @@
 
             <!-- 1. IDENTITÉ -->
             <div class="card">
-                <h2><span class="material-icons-round">badge</span> <span data-i18n="teacher_card_identity">Identité</span></h2>
+                <h2><span class="material-icons-round">badge</span> <span data-i18n="teacher_card_identity">1. Identité</span></h2>
                 <div class="card-desc" data-i18n="teacher_desc_identity">Profil administratif et personnel.</div>
 
                 <!-- Base -->
@@ -200,16 +192,50 @@
                     <input type="text" data-i18n-placeholder="teacher_ph_experience" placeholder="Ex: 5 ans, Débutant..." id="experience">
                 </div>
 
+                <!-- Digital Literacy Slider -->
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_digital_literacy">Littératie / compétence numérique</label>
+                    <div class="mt-2">
+                        <input type="range" id="digitalLiteracySlider" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" onchange="updateDigitalLiteracyLabel()">
+                        <div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
+                            <span data-i18n="teacher_literacy_1">Faible</span>
+                            <span data-i18n="teacher_literacy_2">Basique</span>
+                            <span data-i18n="teacher_literacy_3">Moyen</span>
+                            <span data-i18n="teacher_literacy_4">Bon</span>
+                            <span data-i18n="teacher_literacy_5">Élevé</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technology Adoption Slider (Rogers) -->
+                <div class="form-group">
+                    <label data-i18n="teacher_lbl_tech_adoption">Adoption technologique</label>
+                    <p class="text-xs text-slate-500 mb-2" data-i18n="teacher_tech_adoption_hint">Selon la typologie de Rogers (2003)</p>
+                    <div class="mt-2">
+                        <input type="range" id="techAdoptionSlider" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" onchange="updateTechAdoptionLabel()">
+                        <div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
+                            <span data-i18n="teacher_adoption_1">Réfractaire</span>
+                            <span data-i18n="teacher_adoption_2">Majorité tardive</span>
+                            <span data-i18n="teacher_adoption_3">Majorité précoce</span>
+                            <span data-i18n="teacher_adoption_4">Adopteur précoce</span>
+                            <span data-i18n="teacher_adoption_5">Innovateur</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Advanced Options -->
                 <div class="advanced-context">
                     <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
                     <div class="form-group">
                         <label data-i18n="teacher_lbl_career_path">Parcours professionnel</label>
                         <div class="checkbox-group">
-                            <label class="checkbox-item"><input type="radio" name="careerPath" value="Local"> <span data-i18n="teacher_opt_local_hire">Recrutement local</span></label>
-                            <label class="checkbox-item"><input type="radio" name="careerPath" value="Transfer"> <span data-i18n="teacher_opt_transfer">Transfert / Mobilité géographique</span></label>
-                            <label class="checkbox-item"><input type="radio" name="careerPath" value="Reconversion"> <span data-i18n="teacher_opt_career_change">Reconversion professionnelle</span></label>
-                            <label class="checkbox-item"><input type="radio" name="careerPath" value="International"> <span data-i18n="teacher_opt_international">Coopération internationale / Expatriation</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="careerPathTransfer"> <span data-i18n="teacher_opt_transfer">Transfert / Mobilité géographique</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="careerPathReconversion"> <span data-i18n="teacher_opt_career_change">Reconversion professionnelle</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="careerPathInternational"> <span data-i18n="teacher_opt_international">Coopération internationale / Expatriation</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="careerPathOther" onchange="toggleCareerPathOther()"> <span data-i18n="teacher_opt_other_char">Autre(s) caractéristique(s)</span></label>
+                        </div>
+                        <div id="careerPathOtherField" class="hidden mt-2">
+                            <input type="text" id="careerPathOtherText" class="w-full" data-i18n-placeholder="teacher_ph_other_char" placeholder="Précisez...">
                         </div>
                     </div>
                     <div class="form-group">
@@ -224,9 +250,9 @@
                 </div>
             </div>
 
-            <!-- 2. CONTEXTE D'EXERCICE -->
+            <!-- 2. LOCALISATION ET CLASSE -->
             <div class="card">
-                <h2><span class="material-icons-round">place</span> <span data-i18n="teacher_card_context">Localisation & classe</span></h2>
+                <h2><span class="material-icons-round">place</span> <span data-i18n="teacher_card_context">2. Localisation et classe</span></h2>
                 <div class="card-desc" data-i18n="teacher_desc_context">Environnement et conditions d'exercice.</div>
 
                 <div class="form-group">
@@ -243,13 +269,13 @@
                     <div class="form-group">
                         <label data-i18n="teacher_lbl_class_profile">Profil général de la classe</label>
                         <div class="checkbox-group">
-                            <label class="checkbox-item"><input type="checkbox" id="heterogeneity"> <span data-i18n="teacher_chk_heterogeneity">Hétérogénéité scolaire</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="heterogeneity"> <span data-i18n="teacher_chk_heterogeneity">Classe hétérogène</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="climate"> <span data-i18n="teacher_chk_climate">Gestion de classe difficile</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="multilevel"> <span data-i18n="teacher_chk_multilevel">Classe à double ou triple niveau</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="overcrowded"> <span data-i18n="teacher_chk_overcrowded">Classe surchargée / Faible effectif</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="inclusion"> <span data-i18n="teacher_chk_inclusion">Élèves à besoins particuliers (inclusion scolaire)</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="social"> <span data-i18n="teacher_chk_social">Précarité sociale des familles</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="turnover_students"> <span data-i18n="teacher_chk_turnover_students">Fort turnover des élèves</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="inclusion"> <span data-i18n="teacher_chk_inclusion">Élèves à besoins particuliers</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="social"> <span data-i18n="teacher_chk_social">Précarité</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="classProfileOther"> <span data-i18n="teacher_chk_other">Autre</span></label>
                         </div>
                     </div>
                 </div>
@@ -257,12 +283,28 @@
                 <!-- Advanced Options -->
                 <div class="advanced-context">
                     <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+
+                    <!-- Local (nouveau groupe) -->
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_room_type">Local</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item" title="Salle de classe ordinaire équipée d'un mobilier déplaçable afin de former des configurations de classes différentes."><input type="checkbox" id="roomDryMovable"> <span data-i18n="teacher_chk_room_dry_movable">Classe avec bureaux déplaçables</span></label>
+                            <label class="checkbox-item" title="Salle de classe ordinaire avec un mobilier fixé au sol."><input type="checkbox" id="roomDryFixed"> <span data-i18n="teacher_chk_room_dry_fixed">Classe avec bureaux fixes</span></label>
+                            <label class="checkbox-item" title="Salle de classe équipée d'un mobilier déplaçable et possédant des murs mobiles ou des isoloirs pour changer la configuration du local."><input type="checkbox" id="roomModular"> <span data-i18n="teacher_chk_room_modular">Classe modulaire</span></label>
+                            <label class="checkbox-item" title="Local adapté doté d'un équipement spécialisé pour une discipline donnée. Les laboratoires de chimie, physique ou biologie en sont des exemples."><input type="checkbox" id="roomLabSpecialized"> <span data-i18n="teacher_chk_room_lab_specialized">Laboratoire disciplinaire spécialisé</span></label>
+                            <label class="checkbox-item" title="Local dédié à des cours où les étudiants travaillent à l'ordinateur."><input type="checkbox" id="roomLabComputer"> <span data-i18n="teacher_chk_room_lab_computer">Laboratoire informatique</span></label>
+                            <label class="checkbox-item" title="Local caractérisé par la disposition en îlots des bureaux des étudiants et la présence de tableaux sur les murs. Souvent, le bureau de l'enseignant est situé au milieu de la classe."><input type="checkbox" id="roomActiveLearning"> <span data-i18n="teacher_chk_room_active_learning">Classe d'apprentissage actif</span></label>
+                            <label class="checkbox-item" title="Local spacieux au plafond élevé ou espace extérieur adapté à l'activité physique. Des tracés au sol favorisent la pratique de plusieurs sports."><input type="checkbox" id="roomGym"> <span data-i18n="teacher_chk_room_gym">Gymnase</span></label>
+                            <label class="checkbox-item" title="Le cours se donne principalement ou totalement à distance."><input type="checkbox" id="roomDistance"> <span data-i18n="teacher_chk_room_distance">Formation à distance</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="roomOther"> <span data-i18n="teacher_chk_other">Autre</span></label>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label data-i18n="teacher_lbl_geographic_context">Contexte géographique</label>
                         <div class="checkbox-group">
                             <label class="checkbox-item"><input type="checkbox" id="rural"> <span data-i18n="teacher_chk_rural">Zone rurale / Isolement géographique</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="social_context"> <span data-i18n="teacher_chk_social_context">Contexte économique et social</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="remote"> <span data-i18n="teacher_chk_remote_access">Accès difficile (montagne, île, forêt, etc.)</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="displaced"> <span data-i18n="teacher_chk_displaced">Population déplacée / Réfugiés</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="conflict"> <span data-i18n="teacher_chk_conflict">Zone de conflit / Post-conflit</span></label>
                         </div>
@@ -271,18 +313,18 @@
                         <label data-i18n="teacher_lbl_linguistic_context">Contexte linguistique</label>
                         <div class="checkbox-group">
                             <label class="checkbox-item"><input type="checkbox" id="multilingual"> <span data-i18n="teacher_chk_multilingual">Classes plurilingues</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="allophone"> <span data-i18n="teacher_chk_allophone">Élèves allophones (langue maternelle différente)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="allophone"> <span data-i18n="teacher_chk_allophone">Élèves allophones ou nouvellement arrivé·es</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="regional_lang"> <span data-i18n="teacher_chk_regional_lang">Langue locale dominante (français langue seconde)</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="creole"> <span data-i18n="teacher_chk_creole">Variété linguistique régionale (créole, dialecte)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="creole"> <span data-i18n="teacher_chk_creole">Diversité linguistique</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="bilingual"> <span data-i18n="teacher_chk_bilingual">Programme bilingue / immersion</span></label>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 3. COMPÉTENCES NUMÉRIQUES -->
+            <!-- 3. NUMÉRIQUE -->
             <div class="card">
-                <h2><span class="material-icons-round">devices</span> <span data-i18n="teacher_card_digital">Numérique</span></h2>
+                <h2><span class="material-icons-round">devices</span> <span data-i18n="teacher_card_digital">3. Numérique</span></h2>
                 <div class="card-desc" data-i18n="teacher_desc_digital">Équipement et compétences technologiques.</div>
 
                 <div class="form-group">
@@ -292,7 +334,7 @@
                 <!-- Base -->
                 <div class="suggestions-panel">
                     <div class="form-group">
-                        <label data-i18n="teacher_lbl_tools_usage">Outils & Usages</label>
+                        <label data-i18n="teacher_lbl_tools_usage">Outils et usages de l'enseignant·e</label>
                         <div class="checkbox-group">
                             <label class="checkbox-item"><input type="checkbox" id="office"> <span data-i18n="teacher_chk_office">Bureautique (Word/PPT)</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="institution"> <span data-i18n="teacher_chk_institution">Outils institutionnels (portail, ENA/LMS)</span></label>
@@ -310,6 +352,26 @@
                 <!-- Advanced Options -->
                 <div class="advanced-context">
                     <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+
+                    <!-- Matériel disponible -->
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_available_equipment">Matériel disponible</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item" title="Appareil de projection conçu pour reproduire une source vidéo informatique, sur un écran ou sur une surface murale blanche."><input type="checkbox" id="equipProjector"> <span data-i18n="teacher_chk_equip_projector">Projecteur</span></label>
+                            <label class="checkbox-item" title="Caméra en circuit fermé permettant de projeter des images opaques (des livres par exemple) sur un écran de projection ou une surface murale."><input type="checkbox" id="equipDocCamera"> <span data-i18n="teacher_chk_equip_doc_camera">Caméra document</span></label>
+                            <label class="checkbox-item" title="(TBI / TNI) Tableau à écran tactile ou accompagné d'un dispositif simulant des fonctions tactiles. Il nécessite un ordinateur muni des pilotes périphériques appropriés."><input type="checkbox" id="equipIWB"> <span data-i18n="teacher_chk_equip_iwb">Tableau blanc interactif ou projecteur interactif</span></label>
+                            <label class="checkbox-item" title="Appareil de traitement numérique de l'information qui obéit à des programmes."><input type="checkbox" id="equipComputer"> <span data-i18n="teacher_chk_equip_computer">Ordinateur</span></label>
+                            <label class="checkbox-item" title="Technologie qui permet le branchement à des réseaux informatiques qui échangent de l'information au moyen d'une série de protocoles de communication."><input type="checkbox" id="equipInternet"> <span data-i18n="teacher_chk_equip_internet">Accès internet / wifi</span></label>
+                            <label class="checkbox-item" title="Moyens matériels divers permettant d'effectuer des tâches spécialisées."><input type="checkbox" id="equipWorkstations"> <span data-i18n="teacher_chk_equip_workstations">Postes de travail spécialisés</span></label>
+                            <label class="checkbox-item" title="Ordinateurs comprenant plusieurs éléments matériels (écran, boîtier, clavier et souris) peu portables étant donné leur volume et poids."><input type="checkbox" id="equipDesktops"> <span data-i18n="teacher_chk_equip_desktops">Ordinateurs fixes</span></label>
+                            <label class="checkbox-item" title="Ordinateurs légers dont l'écran se rabat sur le clavier afin de faciliter le transport sécuritaire."><input type="checkbox" id="equipLaptops"> <span data-i18n="teacher_chk_equip_laptops">Ordinateurs portables</span></label>
+                            <label class="checkbox-item" title="Ordinateurs ultralégers dont l'écran tactile élimine le besoin de périphériques (clavier/souris)."><input type="checkbox" id="equipTablets"> <span data-i18n="teacher_chk_equip_tablets">Tablettes</span></label>
+                            <label class="checkbox-item" title="Ordinateurs ultralégers de poche dont l'écran tactile élimine le besoin de périphériques (clavier/souris). Se connectent au réseau téléphonique pour la communication."><input type="checkbox" id="equipSmartphones"> <span data-i18n="teacher_chk_equip_smartphones">Téléphones intelligents</span></label>
+                            <label class="checkbox-item" title="Autres équipements disciplinaires."><input type="checkbox" id="equipSpecialized"> <span data-i18n="teacher_chk_equip_specialized">Équipements spécialisés</span></label>
+                            <label class="checkbox-item" title="Caméras et micros USB permettant la communication audiovisuelle en ligne."><input type="checkbox" id="equipVideoconf"> <span data-i18n="teacher_chk_equip_videoconf">Équipements de visioconférence</span></label>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label data-i18n="teacher_lbl_equipment_challenges">Défis matériels spécifiques</label>
                         <div class="checkbox-group">
@@ -323,7 +385,7 @@
 
             <!-- 4. MOTIVATIONS -->
             <div class="card">
-                <h2><span class="material-icons-round">psychology</span> <span data-i18n="teacher_card_motivations">Motivations</span></h2>
+                <h2><span class="material-icons-round">psychology</span> <span data-i18n="teacher_card_motivations">4. Motivations</span></h2>
                 <div class="card-desc" data-i18n="teacher_desc_motivations">Besoins et attentes vis-à-vis de la formation.</div>
 
                 <div class="form-group">
@@ -334,14 +396,24 @@
                 <div class="suggestions-panel">
                     <div class="form-group">
                         <label data-i18n="teacher_lbl_why_train">Pourquoi se former ?</label>
+
+                        <!-- Motivation intrinsèque -->
+                        <p class="text-xs font-semibold text-slate-600 mt-3 mb-1" data-i18n="teacher_motivation_intrinsic">Motivation intrinsèque</p>
                         <div class="checkbox-group">
                             <label class="checkbox-item"><input type="checkbox" id="classManagement"> <span data-i18n="teacher_chk_class_mgmt">Gestion de classe / Autorité</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="security"> <span data-i18n="teacher_chk_exam_prep">Préparation aux concours</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="time"> <span data-i18n="teacher_chk_time_saving">Gain de temps (Ressources prêtes)</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="innovation"> <span data-i18n="teacher_chk_innovation">Tester de nouvelles approches (Ludification, etc.)</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="wellbeing"> <span data-i18n="teacher_chk_wellbeing">Climat de classe / Bien-être</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="mutation"> <span data-i18n="teacher_chk_career">Évolution de carrière/perspectives</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="project"> <span data-i18n="teacher_chk_project">Monter un projet (Sortie, échange)</span></label>
+                        </div>
+
+                        <!-- Motivation extrinsèque -->
+                        <p class="text-xs font-semibold text-slate-600 mt-3 mb-1" data-i18n="teacher_motivation_extrinsic">Motivation extrinsèque</p>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" id="security"> <span data-i18n="teacher_chk_exam_prep">Préparation aux concours</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="mutation"> <span data-i18n="teacher_chk_career">Évolution de carrière/perspectives</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="mandatory"> <span data-i18n="teacher_chk_mandatory">Formation obligatoire (p. ex. imposée par la direction ou un ordre professionnel)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="motivationOther"> <span data-i18n="teacher_chk_other">Autre</span></label>
                         </div>
                     </div>
                 </div>
@@ -364,7 +436,7 @@
 
             <!-- 5. FREINS -->
             <div class="card">
-                <h2><span class="material-icons-round">warning</span> <span data-i18n="teacher_card_obstacles">Freins</span></h2>
+                <h2><span class="material-icons-round">warning</span> <span data-i18n="teacher_card_obstacles">5. Freins</span></h2>
                 <div class="card-desc" data-i18n="teacher_desc_obstacles">Obstacles potentiels à l'apprentissage.</div>
 
                 <div class="form-group">
@@ -395,9 +467,9 @@
                 </div>
             </div>
 
-            <!-- 6. PRÉFÉRENCES (FORMAT) -->
+            <!-- 6. FORMAT -->
             <div class="card">
-                <h2><span class="material-icons-round">headphones</span> <span data-i18n="teacher_card_format">Format</span></h2>
+                <h2><span class="material-icons-round">headphones</span> <span data-i18n="teacher_card_format">6. Format</span></h2>
                 <div class="card-desc" data-i18n="teacher_desc_format">Modalités pédagogiques préférées.</div>
 
                 <div class="form-group">
@@ -407,14 +479,17 @@
                 <!-- Base -->
                 <div class="suggestions-panel">
                     <div class="form-group">
-                        <label data-i18n="teacher_lbl_preferred_formats">Formats préférés</label>
+                        <label data-i18n="teacher_lbl_preferred_formats">Formats/types de formation préférés</label>
                         <div class="checkbox-group">
-                            <label class="checkbox-item"><input type="checkbox" id="micro"> <span data-i18n="teacher_chk_micro">Micro-learning (5-10 min)</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="mobile"> <span data-i18n="teacher_chk_mobile">Mobile Learning</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="visio"> <span data-i18n="teacher_chk_visio">Visio-conférence (Synchrones)</span></label>
-                            <label class="checkbox-item"><input type="checkbox" id="hybrid"> <span data-i18n="teacher_chk_hybrid">Hybride (Présentiel + Distanciel)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="micro"> <span data-i18n="teacher_chk_micro">Micro-apprentissage (5-10 min)</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="mobile"> <span data-i18n="teacher_chk_mobile">Apprentissage mobile</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="visio"> <span data-i18n="teacher_chk_visio">Visioconférence synchrone</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="hybrid"> <span data-i18n="teacher_chk_hybrid">Hybride ou HyFlex (présentiel et distanciel)</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="tutoring"> <span data-i18n="teacher_chk_tutoring">Tutorat / Accompagnement individuel</span></label>
                             <label class="checkbox-item"><input type="checkbox" id="resources"> <span data-i18n="teacher_chk_resources">Banque de ressources libre accès</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="community"> <span data-i18n="teacher_chk_community">Communauté de pratique</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="mooc"> <span data-i18n="teacher_chk_mooc">MOOC</span></label>
+                            <label class="checkbox-item"><input type="checkbox" id="formatOther"> <span data-i18n="teacher_chk_other">Autre</span></label>
                         </div>
                     </div>
                 </div>
@@ -430,9 +505,9 @@
                 </div>
             </div>
 
-            <!-- 7. SCÉNARIO TYPE (Full Width) -->
+            <!-- 7. JOURNÉE TYPE DE TRAVAIL (Full Width) -->
             <div class="card full-width">
-                <h2><span class="material-icons-round">edit_note</span> <span data-i18n="teacher_card_scenario">Scénario / Journée Type</span></h2>
+                <h2><span class="material-icons-round">edit_note</span> <span data-i18n="teacher_card_scenario">7. Journée type de travail</span></h2>
                 <div class="card-desc" data-i18n="teacher_desc_scenario">Déroulé d'une journée type et disponibilités.</div>
                 <div class="form-group">
                     <label data-i18n="teacher_lbl_scenario">Racontez sa journée pour identifier les créneaux disponibles et les contraintes techniques.</label>

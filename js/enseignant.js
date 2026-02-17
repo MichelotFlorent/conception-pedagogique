@@ -1,172 +1,223 @@
 // ── i18n: French translations (default) ─────────────────────────────────────
 var translations_fr = {
     // Page
-    teacher_page_title: "Canevas Persona : Personnel d\u2019\u00e9ducation",
-    teacher_heading: "Canevas de Persona pour le personnel d\u2019\u00e9ducation",
-    teacher_subtitle: "Prototype pour aider \u00e0 concevoir des formations adapt\u00e9es \u00e0 la r\u00e9alit\u00e9 terrain.",
+    teacher_page_title: "Profil de l'enseignant·e",
+    teacher_heading: "Profil de l'enseignant·e",
+    teacher_subtitle: "Documentez le contexte de formation, identifiez les contraintes et opportunités pour cadrer votre projet pédagogique.",
 
     // Action groups
     teacher_grp_options: "Options",
     teacher_grp_display: "Affichage",
     teacher_grp_management: "Gestion",
-    teacher_grp_io: "IMPORT & EXPORT",
-    teacher_grp_improve: "AM\u00c9LIORATIONS",
+    teacher_grp_io: "Import & Export",
+    teacher_grp_improve: "Améliorations",
     teacher_grp_help: "Aide",
     teacher_grp_language: "Langue",
 
+    // Buttons
+    btn_load: "charger",
+    btn_save: "sauvegarder",
+    teacher_btn_word: "Word",
+    teacher_btn_info: "infos",
+
     // Toggle labels
     teacher_lbl_basic: "Basique",
-    teacher_lbl_advanced: "Avanc\u00e9",
+    teacher_lbl_advanced: "Avancé",
     teacher_lbl_suggestions: "Suggestions",
 
     // Tooltips
-    teacher_tip_reset: "R\u00e9initialiser le canevas",
+    teacher_tip_reset: "Réinitialiser",
     teacher_tip_load: "Charger une sauvegarde (JSON)",
     teacher_tip_save: "Sauvegarder (JSON)",
-    teacher_tip_pdf: "Exporter en PDF",
-    teacher_tip_md: "Exporter Profil (Markdown)",
-    teacher_tip_full_md: "Exporter Canevas Complet (Markdown)",
-    teacher_tip_suggest: "Proposer une am\u00e9lioration (export local)",
-    teacher_tip_guide: "Guide d\u2019utilisation",
-    teacher_tip_about: "\u00c0 propos",
-    teacher_tip_load_lang: "Charger un pack de langue",
+    teacher_tip_md: "Exporter en Markdown",
+    teacher_tip_word: "Exporter en Word (.docx)",
+    teacher_tip_about: "À propos",
     teacher_tip_clear_suggestions: "Supprimer toutes les suggestions locales",
 
     // Card 1: Identité
-    teacher_card_identity: "Identit\u00e9",
+    teacher_card_identity: "1. Identité",
     teacher_desc_identity: "Profil administratif et personnel.",
-    teacher_lbl_firstname: "Pr\u00e9nom",
+    teacher_lbl_firstname: "Prénom",
     teacher_ph_firstname: "Ex: Julie",
-    teacher_lbl_education_sector: "Secteur d\u2019\u00e9ducation",
-    teacher_opt_select: "S\u00e9lectionner...",
-    teacher_optgrp_preprimary: "Enseignement pr\u00e9scolaire et primaire",
-    teacher_opt_preschool: "Pr\u00e9scolaire / Maternelle",
-    teacher_opt_primary: "Primaire / \u00c9l\u00e9mentaire",
+    teacher_lbl_education_sector: "Secteur d'éducation",
+    teacher_opt_select: "Sélectionner...",
+    teacher_optgrp_preprimary: "Enseignement préscolaire et primaire",
+    teacher_opt_preschool: "Préscolaire / Maternelle",
+    teacher_opt_primary: "Primaire / Élémentaire",
     teacher_optgrp_secondary: "Enseignement secondaire",
     teacher_opt_middle: "Secondaire (premier cycle / inférieur)",
     teacher_opt_high_general: "Secondaire (deuxième cycle / supérieur) — général",
     teacher_opt_high_vocational: "Secondaire — technique et professionnel",
-    teacher_optgrp_higher: "Enseignement sup\u00e9rieur",
-    teacher_opt_university: "Universit\u00e9",
+    teacher_optgrp_higher: "Enseignement supérieur",
+    teacher_opt_university: "Université",
     teacher_opt_grande_ecole: "Haute école / École spécialisée",
     teacher_opt_technical: "Collège / CÉGEP / Institut technologique",
     teacher_optgrp_continuing: "Formation continue",
-    teacher_opt_adult_training: "Formation d\u2019adultes / Continue",
+    teacher_opt_adult_training: "Formation d'adultes / Continue",
     teacher_opt_vocational_training: "Formation professionnelle / Apprentissage",
     teacher_optgrp_other: "Autre",
     teacher_opt_specialized: "Éducation spécialisée / adaptation scolaire",
-    teacher_opt_other: "Autre contexte \u00e9ducatif",
-    teacher_lbl_discipline: "Discipline / Sp\u00e9cialit\u00e9",
-    teacher_ph_discipline: "Ex: Math\u00e9matiques, Histoire-G\u00e9o, Informatique...",
+    teacher_opt_other: "Autre contexte éducatif",
+    teacher_lbl_discipline: "Discipline / Spécialité",
+    teacher_ph_discipline: "Ex: Mathématiques, Histoire-Géo, Informatique...",
     teacher_lbl_status: "Statut",
     teacher_opt_tenured: "Permanent",
     teacher_opt_contract: "Contractuel·le",
     teacher_opt_trainee: "En formation initiale (stage / insertion)",
-    teacher_lbl_experience: "Ann\u00e9es d\u2019exp\u00e9rience",
-    teacher_ph_experience: "Ex: 5 ans, D\u00e9butant...",
+    teacher_lbl_experience: "Années d'expérience",
+    teacher_ph_experience: "Ex: 5 ans, Débutant...",
+
+    // Digital Literacy Slider
+    teacher_lbl_digital_literacy: "Littératie / compétence numérique",
+    teacher_literacy_1: "Faible",
+    teacher_literacy_2: "Basique",
+    teacher_literacy_3: "Moyen",
+    teacher_literacy_4: "Bon",
+    teacher_literacy_5: "Élevé",
+
+    // Technology Adoption Slider (Rogers)
+    teacher_lbl_tech_adoption: "Adoption technologique",
+    teacher_tech_adoption_hint: "Selon la typologie de Rogers (2003)",
+    teacher_adoption_1: "Réfractaire",
+    teacher_adoption_2: "Majorité tardive",
+    teacher_adoption_3: "Majorité précoce",
+    teacher_adoption_4: "Adopteur précoce",
+    teacher_adoption_5: "Innovateur",
 
     // Advanced options
-    teacher_advanced_label: "Options avanc\u00e9es",
+    teacher_advanced_label: "Options avancées",
     teacher_lbl_career_path: "Parcours professionnel",
-    teacher_opt_local_hire: "Recrutement local",
-    teacher_opt_transfer: "Mutation / Affectation",
+    teacher_opt_transfer: "Transfert / Mobilité géographique",
     teacher_opt_career_change: "Reconversion professionnelle",
-    teacher_lbl_institution_tenure: "Anciennet\u00e9 dans l\u2019\u00e9tablissement",
+    teacher_opt_international: "Coopération internationale / Expatriation",
+    teacher_opt_other_char: "Autre(s) caractéristique(s)",
+    teacher_ph_other_char: "Précisez...",
+    teacher_lbl_institution_tenure: "Ancienneté dans l'établissement",
     teacher_opt_newcomer: "Nouvel arrivant (< 1 an)",
-    teacher_opt_recent: "1 \u00e0 3 ans",
+    teacher_opt_recent: "1 à 3 ans",
     teacher_opt_established: "Plus de 3 ans",
 
-    // Card 2: Localisation & classe
-    teacher_card_context: "Localisation & classe",
-    teacher_desc_context: "Environnement et conditions d\u2019exercice.",
-    teacher_lbl_details: "D\u00e9tails",
-    teacher_ph_details: "D\u00e9tails",
-    teacher_lbl_school_type: "Type d\u2019\u00e9tablissement",
-    teacher_ph_school_type: "Ex: \u00c9cole de quartier...",
-    teacher_lbl_class_profile: "Profil g\u00e9n\u00e9ral de la classe",
-    teacher_chk_heterogeneity: "H\u00e9t\u00e9rog\u00e9n\u00e9it\u00e9 scolaire",
+    // Card 2: Localisation et classe
+    teacher_card_context: "2. Localisation et classe",
+    teacher_desc_context: "Environnement et conditions d'exercice.",
+    teacher_lbl_details: "Détails",
+    teacher_ph_details: "Détails",
+    teacher_lbl_school_type: "Type d'établissement",
+    teacher_ph_school_type: "Ex: École de quartier...",
+    teacher_lbl_class_profile: "Profil général de la classe",
+    teacher_chk_heterogeneity: "Classe hétérogène",
     teacher_chk_climate: "Gestion de classe difficile",
-    teacher_chk_multilevel: "Classe \u00e0 double ou triple niveau",
-    teacher_chk_overcrowded: "Classe surcharg\u00e9e / Faible effectif",
-    teacher_chk_inclusion: "\u00c9l\u00e8ves \u00e0 besoins particuliers (ULIS, EBEP)",
-    teacher_chk_social: "Pr\u00e9carit\u00e9 sociale des familles",
-    teacher_chk_turnover_students: "Fort turnover des \u00e9l\u00e8ves",
-    teacher_lbl_geographic_context: "Contexte g\u00e9ographique",
-    teacher_chk_rural: "Zone rurale / Isolement g\u00e9ographique",
+    teacher_chk_multilevel: "Classe à double ou triple niveau",
+    teacher_chk_overcrowded: "Classe surchargée / Faible effectif",
+    teacher_chk_inclusion: "Élèves à besoins particuliers",
+    teacher_chk_social: "Précarité",
+    teacher_chk_other: "Autre",
+    teacher_lbl_room_type: "Local",
+    teacher_chk_room_dry_movable: "Classe avec bureaux déplaçables",
+    teacher_chk_room_dry_fixed: "Classe avec bureaux fixes",
+    teacher_chk_room_modular: "Classe modulaire",
+    teacher_chk_room_lab_specialized: "Laboratoire disciplinaire spécialisé",
+    teacher_chk_room_lab_computer: "Laboratoire informatique",
+    teacher_chk_room_active_learning: "Classe d'apprentissage actif",
+    teacher_chk_room_gym: "Gymnase",
+    teacher_chk_room_distance: "Formation à distance",
+    teacher_lbl_geographic_context: "Contexte géographique",
+    teacher_chk_rural: "Zone rurale / Isolement géographique",
     teacher_chk_social_context: "Contexte économique et social",
-    teacher_chk_remote_access: "Acc\u00e8s difficile (montagne, \u00eele, etc.)",
-    teacher_chk_overseas: "Territoire ultramarin",
+    teacher_chk_displaced: "Population déplacée / Réfugiés",
+    teacher_chk_conflict: "Zone de conflit / Post-conflit",
     teacher_lbl_linguistic_context: "Contexte linguistique",
     teacher_chk_multilingual: "Classes plurilingues",
-    teacher_chk_allophone: "\u00c9l\u00e8ves allophones nouvellement arriv\u00e9s (EANA)",
-    teacher_chk_regional_lang: "Enseignement de langue r\u00e9gionale",
+    teacher_chk_allophone: "Élèves allophones ou nouvellement arrivé·es",
+    teacher_chk_regional_lang: "Langue locale dominante (français langue seconde)",
+    teacher_chk_creole: "Diversité linguistique",
+    teacher_chk_bilingual: "Programme bilingue / immersion",
 
     // Card 3: Numérique
-    teacher_card_digital: "Num\u00e9rique",
-    teacher_desc_digital: "\u00c9quipement et comp\u00e9tences technologiques.",
-    teacher_lbl_tools_usage: "Outils & Usages",
+    teacher_card_digital: "3. Numérique",
+    teacher_desc_digital: "Équipement et compétences technologiques.",
+    teacher_lbl_tools_usage: "Outils et usages de l'enseignant·e",
     teacher_chk_office: "Bureautique (Word/PPT)",
     teacher_chk_institution: "Outils institutionnels (portail, ENA/LMS)",
     teacher_chk_smartphone: "Smartphone uniquement",
-    teacher_chk_no_computer: "Pas d\u2019ordi perso / Partage \u00e9quipement",
+    teacher_chk_no_computer: "Pas d'ordi perso / Partage équipement",
     teacher_chk_basic_training: "Besoin formation bases (fichiers, mails)",
-    teacher_chk_paper_only: "Privil\u00e9gie le papier / R\u00e9ticent num\u00e9rique",
-    teacher_chk_social_watch: "Veille via r\u00e9seaux sociaux (Insta/TikTok)",
-    teacher_chk_ai_curious: "Curieux/Utilisateur IA g\u00e9n\u00e9rative",
-    teacher_chk_cloud_academic: "Utilise le cloud acad\u00e9mique (Nuage/Apps)",
-    teacher_lbl_equipment_challenges: "D\u00e9fis mat\u00e9riels sp\u00e9cifiques",
-    teacher_chk_shared_devices: "\u00c9quipements partag\u00e9s entre coll\u00e8gues",
-    teacher_chk_byod: "Utilisation d\u2019\u00e9quipement personnel obligatoire (BYOD)",
-    teacher_chk_outdated: "Mat\u00e9riel obsol\u00e8te ou en panne",
+    teacher_chk_paper_only: "Privilégie le papier / Réticent numérique",
+    teacher_chk_social_watch: "Veille via réseaux sociaux (Insta/TikTok)",
+    teacher_chk_ai_curious: "Curieux/Utilisateur IA générative",
+    teacher_chk_cloud_academic: "Utilise le cloud académique (Nuage/Apps)",
+    teacher_lbl_available_equipment: "Matériel disponible",
+    teacher_chk_equip_projector: "Projecteur",
+    teacher_chk_equip_doc_camera: "Caméra document",
+    teacher_chk_equip_iwb: "Tableau blanc interactif ou projecteur interactif",
+    teacher_chk_equip_computer: "Ordinateur",
+    teacher_chk_equip_internet: "Accès internet / wifi",
+    teacher_chk_equip_workstations: "Postes de travail spécialisés",
+    teacher_chk_equip_desktops: "Ordinateurs fixes",
+    teacher_chk_equip_laptops: "Ordinateurs portables",
+    teacher_chk_equip_tablets: "Tablettes",
+    teacher_chk_equip_smartphones: "Téléphones intelligents",
+    teacher_chk_equip_specialized: "Équipements spécialisés",
+    teacher_chk_equip_videoconf: "Équipements de visioconférence",
+    teacher_lbl_equipment_challenges: "Défis matériels spécifiques",
+    teacher_chk_shared_devices: "Équipements partagés entre collègues",
+    teacher_chk_byod: "Utilisation d'équipement personnel obligatoire (BYOD)",
+    teacher_chk_outdated: "Matériel obsolète ou en panne",
 
     // Card 4: Motivations
-    teacher_card_motivations: "Motivations",
-    teacher_desc_motivations: "Besoins et attentes vis-\u00e0-vis de la formation.",
+    teacher_card_motivations: "4. Motivations",
+    teacher_desc_motivations: "Besoins et attentes vis-à-vis de la formation.",
     teacher_lbl_why_train: "Pourquoi se former ?",
-    teacher_chk_class_mgmt: "Gestion de classe / Autorit\u00e9",
-    teacher_chk_exam_prep: "Pr\u00e9paration aux concours",
-    teacher_chk_time_saving: "Gain de temps (Ressources pr\u00eates)",
+    teacher_motivation_intrinsic: "Motivation intrinsèque",
+    teacher_motivation_extrinsic: "Motivation extrinsèque",
+    teacher_chk_class_mgmt: "Gestion de classe / Autorité",
+    teacher_chk_exam_prep: "Préparation aux concours",
+    teacher_chk_time_saving: "Gain de temps (Ressources prêtes)",
     teacher_chk_innovation: "Tester de nouvelles approches (Ludification, etc.)",
-    teacher_chk_wellbeing: "Climat de classe / Bien-\u00eatre",
-    teacher_chk_career: "\u00c9volution de carri\u00e8re/perspectives",
-    teacher_chk_project: "Monter un projet (Sortie, \u00e9change)",
-    teacher_lbl_infrastructure: "Contraintes d\u2019infrastructure",
-    teacher_chk_power: "Coupures \u00e9lectriques fr\u00e9quentes",
-    teacher_chk_building: "Locaux v\u00e9tustes ou inadapt\u00e9s",
-    teacher_chk_climate_extreme: "Climat extr\u00eame (chaleur, froid, etc.)",
-    teacher_chk_seasonal_access: "Acc\u00e8s saisonnier difficile",
+    teacher_chk_wellbeing: "Climat de classe / Bien-être",
+    teacher_chk_career: "Évolution de carrière/perspectives",
+    teacher_chk_project: "Monter un projet (Sortie, échange)",
+    teacher_chk_mandatory: "Formation obligatoire (p. ex. imposée par la direction ou un ordre professionnel)",
+    teacher_lbl_infrastructure: "Contraintes d'infrastructure",
+    teacher_chk_power: "Coupures électriques fréquentes",
+    teacher_chk_building: "Locaux vétustes ou inadaptés",
+    teacher_chk_climate_extreme: "Climat extrême (chaleur, froid, humidité)",
+    teacher_chk_seasonal_access: "Accès saisonnier difficile",
+    teacher_chk_water: "Accès limité à l'eau potable / sanitaires",
 
     // Card 5: Freins
-    teacher_card_obstacles: "Freins",
-    teacher_desc_obstacles: "Obstacles potentiels \u00e0 l\u2019apprentissage.",
-    teacher_lbl_obstacles: "Obstacles \u00e0 la formation",
+    teacher_card_obstacles: "5. Freins",
+    teacher_desc_obstacles: "Obstacles potentiels à l'apprentissage.",
+    teacher_lbl_obstacles: "Obstacles à la formation",
     teacher_chk_workload: "Charge de travail",
-    teacher_chk_training_gap: "Offre de formation inadapt\u00e9e",
-    teacher_chk_logistics: "Transport / Logistique (Acc\u00e8s formation)",
-    teacher_chk_language_barrier: "Barri\u00e8re de la langue (Enseignant/\u00c9l\u00e8ves)",
+    teacher_chk_training_gap: "Offre de formation inadaptée",
+    teacher_chk_logistics: "Transport / Logistique (Accès formation)",
+    teacher_chk_language_barrier: "Barrière de la langue (Enseignant/Élèves)",
     teacher_chk_unstable_internet: "Connexion domicile instable/inexistante",
     teacher_chk_low_motivation: "Faible motivation",
-    teacher_chk_jetlag: "D\u00e9calage horaire (si formateur distant)",
+    teacher_chk_jetlag: "Décalage horaire (si formateur distant)",
 
     // Card 6: Format
-    teacher_card_format: "Format",
-    teacher_desc_format: "Modalit\u00e9s p\u00e9dagogiques pr\u00e9f\u00e9r\u00e9es.",
-    teacher_lbl_preferred_formats: "Formats pr\u00e9f\u00e9r\u00e9s",
-    teacher_chk_micro: "Micro-learning (5-10 min)",
-    teacher_chk_mobile: "Mobile Learning",
-    teacher_chk_visio: "Visio-conf\u00e9rence (Synchrones)",
-    teacher_chk_hybrid: "Hybride (Pr\u00e9sentiel + Distanciel)",
+    teacher_card_format: "6. Format",
+    teacher_desc_format: "Modalités pédagogiques préférées.",
+    teacher_lbl_preferred_formats: "Formats/types de formation préférés",
+    teacher_chk_micro: "Micro-apprentissage (5-10 min)",
+    teacher_chk_mobile: "Apprentissage mobile",
+    teacher_chk_visio: "Visioconférence synchrone",
+    teacher_chk_hybrid: "Hybride ou HyFlex (présentiel et distanciel)",
     teacher_chk_tutoring: "Tutorat / Accompagnement individuel",
-    teacher_chk_resources: "Banque de ressources libre acc\u00e8s",
-    teacher_chk_offline: "Mode \"Hors-ligne\" (T\u00e9l\u00e9chargement)",
-    teacher_chk_whatsapp: "WhatsApp (Faible d\u00e9bit / Informalit\u00e9)",
-    teacher_chk_peer: "Pair-\u00e0-pair local (T\u00e9moignages cr\u00e9dibles)",
+    teacher_chk_resources: "Banque de ressources libre accès",
+    teacher_chk_community: "Communauté de pratique",
+    teacher_chk_mooc: "MOOC",
+    teacher_chk_offline: "Mode \"Hors-ligne\" (Téléchargement)",
+    teacher_chk_whatsapp: "WhatsApp (Faible débit / Informalité)",
+    teacher_chk_peer: "Pair-à-pair local (Témoignages crédibles)",
 
-    // Card 7: Scénario
-    teacher_card_scenario: "Sc\u00e9nario / Journ\u00e9e Type",
-    teacher_desc_scenario: "D\u00e9roul\u00e9 d\u2019une journ\u00e9e type et disponibilit\u00e9s.",
-    teacher_lbl_scenario: "Racontez sa journ\u00e9e pour identifier les cr\u00e9neaux disponibles et les contraintes techniques.",
-    teacher_ph_scenario: "Ex: Finit la classe \u00e0 13h \u00e0 cause de la chaleur. Pas de r\u00e9seau le soir...",
+    // Card 7: Journée type
+    teacher_card_scenario: "7. Journée type de travail",
+    teacher_desc_scenario: "Déroulé d'une journée type et disponibilités.",
+    teacher_lbl_scenario: "Racontez sa journée pour identifier les créneaux disponibles et les contraintes techniques.",
+    teacher_ph_scenario: "Ex: Finit la classe à 13h à cause de la chaleur. Pas de réseau le soir...",
 
     // Footer
     teacher_footer: "D\u00e9velopp\u00e9 par Florent Michelot, inspir\u00e9 des travaux de Fran\u00e7ois Jourde & Jacques Dubois (2026) \u2022 CC BY-SA<br>Code original disponible sur <a href=\"https://github.com/jourde/artefacts\" target=\"_blank\" style=\"color: inherit;\">https://github.com/jourde/artefacts</a>",
@@ -619,12 +670,239 @@ function exportFullMarkdown() {
 
 // ── Reset ────────────────────────────────────────────────────────────────────
 function resetForm() {
+    var confirmMsg = i18nCore.t('teacher_reset_confirm') || 'Êtes-vous certain·e de supprimer le contenu de cette page? Cette action est irréversible.';
+    if (!confirm(confirmMsg)) return;
+
     document.getElementById('personaForm').reset();
     toggle.checked = false;
     body.classList.remove('show-context');
     suggestionsToggle.checked = false;
     body.classList.remove('show-suggestions');
     handleSectorChange('');
+
+    // Reset sliders to default values
+    var literacySlider = document.getElementById('digitalLiteracySlider');
+    var adoptionSlider = document.getElementById('techAdoptionSlider');
+    if (literacySlider) literacySlider.value = 3;
+    if (adoptionSlider) adoptionSlider.value = 3;
+
+    // Hide career path other field
+    var careerPathOtherField = document.getElementById('careerPathOtherField');
+    if (careerPathOtherField) careerPathOtherField.classList.add('hidden');
+}
+
+// ── Slider Label Updates ─────────────────────────────────────────────────────
+function updateDigitalLiteracyLabel() {
+    // Labels are already displayed below the slider, no additional action needed
+}
+
+function updateTechAdoptionLabel() {
+    // Labels are already displayed below the slider, no additional action needed
+}
+
+// ── Toggle Career Path Other Field ───────────────────────────────────────────
+function toggleCareerPathOther() {
+    var checkbox = document.getElementById('careerPathOther');
+    var field = document.getElementById('careerPathOtherField');
+    if (checkbox && field) {
+        if (checkbox.checked) {
+            field.classList.remove('hidden');
+        } else {
+            field.classList.add('hidden');
+            var textInput = document.getElementById('careerPathOtherText');
+            if (textInput) textInput.value = '';
+        }
+    }
+}
+
+// ── Word Export ──────────────────────────────────────────────────────────────
+function exportWord() {
+    if (!window.docx || !window.docx.Document) {
+        alert(i18nCore.t('teacher_docx_not_available') || "La bibliothèque d'export Word n'est pas disponible.");
+        return;
+    }
+
+    var Document = window.docx.Document;
+    var Packer = window.docx.Packer;
+    var Paragraph = window.docx.Paragraph;
+    var TextRun = window.docx.TextRun;
+
+    var name = document.getElementById('name').value || 'Persona';
+    var safe = function (s) { return (s || '').toString().trim(); };
+    var children = [];
+
+    // Styles: Helvetica for headings (burgundy), Garamond for body
+    var burgundy = '912338';
+
+    // Helper functions for styled paragraphs
+    var createTitle = function (text) {
+        return new Paragraph({
+            children: [new TextRun({
+                text: text,
+                font: 'Helvetica',
+                size: 32, // 16pt
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { after: 200 }
+        });
+    };
+
+    var createHeading = function (text) {
+        return new Paragraph({
+            children: [new TextRun({
+                text: text,
+                font: 'Helvetica',
+                size: 28, // 14pt
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { before: 400, after: 200 }
+        });
+    };
+
+    var createSubheading = function (text) {
+        return new Paragraph({
+            children: [new TextRun({
+                text: text,
+                font: 'Helvetica',
+                size: 24, // 12pt
+                color: burgundy,
+                bold: true
+            })],
+            spacing: { before: 300, after: 150 }
+        });
+    };
+
+    var createLabelValue = function (label, value) {
+        return new Paragraph({
+            children: [
+                new TextRun({ text: label, font: 'Garamond', size: 24, bold: true }),
+                new TextRun({ text: value, font: 'Garamond', size: 24 })
+            ]
+        });
+    };
+
+    var createLabel = function (label) {
+        return new Paragraph({
+            children: [new TextRun({ text: label, font: 'Garamond', size: 24, bold: true })]
+        });
+    };
+
+    var createBody = function (text) {
+        return new Paragraph({
+            children: [new TextRun({ text: text, font: 'Garamond', size: 24 })]
+        });
+    };
+
+    var createBullet = function (text) {
+        return new Paragraph({
+            children: [new TextRun({ text: '• ' + text, font: 'Garamond', size: 24 })],
+            indent: { left: 360 }
+        });
+    };
+
+    // Title
+    children.push(createTitle(i18nCore.t('teacher_heading') || 'Profil de l\'enseignant·e'));
+    children.push(createLabelValue('Date : ', new Date().toLocaleDateString('fr-CA')));
+    children.push(new Paragraph({ spacing: { after: 400 } }));
+
+    // Section 1: Identité
+    children.push(createHeading('1. Identité'));
+    if (safe(name)) children.push(createLabelValue('Prénom : ', safe(name)));
+
+    var sector = document.getElementById('educationSector');
+    if (sector && safe(sector.value)) children.push(createLabelValue('Secteur : ', safe(sector.value)));
+
+    var discipline = document.getElementById('discipline');
+    if (discipline && safe(discipline.value)) children.push(createLabelValue('Discipline : ', safe(discipline.value)));
+
+    var status = document.getElementById('status');
+    if (status && safe(status.value)) children.push(createLabelValue('Statut : ', safe(status.value)));
+
+    var experience = document.getElementById('experience');
+    if (experience && safe(experience.value)) children.push(createLabelValue('Expérience : ', safe(experience.value)));
+
+    var literacySlider = document.getElementById('digitalLiteracySlider');
+    if (literacySlider) {
+        var literacyLabels = ['', 'Faible', 'Basique', 'Moyen', 'Bon', 'Élevé'];
+        children.push(createLabelValue('Compétence numérique : ', literacyLabels[parseInt(literacySlider.value)] || ''));
+    }
+
+    var adoptionSlider = document.getElementById('techAdoptionSlider');
+    if (adoptionSlider) {
+        var adoptionLabels = ['', 'Réfractaire', 'Majorité tardive', 'Majorité précoce', 'Adopteur précoce', 'Innovateur'];
+        children.push(createLabelValue('Adoption technologique : ', adoptionLabels[parseInt(adoptionSlider.value)] || ''));
+    }
+
+    // Section 2: Localisation et classe
+    children.push(createHeading('2. Localisation et classe'));
+    var contextDetails = document.getElementById('contextDetails');
+    if (contextDetails && safe(contextDetails.value)) {
+        children.push(createLabel('Détails :'));
+        children.push(createBody(safe(contextDetails.value)));
+    }
+    var schoolType = document.getElementById('schoolType');
+    if (schoolType && safe(schoolType.value)) children.push(createLabelValue('Type d\'établissement : ', safe(schoolType.value)));
+
+    // Section 3: Numérique
+    children.push(createHeading('3. Numérique'));
+    var digitalDetails = document.getElementById('digitalDetails');
+    if (digitalDetails && safe(digitalDetails.value)) {
+        children.push(createLabel('Détails :'));
+        children.push(createBody(safe(digitalDetails.value)));
+    }
+
+    // Section 4: Motivations
+    children.push(createHeading('4. Motivations'));
+    var motivationDetails = document.getElementById('motivationDetails');
+    if (motivationDetails && safe(motivationDetails.value)) {
+        children.push(createLabel('Détails :'));
+        children.push(createBody(safe(motivationDetails.value)));
+    }
+
+    // Section 5: Freins
+    children.push(createHeading('5. Freins'));
+    var obstacleDetails = document.getElementById('obstacleDetails');
+    if (obstacleDetails && safe(obstacleDetails.value)) {
+        children.push(createLabel('Détails :'));
+        children.push(createBody(safe(obstacleDetails.value)));
+    }
+
+    // Section 6: Format
+    children.push(createHeading('6. Format'));
+    var formatDetails = document.getElementById('formatDetails');
+    if (formatDetails && safe(formatDetails.value)) {
+        children.push(createLabel('Détails :'));
+        children.push(createBody(safe(formatDetails.value)));
+    }
+
+    // Section 7: Journée type
+    children.push(createHeading('7. Journée type de travail'));
+    var scenario = document.getElementById('scenario');
+    if (scenario && safe(scenario.value)) {
+        children.push(createBody(safe(scenario.value)));
+    }
+
+    // Create document
+    var doc = new Document({
+        sections: [{
+            properties: {},
+            children: children
+        }]
+    });
+
+    // Generate and download
+    Packer.toBlob(doc).then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'profil_enseignant_' + name.replace(/\s+/g, '_') + '.docx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 500);
+    });
 }
 
 // ── Education Sector ─────────────────────────────────────────────────────────
