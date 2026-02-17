@@ -192,37 +192,6 @@
                     <input type="text" data-i18n-placeholder="teacher_ph_experience" placeholder="Ex: 5 ans, Débutant..." id="experience">
                 </div>
 
-                <!-- Digital Literacy Slider -->
-                <div class="form-group">
-                    <label data-i18n="teacher_lbl_digital_literacy">Littératie / compétence numérique</label>
-                    <div class="mt-2">
-                        <input type="range" id="digitalLiteracySlider" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" onchange="updateDigitalLiteracyLabel()">
-                        <div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
-                            <span data-i18n="teacher_literacy_1">Faible</span>
-                            <span data-i18n="teacher_literacy_2">Basique</span>
-                            <span data-i18n="teacher_literacy_3">Moyen</span>
-                            <span data-i18n="teacher_literacy_4">Bon</span>
-                            <span data-i18n="teacher_literacy_5">Élevé</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Technology Adoption Slider (Rogers) -->
-                <div class="form-group">
-                    <label data-i18n="teacher_lbl_tech_adoption">Adoption technologique</label>
-                    <p class="text-xs text-slate-500 mb-2" data-i18n="teacher_tech_adoption_hint">Selon la typologie de Rogers (2003)</p>
-                    <div class="mt-2">
-                        <input type="range" id="techAdoptionSlider" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" onchange="updateTechAdoptionLabel()">
-                        <div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
-                            <span data-i18n="teacher_adoption_1">Réfractaire</span>
-                            <span data-i18n="teacher_adoption_2">Majorité tardive</span>
-                            <span data-i18n="teacher_adoption_3">Majorité précoce</span>
-                            <span data-i18n="teacher_adoption_4">Adopteur précoce</span>
-                            <span data-i18n="teacher_adoption_5">Innovateur</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Advanced Options -->
                 <div class="advanced-context">
                     <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
@@ -327,6 +296,42 @@
                 <h2><span class="material-icons-round">devices</span> <span data-i18n="teacher_card_digital">3. Numérique</span></h2>
                 <div class="card-desc" data-i18n="teacher_desc_digital">Équipement et compétences technologiques.</div>
 
+                <!-- Profil numérique subsection -->
+                <div class="suggestions-panel">
+                    <p class="text-xs font-semibold text-slate-600 mb-3" data-i18n="teacher_digital_profile_title">Profil numérique</p>
+
+                    <!-- Digital Literacy Slider -->
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_digital_literacy">Littératie / compétence numérique</label>
+                        <div class="mt-2">
+                            <input type="range" id="digitalLiteracySlider" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" onchange="updateDigitalLiteracyLabel()">
+                            <div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
+                                <span data-i18n="teacher_literacy_1">Faible</span>
+                                <span data-i18n="teacher_literacy_2">Basique</span>
+                                <span data-i18n="teacher_literacy_3">Moyen</span>
+                                <span data-i18n="teacher_literacy_4">Bon</span>
+                                <span data-i18n="teacher_literacy_5">Élevé</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technology Adoption Slider (Rogers) -->
+                    <div class="form-group">
+                        <label data-i18n="teacher_lbl_tech_adoption">Adoption technologique</label>
+                        <p class="text-xs text-slate-500 mb-2" data-i18n="teacher_tech_adoption_hint">Selon la typologie de Rogers (2003)</p>
+                        <div class="mt-2">
+                            <input type="range" id="techAdoptionSlider" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" onchange="updateTechAdoptionLabel()">
+                            <div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
+                                <span data-i18n="teacher_adoption_1">Réfractaire</span>
+                                <span data-i18n="teacher_adoption_2">Majorité tardive</span>
+                                <span data-i18n="teacher_adoption_3">Majorité précoce</span>
+                                <span data-i18n="teacher_adoption_4">Adopteur précoce</span>
+                                <span data-i18n="teacher_adoption_5">Innovateur</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label data-i18n="teacher_lbl_details">Détails</label>
                     <textarea id="digitalDetails" data-i18n-placeholder="teacher_ph_details" placeholder="Détails"></textarea>
@@ -352,6 +357,7 @@
                 <!-- Advanced Options -->
                 <div class="advanced-context">
                     <span class="advanced-label" data-i18n="teacher_advanced_label">Options avancées</span>
+                    <p class="text-xs text-slate-500 italic mb-3" data-i18n="teacher_digital_equipment_note">Dispositifs numériques accessibles en classe ou mis à disposition par l'établissement.</p>
 
                     <!-- Matériel disponible -->
                     <div class="form-group">

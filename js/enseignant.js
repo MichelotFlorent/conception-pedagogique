@@ -67,6 +67,10 @@ var translations_fr = {
     teacher_lbl_experience: "Années d'expérience",
     teacher_ph_experience: "Ex: 5 ans, Débutant...",
 
+    // Digital Profile Subsection (Section 3)
+    teacher_digital_profile_title: "Profil numérique",
+    teacher_digital_equipment_note: "Dispositifs numériques accessibles en classe ou mis à disposition par l'établissement.",
+
     // Digital Literacy Slider
     teacher_lbl_digital_literacy: "Littératie / compétence numérique",
     teacher_literacy_1: "Faible",

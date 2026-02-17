@@ -841,6 +841,8 @@
     "teacher_opt_trainee": "In initial training (internship / induction)",
     "teacher_lbl_experience": "Years of experience",
     "teacher_ph_experience": "E.g.: 5 years, Beginner...",
+    "teacher_digital_profile_title": "Digital Profile",
+    "teacher_digital_equipment_note": "Digital devices accessible in class or provided by the institution.",
     "teacher_lbl_digital_literacy": "Digital literacy / competency",
     "teacher_literacy_1": "Low",
     "teacher_literacy_2": "Basic",
