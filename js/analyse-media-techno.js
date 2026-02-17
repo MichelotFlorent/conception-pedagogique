@@ -183,18 +183,38 @@
         });
         score += Math.min(10, Math.round(accessCount * 1.67));
 
-        // Update display
-        var display = document.getElementById('dnaScoreDisplay');
-        if (display) {
-            display.textContent = Math.min(100, score);
+        // Update odometer display
+        var finalScore = Math.min(100, score);
+        var scoreStr = finalScore.toString().padStart(3, '0');
+        var scoreClass = finalScore >= 80 ? 'score-high' : (finalScore >= 50 ? 'score-medium' : 'score-low');
 
-            // Color coding
-            if (score >= 80) {
-                display.className = 'text-2xl font-bold text-emerald-600';
-            } else if (score >= 50) {
-                display.className = 'text-2xl font-bold text-amber-600';
+        // Update individual digits
+        for (var i = 0; i < 3; i++) {
+            var digit = document.getElementById('dnaDigit' + i);
+            if (digit) {
+                digit.textContent = scoreStr[i];
+                digit.className = 'odometer-digit ' + scoreClass;
+            }
+        }
+
+        // Update progress bar
+        var progressBar = document.getElementById('dnaProgressBar');
+        if (progressBar) {
+            progressBar.style.width = finalScore + '%';
+        }
+
+        // Update score label
+        var scoreLabel = document.getElementById('dnaScoreLabel');
+        if (scoreLabel) {
+            if (finalScore >= 80) {
+                scoreLabel.textContent = 'Excellent';
+                scoreLabel.className = 'text-xs font-semibold text-emerald-400';
+            } else if (finalScore >= 50) {
+                scoreLabel.textContent = 'Acceptable';
+                scoreLabel.className = 'text-xs font-semibold text-amber-400';
             } else {
-                display.className = 'text-2xl font-bold text-rose-600';
+                scoreLabel.textContent = 'À améliorer';
+                scoreLabel.className = 'text-xs font-semibold text-rose-400';
             }
         }
 
