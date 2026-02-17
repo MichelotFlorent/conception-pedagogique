@@ -42,10 +42,18 @@
 
 /* Dyslexia-friendly mode */
 html.dyslexic-font,
-html.dyslexic-font *,
+html.dyslexic-font *:not(.material-icons):not(.material-icons-round):not(.material-icons-outlined):not(.material-symbols-rounded),
 body.dyslexic-font,
-body.dyslexic-font * {
+body.dyslexic-font *:not(.material-icons):not(.material-icons-round):not(.material-icons-outlined):not(.material-symbols-rounded) {
   font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+/* Ensure Material Icons keep their font */
+.material-icons,
+.material-icons-round,
+.material-icons-outlined,
+.material-symbols-rounded {
+  font-family: 'Material Icons Round', 'Material Icons', 'Material Symbols Rounded' !important;
 }
 
 /* ============================================
