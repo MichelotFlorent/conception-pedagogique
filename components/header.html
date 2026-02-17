@@ -133,6 +133,15 @@
                 </div>
             </div>
 
+            <!-- Dyslexia Font Toggle -->
+            <div class="dyslexia-toggle">
+                <label class="dyslexia-toggle-label" title="Police adaptée à la dyslexie">
+                    <input type="checkbox" id="globalDyslexicToggle" onchange="toggleDyslexicFont(this.checked)">
+                    <span class="material-icons-round">format_size</span>
+                    <span class="dyslexia-toggle-text" data-i18n="header_dyslexic_font">Dyslexie</span>
+                </label>
+            </div>
+
             <!-- Language Selector -->
             <div class="lang-selector">
                 <span class="material-icons-round text-sm">translate</span>
@@ -364,6 +373,58 @@
     border-color: #cbd5e1;
 }
 
+/* Dyslexia toggle */
+.dyslexia-toggle {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5rem;
+}
+
+.dyslexia-toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #334155;
+}
+
+.dyslexia-toggle-label:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.dyslexia-toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.dyslexia-toggle-label input[type="checkbox"]:checked + .material-icons-round {
+    color: #912338;
+}
+
+.dyslexia-toggle-label input[type="checkbox"]:checked ~ .dyslexia-toggle-text {
+    color: #912338;
+    font-weight: 600;
+}
+
+.dyslexia-toggle-label .material-icons-round {
+    font-size: 1rem;
+    color: #64748b;
+    transition: color 0.2s ease;
+}
+
+/* Active state for dyslexia toggle */
+.dyslexia-toggle-label:has(input:checked) {
+    background: #fef2f4;
+    border-color: #912338;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .nav-dropdown-menu {
@@ -380,5 +441,35 @@
     .nav-dropdown-btn {
         padding: 0.5rem;
     }
+
+    .dyslexia-toggle-text {
+        display: none;
+    }
+
+    .dyslexia-toggle-label {
+        padding: 0.5rem;
+    }
 }
 </style>
+
+<script>
+// Dyslexic font toggle function
+function toggleDyslexicFont(enabled) {
+    if (enabled) {
+        document.body.classList.add('dyslexic-font');
+        localStorage.setItem('dyslexicFont', 'true');
+    } else {
+        document.body.classList.remove('dyslexic-font');
+        localStorage.setItem('dyslexicFont', 'false');
+    }
+}
+
+// Initialize dyslexic font state on page load
+(function() {
+    var toggle = document.getElementById('globalDyslexicToggle');
+    if (toggle && localStorage.getItem('dyslexicFont') === 'true') {
+        toggle.checked = true;
+        document.body.classList.add('dyslexic-font');
+    }
+})();
+</script>
