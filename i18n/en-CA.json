@@ -803,6 +803,7 @@
     "teacher_lbl_basic": "Basic",
     "teacher_lbl_advanced": "Advanced",
     "teacher_lbl_suggestions": "Suggestions",
+    "teacher_lbl_dyslexic_font": "Dyslexia-friendly font",
     "teacher_tip_reset": "Reset",
     "teacher_tip_load": "Load a backup (JSON)",
     "teacher_tip_save": "Save (JSON)",

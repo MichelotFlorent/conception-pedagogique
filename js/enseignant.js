@@ -24,6 +24,7 @@ var translations_fr = {
     teacher_lbl_basic: "Basique",
     teacher_lbl_advanced: "Avancé",
     teacher_lbl_suggestions: "Suggestions",
+    teacher_lbl_dyslexic_font: "Police adaptée à la dyslexie",
 
     // Tooltips
     teacher_tip_reset: "Réinitialiser",
@@ -288,6 +289,7 @@ var translations_fr = {
 var toggle = document.getElementById('contextToggle');
 var body = document.body;
 var suggestionsToggle = document.getElementById('suggestionsToggle');
+var dyslexicFontToggle = document.getElementById('dyslexicFontToggle');
 var infoModal = document.getElementById('infoModal');
 var helpModal = document.getElementById('helpModal');
 var suggestionsModal = document.getElementById('suggestionsModal');
@@ -332,6 +334,23 @@ suggestionsToggle.addEventListener('change', function () {
 // ── Initialize suggestions visibility on page load ───────────────────────────
 if (suggestionsToggle.checked) {
     body.classList.add('show-suggestions');
+}
+
+// ── Dyslexic font toggle ─────────────────────────────────────────────────────
+dyslexicFontToggle.addEventListener('change', function () {
+    if (this.checked) {
+        body.classList.add('dyslexic-font');
+        localStorage.setItem('dyslexicFont', 'true');
+    } else {
+        body.classList.remove('dyslexic-font');
+        localStorage.setItem('dyslexicFont', 'false');
+    }
+});
+
+// Initialize dyslexic font from localStorage
+if (localStorage.getItem('dyslexicFont') === 'true') {
+    dyslexicFontToggle.checked = true;
+    body.classList.add('dyslexic-font');
 }
 
 // ── Save ─────────────────────────────────────────────────────────────────────
