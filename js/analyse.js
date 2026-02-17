@@ -764,43 +764,104 @@
         var Packer = window.docx.Packer;
         var Paragraph = window.docx.Paragraph;
         var TextRun = window.docx.TextRun;
-        var HeadingLevel = window.docx.HeadingLevel;
 
         var safe = function (s) { return (s || '').toString().trim(); };
         var children = [];
 
-        // Title
-        children.push(new Paragraph({
-            text: getTranslation('analysis_heading') || 'Analyse de la situation',
-            heading: HeadingLevel.TITLE,
-            spacing: { after: 200 }
-        }));
+        // Styles: Helvetica for headings (burgundy), Garamond for body
+        var burgundy = '912338';
+
+        // Helper functions for styled paragraphs
+        var createTitle = function (text) {
+            return new Paragraph({
+                children: [new TextRun({
+                    text: text,
+                    font: 'Helvetica',
+                    size: 32, // 16pt
+                    color: burgundy,
+                    bold: true
+                })],
+                spacing: { after: 200 }
+            });
+        };
+
+        var createHeading = function (text) {
+            return new Paragraph({
+                children: [new TextRun({
+                    text: text,
+                    font: 'Helvetica',
+                    size: 28, // 14pt
+                    color: burgundy,
+                    bold: true
+                })],
+                spacing: { before: 400, after: 200 }
+            });
+        };
+
+        var createSubheading = function (text) {
+            return new Paragraph({
+                children: [new TextRun({
+                    text: text,
+                    font: 'Helvetica',
+                    size: 24, // 12pt
+                    color: burgundy,
+                    bold: true
+                })],
+                spacing: { before: 300, after: 150 }
+            });
+        };
+
+        var createLabelValue = function (label, value) {
+            return new Paragraph({
+                children: [
+                    new TextRun({ text: label, font: 'Garamond', size: 24, bold: true }),
+                    new TextRun({ text: value, font: 'Garamond', size: 24 })
+                ]
+            });
+        };
+
+        var createLabel = function (label) {
+            return new Paragraph({
+                children: [new TextRun({ text: label, font: 'Garamond', size: 24, bold: true })]
+            });
+        };
+
+        var createBody = function (text) {
+            return new Paragraph({
+                children: [new TextRun({ text: text, font: 'Garamond', size: 24 })]
+            });
+        };
+
+        var createIndentedBody = function (text) {
+            return new Paragraph({
+                children: [new TextRun({ text: text, font: 'Garamond', size: 24 })],
+                indent: { left: 360 }
+            });
+        };
+
+        // Title (H1: 16pt Helvetica, burgundy)
+        children.push(createTitle(getTranslation('analysis_heading') || 'Analyse de la situation'));
 
         // Date
-        children.push(new Paragraph({
-            children: [
-                new TextRun({ text: 'Date : ', bold: true }),
-                new TextRun(new Date().toLocaleDateString('fr-CA'))
-            ],
-            spacing: { after: 400 }
-        }));
+        children.push(createLabelValue('Date : ', new Date().toLocaleDateString('fr-CA')));
+        children.push(new Paragraph({ spacing: { after: 400 } }));
 
         // Section 1: Clarification de la demande
-        children.push(new Paragraph({ text: '1. Clarification de la demande', heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading('1. Clarification de la demande'));
         if (safe(data.section1.sponsorName)) {
-            children.push(new Paragraph({ children: [new TextRun({ text: 'Commanditaire : ', bold: true }), new TextRun(safe(data.section1.sponsorName))] }));
+            children.push(createLabelValue('Commanditaire : ', safe(data.section1.sponsorName)));
         }
         if (safe(data.section1.requestOriginal)) {
-            children.push(new Paragraph({ children: [new TextRun({ text: 'Demande formulée : ', bold: true })] }));
-            children.push(new Paragraph({ text: safe(data.section1.requestOriginal) }));
+            children.push(createLabel('Demande formulée :'));
+            children.push(createBody(safe(data.section1.requestOriginal)));
         }
         if (safe(data.section1.requestReformulated)) {
-            children.push(new Paragraph({ children: [new TextRun({ text: 'Demande reformulée : ', bold: true })] }));
-            children.push(new Paragraph({ text: safe(data.section1.requestReformulated) }));
+            children.push(createLabel('Demande reformulée :'));
+            children.push(createBody(safe(data.section1.requestReformulated)));
         }
 
         // Section 2: Besoin organisationnel
-        children.push(new Paragraph({ text: '2. Besoin organisationnel', heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading('2. Besoin organisationnel'));
         if (data.section2.businessNeedTypes && data.section2.businessNeedTypes.length > 0) {
             var typeLabels = {
                 revenue: 'Générer des revenus',
@@ -813,88 +874,88 @@
             if (data.section2.businessNeedOther && data.section2.businessNeedTypes.indexOf('other') >= 0) {
                 typeText += ' (' + data.section2.businessNeedOther + ')';
             }
-            children.push(new Paragraph({ children: [new TextRun({ text: 'Type de besoin : ', bold: true }), new TextRun(typeText)] }));
+            children.push(createLabelValue('Type de besoin : ', typeText));
         }
         if (safe(data.section2.businessStatement)) {
-            children.push(new Paragraph({ children: [new TextRun({ text: 'Énoncé des besoins : ', bold: true })] }));
-            children.push(new Paragraph({ text: safe(data.section2.businessStatement) }));
+            children.push(createLabel('Énoncé des besoins :'));
+            children.push(createBody(safe(data.section2.businessStatement)));
         }
 
         // Section 3: Analyse de l'écart de performance
-        children.push(new Paragraph({ text: "3. Analyse de l'écart de performance", heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading("3. Analyse de l'écart de performance"));
         if (data.gapAnalysis) {
             if (safe(data.gapAnalysis.optimalPerformance)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Performance optimale : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.gapAnalysis.optimalPerformance) }));
+                children.push(createLabel('Performance optimale :'));
+                children.push(createBody(safe(data.gapAnalysis.optimalPerformance)));
             }
             if (safe(data.gapAnalysis.actualPerformance)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Performance réelle : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.gapAnalysis.actualPerformance) }));
+                children.push(createLabel('Performance réelle :'));
+                children.push(createBody(safe(data.gapAnalysis.actualPerformance)));
             }
             if (safe(data.gapAnalysis.gapStatement)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: "Énoncé de l'écart : ", bold: true }), new TextRun(safe(data.gapAnalysis.gapStatement))] }));
+                children.push(createLabelValue("Énoncé de l'écart : ", safe(data.gapAnalysis.gapStatement)));
             }
             if (safe(data.gapAnalysis.gapFrequency)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Fréquence et étendue : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.gapAnalysis.gapFrequency) }));
+                children.push(createLabel('Fréquence et étendue :'));
+                children.push(createBody(safe(data.gapAnalysis.gapFrequency)));
             }
         }
 
         // Section 4: Analyse des tâches
-        children.push(new Paragraph({ text: '4. Analyse des tâches', heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading('4. Analyse des tâches'));
         if (data.section5 && data.section5.mainTasks && data.section5.mainTasks.length) {
-            children.push(new Paragraph({ children: [new TextRun({ text: 'Tâches principales :', bold: true })] }));
+            children.push(createLabel('Tâches principales :'));
             data.section5.mainTasks.forEach(function (task, i) {
                 if (safe(task)) {
-                    children.push(new Paragraph({ text: (i + 1) + '. ' + safe(task), indent: { left: 360 } }));
+                    children.push(createIndentedBody((i + 1) + '. ' + safe(task)));
                 }
             });
         }
         if (safe(data.section5.entryTasks)) {
-            children.push(new Paragraph({ children: [new TextRun({ text: 'Prérequis : ', bold: true })] }));
-            children.push(new Paragraph({ text: safe(data.section5.entryTasks) }));
+            children.push(createLabel('Prérequis :'));
+            children.push(createBody(safe(data.section5.entryTasks)));
         }
 
         // Section 5: Profil des apprenant·es
-        children.push(new Paragraph({ text: '5. Profil des apprenant·es', heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading('5. Profil des apprenant·es'));
         if (data.section6) {
             if (safe(data.section6.learnerCount)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: "Nombre d'apprenant·es : ", bold: true }), new TextRun(safe(data.section6.learnerCount))] }));
+                children.push(createLabelValue("Nombre d'apprenant·es : ", safe(data.section6.learnerCount)));
             }
             if (safe(data.section6.experienceLevel)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: "Niveau d'expérience : ", bold: true }), new TextRun(safe(data.section6.experienceLevel))] }));
+                children.push(createLabelValue("Niveau d'expérience : ", safe(data.section6.experienceLevel)));
             }
             if (safe(data.section6.learnerProfile)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Profil détaillé : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.section6.learnerProfile) }));
+                children.push(createLabel('Profil détaillé :'));
+                children.push(createBody(safe(data.section6.learnerProfile)));
             }
         }
 
         // Section 6: Facteurs d'influence
-        children.push(new Paragraph({ text: "6. Facteurs d'influence", heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading("6. Facteurs d'influence"));
         if (data.section7) {
             if (safe(data.section7.learningBarriers)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: "Obstacles à l'apprentissage : ", bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.section7.learningBarriers) }));
+                children.push(createLabel("Obstacles à l'apprentissage :"));
+                children.push(createBody(safe(data.section7.learningBarriers)));
             }
             if (safe(data.section7.supportFactors)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Facteurs de soutien : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.section7.supportFactors) }));
+                children.push(createLabel('Facteurs de soutien :'));
+                children.push(createBody(safe(data.section7.supportFactors)));
             }
             if (safe(data.section7.learningEnvironment)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: "Environnement d'apprentissage : ", bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.section7.learningEnvironment) }));
+                children.push(createLabel("Environnement d'apprentissage :"));
+                children.push(createBody(safe(data.section7.learningEnvironment)));
             }
         }
 
         // Section 7: Contraintes du projet
-        children.push(new Paragraph({ text: '7. Contraintes du projet', heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading('7. Contraintes du projet'));
         if (data.section8) {
             if (safe(data.section8.projectDeadline)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Date de lancement : ', bold: true }), new TextRun(safe(data.section8.projectDeadline))] }));
+                children.push(createLabelValue('Date de lancement : ', safe(data.section8.projectDeadline)));
             }
             if (safe(data.section8.projectBudget)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Budget : ', bold: true }), new TextRun(safe(data.section8.projectBudget))] }));
+                children.push(createLabelValue('Budget : ', safe(data.section8.projectBudget)));
             }
             var formats = [];
             if (data.section8.formatClassroom) formats.push('présentiel');
@@ -902,79 +963,98 @@
             if (data.section8.formatSelfStudy) formats.push('autoformation');
             if (data.section8.formatBlended) formats.push('mixte');
             if (formats.length) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Formats : ', bold: true }), new TextRun(formats.join(', '))] }));
+                children.push(createLabelValue('Formats : ', formats.join(', ')));
             }
             if (safe(data.section8.otherConstraints)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Autres contraintes : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.section8.otherConstraints) }));
+                children.push(createLabel('Autres contraintes :'));
+                children.push(createBody(safe(data.section8.otherConstraints)));
             }
         }
 
         // Section 8: Étude approfondie des causes
-        children.push(new Paragraph({ text: '8. Étude approfondie des causes', heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading('8. Étude approfondie des causes'));
         if (data.rootCauseFilter) {
             var survivalResult = { yes: 'OUI - Environnemental/Motivationnel', no: 'NON - Déficit de compétences' };
             if (safe(data.rootCauseFilter.survivalTest)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Test de capacité : ', bold: true }), new TextRun(survivalResult[data.rootCauseFilter.survivalTest] || '')] }));
+                children.push(createLabelValue('Test de capacité : ', survivalResult[data.rootCauseFilter.survivalTest] || ''));
             }
+
+            // Sous-section A: Facteurs environnementaux
+            children.push(createSubheading('A. Facteurs environnementaux'));
             if (safe(data.rootCauseFilter.envToolsEquipment)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Outils et équipements : ', bold: true }), new TextRun(safe(data.rootCauseFilter.envToolsEquipment))] }));
+                children.push(createLabelValue('Outils et équipements : ', safe(data.rootCauseFilter.envToolsEquipment)));
             }
             if (safe(data.rootCauseFilter.envProcedures)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Processus et procédures : ', bold: true }), new TextRun(safe(data.rootCauseFilter.envProcedures))] }));
+                children.push(createLabelValue('Processus et procédures : ', safe(data.rootCauseFilter.envProcedures)));
             }
             if (safe(data.rootCauseFilter.envFeedback)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Systèmes de rétroaction : ', bold: true }), new TextRun(safe(data.rootCauseFilter.envFeedback))] }));
+                children.push(createLabelValue('Systèmes de rétroaction : ', safe(data.rootCauseFilter.envFeedback)));
             }
+
+            // Sous-section B: Facteurs motivationnels
+            children.push(createSubheading('B. Facteurs motivationnels'));
             if (safe(data.rootCauseFilter.motConsequences)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Conséquences : ', bold: true }), new TextRun(safe(data.rootCauseFilter.motConsequences))] }));
+                children.push(createLabelValue('Conséquences : ', safe(data.rootCauseFilter.motConsequences)));
             }
             if (safe(data.rootCauseFilter.motValueAlignment)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Alignement des valeurs : ', bold: true }), new TextRun(safe(data.rootCauseFilter.motValueAlignment))] }));
+                children.push(createLabelValue('Alignement des valeurs : ', safe(data.rootCauseFilter.motValueAlignment)));
             }
+
+            // Sous-section C: Facteurs de connaissances et compétences
+            children.push(createSubheading('C. Facteurs de connaissances et compétences'));
             if (safe(data.rootCauseFilter.ksPrerequisite)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Vérification des prérequis : ', bold: true }), new TextRun(safe(data.rootCauseFilter.ksPrerequisite))] }));
+                children.push(createLabelValue('Vérification des prérequis : ', safe(data.rootCauseFilter.ksPrerequisite)));
             }
             if (safe(data.rootCauseFilter.ksComplexity)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Complexité et fréquence : ', bold: true }), new TextRun(safe(data.rootCauseFilter.ksComplexity))] }));
+                children.push(createLabelValue('Complexité et fréquence : ', safe(data.rootCauseFilter.ksComplexity)));
             }
         }
 
         // Section 9: Analyse d'impact et de valeur
-        children.push(new Paragraph({ text: "9. Analyse d'impact et de valeur", heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading("9. Analyse d'impact et de valeur"));
         if (data.impactAnalysis) {
             if (safe(data.impactAnalysis.costInaction)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: "Coût de l'inaction : ", bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.impactAnalysis.costInaction) }));
+                children.push(createLabel("Coût de l'inaction :"));
+                children.push(createBody(safe(data.impactAnalysis.costInaction)));
             }
             if (safe(data.impactAnalysis.smartGoal)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Objectif SMART : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.impactAnalysis.smartGoal) }));
+                children.push(createLabel('Objectif SMART :'));
+                children.push(createBody(safe(data.impactAnalysis.smartGoal)));
             }
             if (safe(data.impactAnalysis.dropDeadDeadline)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Date limite : ', bold: true }), new TextRun(safe(data.impactAnalysis.dropDeadDeadline))] }));
+                children.push(createLabelValue('Date limite : ', safe(data.impactAnalysis.dropDeadDeadline)));
             }
             if (safe(data.impactAnalysis.maxBudget)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Budget maximum : ', bold: true }), new TextRun(safe(data.impactAnalysis.maxBudget))] }));
+                children.push(createLabelValue('Budget maximum : ', safe(data.impactAnalysis.maxBudget)));
             }
         }
 
         // Synthèse
-        children.push(new Paragraph({ text: 'Synthèse et recommandations', heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 200 } }));
+        children.push(createHeading('Synthèse et recommandations'));
         if (data.synthesis) {
             if (safe(data.synthesis.keyFindings)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Constats clés : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.synthesis.keyFindings) }));
+                children.push(createLabel('Constats clés :'));
+                children.push(createBody(safe(data.synthesis.keyFindings)));
             }
             if (safe(data.synthesis.isTrainingSolution)) {
                 var sol = { yes: 'Oui', partial: 'Partiellement', no: 'Non' };
-                children.push(new Paragraph({ children: [new TextRun({ text: 'La formation est-elle appropriée ? ', bold: true }), new TextRun(sol[data.synthesis.isTrainingSolution] || '')] }));
+                children.push(createLabelValue('La formation est-elle appropriée ? ', sol[data.synthesis.isTrainingSolution] || ''));
             }
             if (safe(data.synthesis.recommendations)) {
-                children.push(new Paragraph({ children: [new TextRun({ text: 'Recommandations : ', bold: true })] }));
-                children.push(new Paragraph({ text: safe(data.synthesis.recommendations) }));
+                children.push(createLabel('Recommandations :'));
+                children.push(createBody(safe(data.synthesis.recommendations)));
             }
         }
+
+        // Type de solution recommandé
+        var solutionType = 'À déterminer';
+        if (data.rootCauseFilter && data.rootCauseFilter.survivalTest === 'yes') {
+            solutionType = 'NON PÉDAGOGIQUE (environnemental/motivationnel)';
+        } else if (data.rootCauseFilter && data.rootCauseFilter.survivalTest === 'no') {
+            solutionType = 'PÉDAGOGIQUE (déficit de compétences)';
+        }
+        children.push(new Paragraph({ spacing: { before: 300 } }));
+        children.push(createLabelValue('Type de solution recommandé : ', solutionType));
 
         // Create document
         var doc = new Document({
