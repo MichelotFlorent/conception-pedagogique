@@ -6,61 +6,140 @@
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <!-- Logo/Title -->
         <div class="flex items-center gap-3">
-            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #912338, #6d1a2a); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(145, 35, 56, 0.2);">
-                <span class="material-icons-round" style="color: #FFD700; font-size: 28px;">school</span>
-            </div>
-            <div>
-                <div class="text-lg font-bold" style="color: #912338; letter-spacing: -0.02em;">Learning Designer</div>
-                <div class="text-xs text-slate-500" data-i18n="header_tagline">outils de conception pédagogique</div>
-            </div>
+            <a href="index.html" class="flex items-center gap-3" style="text-decoration: none;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #912338, #6d1a2a); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(145, 35, 56, 0.2);">
+                    <span class="material-icons-round" style="color: #FFD700; font-size: 28px;">school</span>
+                </div>
+                <div>
+                    <div class="text-lg font-bold" style="color: #912338; letter-spacing: -0.02em;">Learning Designer</div>
+                    <div class="text-xs text-slate-500" data-i18n="header_tagline">outils de conception pédagogique</div>
+                </div>
+            </a>
         </div>
 
-        <!-- Navigation Links (order matches homepage tiles) -->
-        <div class="flex flex-wrap items-center gap-2">
-            <a href="index.html" class="nav-link" data-i18n="nav_home">
+        <!-- Navigation Links - ADDIE Structure -->
+        <div class="flex flex-wrap items-center gap-1">
+            <!-- Accueil -->
+            <a href="index.html" class="nav-link">
                 <span class="material-icons-round text-sm">home</span>
-                accueil
+                <span data-i18n="nav_home">Accueil</span>
             </a>
-            <a href="analyse.html" class="nav-link" data-i18n="nav_analysis">
-                <span class="material-icons-round text-sm">analytics</span>
-                analyse
-            </a>
-            <a href="analyse-media-techno.html" class="nav-link" data-i18n="nav_media">
-                <span class="material-icons-round text-sm">devices</span>
-                médias
-            </a>
-            <a href="enseignant.html" class="nav-link" data-i18n="nav_teacher">
-                <span class="material-icons-round text-sm">person</span>
-                enseignant
-            </a>
-            <a href="persona.html" class="nav-link" data-i18n="nav_persona">
-                <span class="material-icons-round text-sm">people</span>
-                personas
-            </a>
-            <a href="configuration.html" class="nav-link" data-i18n="nav_portrait">
-                <span class="material-icons-round text-sm">tune</span>
-                portrait
-            </a>
-            <a href="macrodesign.html" class="nav-link" data-i18n="nav_macrodesign">
-                <span class="material-icons-round text-sm">account_tree</span>
-                macrodesign
-            </a>
-            <a href="microdesign.html" class="nav-link" data-i18n="nav_microdesign">
-                <span class="material-icons-round text-sm">view_timeline</span>
-                microdesign
-            </a>
-            <a href="macrodesign-beta.html" class="nav-link nav-link-beta" data-i18n="nav_macrodesign_beta">
-                <span class="material-icons-round text-sm">science</span>
-                macro β
-            </a>
-            <a href="microdesign-beta.html" class="nav-link nav-link-beta" data-i18n="nav_microdesign_beta">
-                <span class="material-icons-round text-sm">science</span>
-                micro β
-            </a>
-            <a href="evaluation.html" class="nav-link" data-i18n="nav_evaluation">
-                <span class="material-icons-round text-sm">assessment</span>
-                évaluation
-            </a>
+
+            <!-- ANALYSE Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn nav-phase-analyse">
+                    <span class="material-icons-round text-sm">search</span>
+                    <span data-i18n="nav_phase_analysis">Analyse</span>
+                    <span class="material-icons-round text-xs nav-chevron">expand_more</span>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="analyse.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">analytics</span>
+                        <span data-i18n="nav_tool_analysis">Analyse de la situation</span>
+                    </a>
+                    <a href="analyse-media-techno.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">devices</span>
+                        <span data-i18n="nav_tool_media">Analyse médiatique et technologique</span>
+                    </a>
+                    <a href="enseignant.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">person</span>
+                        <span data-i18n="nav_tool_teacher">Profil de l'enseignant·e</span>
+                    </a>
+                    <a href="persona.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">people</span>
+                        <span data-i18n="nav_tool_personas">Personas d'apprenant·e·s</span>
+                    </a>
+                    <a href="configuration.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">tune</span>
+                        <span data-i18n="nav_tool_portrait">Portrait du cours</span>
+                    </a>
+                    <a href="macrodesign.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">account_tree</span>
+                        <span data-i18n="nav_tool_macrodesign">Macrodesign</span>
+                    </a>
+                    <a href="macrodesign-beta.html" class="nav-dropdown-item nav-dropdown-item-beta">
+                        <span class="material-icons-round">science</span>
+                        <span data-i18n="nav_tool_macrodesign_beta">Macrodesign Beta</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- DESIGN Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn nav-phase-design">
+                    <span class="material-icons-round text-sm">architecture</span>
+                    <span data-i18n="nav_phase_design">Design</span>
+                    <span class="material-icons-round text-xs nav-chevron">expand_more</span>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="analyse-media-techno.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">devices</span>
+                        <span data-i18n="nav_tool_media">Analyse médiatique et technologique</span>
+                    </a>
+                    <a href="configuration.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">tune</span>
+                        <span data-i18n="nav_tool_portrait">Portrait du cours</span>
+                    </a>
+                    <a href="macrodesign.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">account_tree</span>
+                        <span data-i18n="nav_tool_macrodesign">Macrodesign</span>
+                    </a>
+                    <a href="macrodesign-beta.html" class="nav-dropdown-item nav-dropdown-item-beta">
+                        <span class="material-icons-round">science</span>
+                        <span data-i18n="nav_tool_macrodesign_beta">Macrodesign Beta</span>
+                    </a>
+                    <a href="microdesign.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">view_timeline</span>
+                        <span data-i18n="nav_tool_microdesign">Microdesign</span>
+                    </a>
+                    <a href="microdesign-beta.html" class="nav-dropdown-item nav-dropdown-item-beta">
+                        <span class="material-icons-round">science</span>
+                        <span data-i18n="nav_tool_microdesign_beta">Microdesign Beta</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- DÉVELOPPEMENT Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn nav-phase-development">
+                    <span class="material-icons-round text-sm">build</span>
+                    <span data-i18n="nav_phase_development">Développement</span>
+                    <span class="material-icons-round text-xs nav-chevron">expand_more</span>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="microdesign.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">view_timeline</span>
+                        <span data-i18n="nav_tool_microdesign">Microdesign</span>
+                    </a>
+                    <a href="microdesign-beta.html" class="nav-dropdown-item nav-dropdown-item-beta">
+                        <span class="material-icons-round">science</span>
+                        <span data-i18n="nav_tool_microdesign_beta">Microdesign Beta</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- IMPLÉMENTATION (pas d'outils actuellement) -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn nav-phase-implementation nav-disabled" disabled>
+                    <span class="material-icons-round text-sm">play_circle</span>
+                    <span data-i18n="nav_phase_implementation">Implémentation</span>
+                </button>
+            </div>
+
+            <!-- ÉVALUATION Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn nav-phase-evaluation">
+                    <span class="material-icons-round text-sm">assessment</span>
+                    <span data-i18n="nav_phase_evaluation">Évaluation</span>
+                    <span class="material-icons-round text-xs nav-chevron">expand_more</span>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="evaluation.html" class="nav-dropdown-item">
+                        <span class="material-icons-round">assessment</span>
+                        <span data-i18n="nav_tool_evaluation">Plan d'évaluation</span>
+                    </a>
+                </div>
+            </div>
 
             <!-- Language Selector -->
             <div class="lang-selector">
@@ -75,6 +154,7 @@
 </nav>
 
 <style>
+/* Base nav link */
 .nav-link {
     color: #5a5a5a;
     text-decoration: none;
@@ -86,7 +166,6 @@
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    text-transform: lowercase;
 }
 
 .nav-link:hover {
@@ -107,24 +186,160 @@
     font-size: 1rem;
 }
 
-.nav-link-beta {
+/* Dropdown container */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown button (ADDIE phases) */
+.nav-dropdown-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.nav-dropdown-btn .nav-chevron {
+    transition: transform 0.2s ease;
+}
+
+.nav-dropdown:hover .nav-dropdown-btn .nav-chevron {
+    transform: rotate(180deg);
+}
+
+/* ADDIE Phase colors */
+.nav-phase-analyse {
+    color: #2563eb;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+.nav-phase-analyse:hover, .nav-dropdown:hover .nav-phase-analyse {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.nav-phase-design {
+    color: #9333ea;
+    background: #faf5ff;
+    border-color: #e9d5ff;
+}
+.nav-phase-design:hover, .nav-dropdown:hover .nav-phase-design {
+    background: #f3e8ff;
+    border-color: #d8b4fe;
+}
+
+.nav-phase-development {
+    color: #16a34a;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+.nav-phase-development:hover, .nav-dropdown:hover .nav-phase-development {
+    background: #dcfce7;
+    border-color: #86efac;
+}
+
+.nav-phase-implementation {
+    color: #ea580c;
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.nav-phase-implementation:hover, .nav-dropdown:hover .nav-phase-implementation {
+    background: #ffedd5;
+    border-color: #fdba74;
+}
+
+.nav-phase-evaluation {
+    color: #dc2626;
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+.nav-phase-evaluation:hover, .nav-dropdown:hover .nav-phase-evaluation {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
+/* Disabled state */
+.nav-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Dropdown menu */
+.nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 280px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(4px);
+}
+
+/* Dropdown items */
+.nav-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #334155;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease;
+}
+
+.nav-dropdown-item:hover {
+    background: #f1f5f9;
+    color: #912338;
+}
+
+.nav-dropdown-item .material-icons-round {
+    font-size: 1.25rem;
+    color: #64748b;
+}
+
+.nav-dropdown-item:hover .material-icons-round {
+    color: #912338;
+}
+
+/* Beta items */
+.nav-dropdown-item-beta {
     color: #b45309;
-    border: 1px dashed #fbbf24;
     background: #fffbeb;
+    border: 1px dashed #fcd34d;
 }
 
-.nav-link-beta:hover {
-    color: #92400e;
+.nav-dropdown-item-beta:hover {
     background: #fef3c7;
-    border-color: #f59e0b;
+    color: #92400e;
 }
 
-.nav-link-beta.active {
-    color: #ffffff;
-    background: linear-gradient(135deg, #d97706, #b45309);
-    border-color: transparent;
+.nav-dropdown-item-beta .material-icons-round {
+    color: #d97706;
 }
 
+/* Language selector */
 .lang-selector {
     display: inline-flex;
     align-items: center;
@@ -155,5 +370,23 @@
 .lang-selector:hover {
     background: #e2e8f0;
     border-color: #cbd5e1;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .nav-dropdown-menu {
+        position: fixed;
+        left: 1rem;
+        right: 1rem;
+        min-width: auto;
+    }
+
+    .nav-dropdown-btn span:not(.material-icons-round) {
+        display: none;
+    }
+
+    .nav-dropdown-btn {
+        padding: 0.5rem;
+    }
 }
 </style>
