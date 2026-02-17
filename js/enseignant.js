@@ -329,6 +329,11 @@ suggestionsToggle.addEventListener('change', function () {
     }
 });
 
+// ── Initialize suggestions visibility on page load ───────────────────────────
+if (suggestionsToggle.checked) {
+    body.classList.add('show-suggestions');
+}
+
 // ── Save ─────────────────────────────────────────────────────────────────────
 function saveData() {
     var data = {
@@ -680,8 +685,8 @@ function resetForm() {
     document.getElementById('personaForm').reset();
     toggle.checked = false;
     body.classList.remove('show-context');
-    suggestionsToggle.checked = false;
-    body.classList.remove('show-suggestions');
+    suggestionsToggle.checked = true;
+    body.classList.add('show-suggestions');
     handleSectorChange('');
 
     // Reset sliders to default values
