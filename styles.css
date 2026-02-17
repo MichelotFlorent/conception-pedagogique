@@ -41,6 +41,8 @@
 }
 
 /* Dyslexia-friendly mode */
+html.dyslexic-font,
+html.dyslexic-font *,
 body.dyslexic-font,
 body.dyslexic-font * {
   font-family: 'OpenDyslexic', sans-serif !important;

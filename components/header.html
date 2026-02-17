@@ -451,25 +451,3 @@
     }
 }
 </style>
-
-<script>
-// Dyslexic font toggle function
-function toggleDyslexicFont(enabled) {
-    if (enabled) {
-        document.body.classList.add('dyslexic-font');
-        localStorage.setItem('dyslexicFont', 'true');
-    } else {
-        document.body.classList.remove('dyslexic-font');
-        localStorage.setItem('dyslexicFont', 'false');
-    }
-}
-
-// Initialize dyslexic font state on page load
-(function() {
-    var toggle = document.getElementById('globalDyslexicToggle');
-    if (toggle && localStorage.getItem('dyslexicFont') === 'true') {
-        toggle.checked = true;
-        document.body.classList.add('dyslexic-font');
-    }
-})();
-</script>

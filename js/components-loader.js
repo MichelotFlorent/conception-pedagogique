@@ -12,6 +12,48 @@
     };
 
     // ========================================
+    // Dyslexic Font Toggle (Accessibility)
+    // ========================================
+
+    // Apply dyslexic font immediately if stored preference exists
+    // This prevents flash of default font on page load
+    (function initDyslexicFontEarly() {
+        try {
+            if (localStorage.getItem('dyslexicFont') === 'true') {
+                document.documentElement.classList.add('dyslexic-font');
+                if (document.body) {
+                    document.body.classList.add('dyslexic-font');
+                }
+            }
+        } catch (e) {}
+    })();
+
+    // Global toggle function called by the header checkbox
+    window.toggleDyslexicFont = function (enabled) {
+        if (enabled) {
+            document.documentElement.classList.add('dyslexic-font');
+            document.body.classList.add('dyslexic-font');
+            localStorage.setItem('dyslexicFont', 'true');
+        } else {
+            document.documentElement.classList.remove('dyslexic-font');
+            document.body.classList.remove('dyslexic-font');
+            localStorage.setItem('dyslexicFont', 'false');
+        }
+    };
+
+    // Sync the toggle checkbox state with stored preference
+    function syncDyslexicFontToggle() {
+        var toggle = document.getElementById('globalDyslexicToggle');
+        if (toggle) {
+            var isEnabled = localStorage.getItem('dyslexicFont') === 'true';
+            toggle.checked = isEnabled;
+            if (isEnabled) {
+                document.body.classList.add('dyslexic-font');
+            }
+        }
+    }
+
+    // ========================================
     // Global Language Switching
     // ========================================
     window.switchGlobalLang = function (code) {
@@ -121,6 +163,7 @@
         }).then(function () {
             markActiveNavLink();
             syncGlobalLangSelector();
+            syncDyslexicFontToggle();
             // Apply translations to newly loaded components
             if (typeof i18nCore !== 'undefined' && i18nCore.applyTranslations) {
                 i18nCore.applyTranslations(document.getElementById('app-header-mount'));
